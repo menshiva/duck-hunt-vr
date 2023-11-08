@@ -22,6 +22,9 @@
 !/Content/**/*.png
 !/Content/**/*.umap
 
+# Do not ignore README.md.
+!README.md
+
 # OS/platform generated files.
 
 # Windows
