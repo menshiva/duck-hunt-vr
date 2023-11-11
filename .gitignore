@@ -20,6 +20,8 @@
 # files if adding them here.
 !/Content/**/*.uasset
 !/Content/**/*.png
+!/Content/**/*.wav
+!/Content/**/*.obj
 !/Content/**/*.umap
 
 # Do not ignore README.md.
