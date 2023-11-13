@@ -26,12 +26,12 @@
 ### Hand models and animations (for controllers)
 
 > ⚠️ Some blueprints were changed to use components instead of actors, to use UE5 enhanced input system and to implement
-custom hand positions for holding a gun, but in general the original content was used.
+custom hand positions when holding a gun, but in general the original content was used.
 
 * https://github.com/oculus-samples/Unreal-Locomotion/tree/main/Content/Hands
 
 ### NES Zapper model
 
-> ⚠️ Battery was removed from the model.
+> ⚠️ Battery was removed.
 
 * "NES Zapper (PBR)" (https://skfb.ly/zMSW) by Yogensia is licensed under CC Attribution-NonCommercial-ShareAlike (http://creativecommons.org/licenses/by-nc-sa/4.0/).
