@@ -1,6 +1,8 @@
 #include "Gun.h"
 #include "Sound/SoundCue.h"
 #include "Components/AudioComponent.h"
+#include "Haptics/HapticFeedbackEffect_Curve.h"
+#include "OculusXRInputFunctionLibrary.h"
 
 UGun::UGun() {
 	PrimaryComponentTick.bStartWithTickEnabled = false;
@@ -20,21 +22,29 @@ UGun::UGun() {
 	m_pShootSound = CreateDefaultSubobject<UAudioComponent>(TEXT("ShootSound"));
 	m_pShootSound->SetupAttachment(this);
 
+	m_pShootSound->PrimaryComponentTick.bStartWithTickEnabled = false;
+	m_pShootSound->PrimaryComponentTick.bCanEverTick = false;
+	m_pShootSound->PrimaryComponentTick.bAllowTickOnDedicatedServer = false;
+
 	struct FConstructorStatics {
 		ConstructorHelpers::FObjectFinder<UStaticMesh> GunMesh;
 		ConstructorHelpers::FObjectFinder<USoundCue> GunSound;
+		ConstructorHelpers::FObjectFinder<UHapticFeedbackEffect_Curve> GunHaptic;
 
 		FConstructorStatics() :
 		GunMesh(TEXT("/Script/Engine.StaticMesh'/Game/DuckHuntVr/Characters/Player/Gun/Model/SM_Gun.SM_Gun'")),
-		GunSound(TEXT("/Script/Engine.SoundCue'/Game/DuckHuntVr/Characters/Player/Gun/Audio/A_Gun_Cue.A_Gun_Cue'"))
+		GunSound(TEXT("/Script/Engine.SoundCue'/Game/DuckHuntVr/Characters/Player/Gun/Audio/A_Gun_Cue.A_Gun_Cue'")),
+		GunHaptic(TEXT("/Script/Engine.HapticFeedbackEffect_Curve'/Game/DuckHuntVr/Characters/Player/Gun/Haptics/HFC_GunFire.HFC_GunFire'"))
 		{}
 	};
 	static const FConstructorStatics ConstructorStatics;
 
-	UStaticMeshComponent::SetStaticMesh(ConstructorStatics.GunMesh.Object.Get());
-	m_pShootSound->SetSound(ConstructorStatics.GunSound.Object.Get());
+	UStaticMeshComponent::SetStaticMesh(ConstructorStatics.GunMesh.Object);
+	m_pShootSound->SetSound(ConstructorStatics.GunSound.Object);
+	m_pHapticFeedbackEffect = ConstructorStatics.GunHaptic.Object;
 }
 
-void UGun::Shoot() const {
+void UGun::Shoot(const EControllerHand Hand) const {
 	m_pShootSound->Play();
+	UOculusXRInputFunctionLibrary::PlayCurveHapticEffect(m_pHapticFeedbackEffect, Hand);
 }
