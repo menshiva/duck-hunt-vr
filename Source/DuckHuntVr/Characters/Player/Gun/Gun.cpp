@@ -19,12 +19,12 @@ UGun::UGun() {
 
 	SetCastShadow(false);
 
-	m_pShootSound = CreateDefaultSubobject<UAudioComponent>(TEXT("ShootSound"));
-	m_pShootSound->SetupAttachment(this);
+	ShootSound = CreateDefaultSubobject<UAudioComponent>(TEXT("ShootSound"));
+	ShootSound->SetupAttachment(this);
 
-	m_pShootSound->PrimaryComponentTick.bStartWithTickEnabled = false;
-	m_pShootSound->PrimaryComponentTick.bCanEverTick = false;
-	m_pShootSound->PrimaryComponentTick.bAllowTickOnDedicatedServer = false;
+	ShootSound->PrimaryComponentTick.bStartWithTickEnabled = false;
+	ShootSound->PrimaryComponentTick.bCanEverTick = false;
+	ShootSound->PrimaryComponentTick.bAllowTickOnDedicatedServer = false;
 
 	struct FConstructorStatics {
 		ConstructorHelpers::FObjectFinder<UStaticMesh> GunMesh;
@@ -40,11 +40,11 @@ UGun::UGun() {
 	static const FConstructorStatics ConstructorStatics;
 
 	UStaticMeshComponent::SetStaticMesh(ConstructorStatics.GunMesh.Object);
-	m_pShootSound->SetSound(ConstructorStatics.GunSound.Object);
-	m_pHapticFeedbackEffect = ConstructorStatics.GunHaptic.Object;
+	ShootSound->SetSound(ConstructorStatics.GunSound.Object);
+	HapticFeedbackEffect = ConstructorStatics.GunHaptic.Object;
 }
 
 void UGun::Shoot(const EControllerHand Hand) const {
-	m_pShootSound->Play();
-	UOculusXRInputFunctionLibrary::PlayCurveHapticEffect(m_pHapticFeedbackEffect, Hand);
+	ShootSound->Play();
+	UOculusXRInputFunctionLibrary::PlayCurveHapticEffect(HapticFeedbackEffect, Hand);
 }
