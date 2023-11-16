@@ -4,7 +4,7 @@
 
 class UHapticFeedbackEffect_Curve;
 
-UCLASS(NotBlueprintable, NotBlueprintType, meta=(BlueprintSpawnableComponent))
+UCLASS(NotBlueprintable, NotBlueprintType, NotPlaceable, meta=(BlueprintSpawnableComponent))
 class DUCKHUNTVR_API UGun : public UStaticMeshComponent {
 	GENERATED_BODY()
 public:

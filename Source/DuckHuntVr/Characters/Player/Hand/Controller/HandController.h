@@ -4,7 +4,7 @@
 
 class UGun;
 
-UCLASS()
+UCLASS(NotBlueprintable, NotPlaceable, meta=(BlueprintSpawnableComponent))
 class DUCKHUNTVR_API UHandController : public USkeletalMeshComponent {
 	GENERATED_BODY()
 
