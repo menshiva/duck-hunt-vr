@@ -2,8 +2,6 @@
 #include "DuckHuntVr/Characters/Player/Gun/Gun.h"
 
 UHandController::UHandController() {
-	PrimaryComponentTick.bStartWithTickEnabled = false;
-	// PrimaryComponentTick.bCanEverTick = false; // Tick is needed for HasGun and animations to work
 	PrimaryComponentTick.bAllowTickOnDedicatedServer = false;
 
 	SetAllowClothActors(false);
