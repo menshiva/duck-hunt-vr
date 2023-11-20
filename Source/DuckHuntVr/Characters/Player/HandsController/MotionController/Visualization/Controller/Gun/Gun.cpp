@@ -4,10 +4,9 @@
 #include "OculusXRInputFunctionLibrary.h"
 #include "Sound/SoundCue.h"
 #include "Components/AudioComponent.h"
-#include "DuckHuntVr/Characters/Player/HandsController/HandsController.h"
-#include "DuckHuntVr/Characters/Player/HandsController/MotionController/HandMotionController.h"
 #include "DuckHuntVr/Characters/Player/HandsController/MotionController/Visualization/Controller/HandController.h"
 #include "Haptics/HapticFeedbackEffect_Curve.h"
+#include "Kismet/GameplayStatics.h"
 
 UGun::UGun() {
 	PrimaryComponentTick.bStartWithTickEnabled = false;
@@ -69,7 +68,7 @@ void UGun::EndPlay(const EEndPlayReason::Type EndPlayReason) {
 }
 
 void UGun::InitFireMappingContext() {
-	if (const auto PlayerController = Cast<APlayerController>(ParentHandController->GetMotionController()->GetHandsController()->GetCharacter()->GetController())) {
+	if (const auto PlayerController = UGameplayStatics::GetPlayerController(this, 0)) {
 		if (const auto Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer()))
 			Subsystem->AddMappingContext(ParentHandController->GetFireMappingContext(), 0);
 
@@ -79,7 +78,7 @@ void UGun::InitFireMappingContext() {
 }
 
 void UGun::RemoveFireMappingContext() const {
-	if (const auto PlayerController = Cast<APlayerController>(ParentHandController->GetMotionController()->GetHandsController()->GetCharacter()->GetController()))
+	if (const auto PlayerController = UGameplayStatics::GetPlayerController(this, 0))
 		if (const auto Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer()))
 			Subsystem->RemoveMappingContext(ParentHandController->GetFireMappingContext());
 }
@@ -87,5 +86,5 @@ void UGun::RemoveFireMappingContext() const {
 // ReSharper disable once CppMemberFunctionMayBeConst
 void UGun::Fire() {
 	FireAudioComponent->Play();
-	UOculusXRInputFunctionLibrary::PlayCurveHapticEffect(HapticFeedbackEffect.Get(), ParentHandController->GetMotionController()->GetHandType());
+	UOculusXRInputFunctionLibrary::PlayCurveHapticEffect(HapticFeedbackEffect.Get(), ParentHandController->GetHandType());
 }

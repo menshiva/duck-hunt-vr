@@ -26,7 +26,7 @@
 ### Hand models and animations (for controllers)
 
 > ⚠️ Hand blueprints were rewritten in C++, and some logic was rewritten to:
-> 1) Make hands be components instead of actors
+> 1) Make hands components instead of actors
 > 2) Use UE5 enhanced input system
 > 3) Implement custom hand positions when holding a gun
 >

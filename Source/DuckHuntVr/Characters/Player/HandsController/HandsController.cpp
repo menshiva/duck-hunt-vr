@@ -1,6 +1,7 @@
 ﻿#include "HandsController.h"
 #include "OculusXRInputFunctionLibrary.h"
 #include "MotionController/HandMotionController.h"
+#include "MotionController/Visualization/Tracked/HandTracked.h"
 
 UHandsController::UHandsController() {
 	PrimaryComponentTick.bStartWithTickEnabled = true;
@@ -12,11 +13,11 @@ UHandsController::UHandsController() {
 	UActorComponent::SetAutoActivate(true);
 
 	LeftController = CreateDefaultSubobject<UHandMotionController>(TEXT("LeftMotionController"));
-	LeftController->Init(this, EControllerHand::Left);
+	LeftController->Init(EControllerHand::Left);
 	LeftController->SetupAttachment(this);
 
 	RightController = CreateDefaultSubobject<UHandMotionController>(TEXT("RightMotionController"));
-	RightController->Init(this, EControllerHand::Right);
+	RightController->Init(EControllerHand::Right);
 	RightController->SetupAttachment(this);
 }
 
@@ -26,8 +27,112 @@ void UHandsController::TickComponent(const float Dt, const ELevelTick Tt, FActor
 }
 
 void UHandsController::SetPrimaryHandType(const EControllerHand NewPrimaryHand) {
+	if (PrimaryHand == NewPrimaryHand)
+		return;
+
+	if (CurrentVisualizationType == EControllerVisualizationType::Controller)
+		SwapPrimaryControllerVisualization();
+	else if (CurrentVisualizationType == EControllerVisualizationType::Hands)
+		SwapPrimaryHandsVisualization();
+	else
+		check(CurrentVisualizationType == EControllerVisualizationType::None);
+
 	PrimaryHand = NewPrimaryHand;
-	// TODO
+}
+
+void UHandsController::DeterminePrimaryController(
+	UHandController* LeftHandController, UHandController* RightHandController,
+	UHandController*& PrimaryHandController, UHandController*& SecondaryHandController,
+	const FTransform*& PrimaryGunTransformPtr, const FTransform*& SecondaryGunTransformPtr
+) const {
+	PrimaryHandController = LeftHandController;
+	SecondaryHandController = RightHandController;
+
+	PrimaryGunTransformPtr = &LeftGunTransform;
+	SecondaryGunTransformPtr = &RightGunTransform;
+
+	check(PrimaryHand == EControllerHand::Left || PrimaryHand == EControllerHand::Right);
+	if (PrimaryHand == EControllerHand::Right) {
+		Swap(PrimaryHandController, SecondaryHandController);
+		Swap(PrimaryGunTransformPtr, SecondaryGunTransformPtr);
+	}
+}
+
+void UHandsController::SetControllerVisualization() {
+	UHandController* PrimaryController, *SecondaryController;
+	const FTransform* PrimaryGunTransformPtr, *SecondaryGunTransformPtr;
+
+	DeterminePrimaryController(
+		LeftController->SetControllerVisualization(LeftHandControllerInitStatics),
+		RightController->SetControllerVisualization(RightHandControllerInitStatics),
+		PrimaryController, SecondaryController,
+		PrimaryGunTransformPtr, SecondaryGunTransformPtr
+	);
+
+	const auto Gun = NewObject<UGun>(this);
+	Gun->Init(PrimaryController, *PrimaryGunTransformPtr, GunInitStatics);
+	PrimaryController->SetGun(Gun);
+}
+
+void UHandsController::SwapPrimaryControllerVisualization() const {
+	UHandController* PrimaryController, *SecondaryController;
+	const FTransform* PrimaryGunTransformPtr, *SecondaryGunTransformPtr;
+
+	DeterminePrimaryController(
+		CastChecked<UHandController>(LeftController->GetHandMesh()),
+		CastChecked<UHandController>(RightController->GetHandMesh()),
+		PrimaryController, SecondaryController,
+		PrimaryGunTransformPtr, SecondaryGunTransformPtr
+	);
+
+	check(PrimaryController->IsPrimary());
+	check(!SecondaryController->IsPrimary());
+
+	const auto Gun = PrimaryController->GetGun();
+	PrimaryController->SetGun(nullptr);
+	Gun->Reattach(SecondaryController, *SecondaryGunTransformPtr);
+	SecondaryController->SetGun(Gun);
+}
+
+void UHandsController::DeterminePrimaryHand(
+	UHandTracked* LeftHandTracked, UHandTracked* RightHandTracked,
+	UHandTracked*& PrimaryHandTracked, UHandTracked*& SecondaryHandTracked
+) const {
+	PrimaryHandTracked = LeftHandTracked;
+	SecondaryHandTracked = RightHandTracked;
+
+	check(PrimaryHand == EControllerHand::Left || PrimaryHand == EControllerHand::Right);
+	if (PrimaryHand == EControllerHand::Right)
+		Swap(PrimaryHandTracked, SecondaryHandTracked);
+}
+
+void UHandsController::SetHandsVisualization() const {
+	UHandTracked* PrimaryHandTracked, *SecondaryHandTracked;
+
+	DeterminePrimaryHand(
+		LeftController->SetHandsVisualization(),
+		RightController->SetHandsVisualization(),
+		PrimaryHandTracked, SecondaryHandTracked
+	);
+
+	PrimaryHandTracked->SetPrimary(true, PrimaryHandTrackedMaterial);
+	SecondaryHandTracked->SetPrimary(false, SecondaryHandTrackedMaterial);
+}
+
+void UHandsController::SwapPrimaryHandsVisualization() const {
+	UHandTracked* PrimaryHandTracked, *SecondaryHandTracked;
+
+	DeterminePrimaryHand(
+		CastChecked<UHandTracked>(LeftController->GetHandMesh()),
+		CastChecked<UHandTracked>(RightController->GetHandMesh()),
+		PrimaryHandTracked, SecondaryHandTracked
+	);
+
+	check(PrimaryHandTracked->IsPrimary());
+	check(!SecondaryHandTracked->IsPrimary());
+
+	SecondaryHandTracked->SetPrimary(true, PrimaryHandTrackedMaterial);
+	PrimaryHandTracked->SetPrimary(false, SecondaryHandTrackedMaterial);
 }
 
 UHandsController::EControllerVisualizationType UHandsController::GetNewVisualizationType() const {
@@ -38,31 +143,7 @@ UHandsController::EControllerVisualizationType UHandsController::GetNewVisualiza
 	return EControllerVisualizationType::None;
 }
 
-void UHandsController::SetControllerVisualization() {
-	auto PrimaryController = LeftController->SetControllerVisualization(LeftHandControllerInitStatics);
-	auto PrimaryGunTransformPtr = &LeftGunTransform;
-
-	auto SecondaryController = RightController->SetControllerVisualization(RightHandControllerInitStatics);
-	auto SecondaryGunTransformPtr = &RightGunTransform;
-
-	check(PrimaryHand == EControllerHand::Left || PrimaryHand == EControllerHand::Right);
-	if (PrimaryHand == EControllerHand::Right) {
-		Swap(PrimaryController, SecondaryController);
-		Swap(PrimaryGunTransformPtr, SecondaryGunTransformPtr);
-	}
-
-	const auto Gun = NewObject<UGun>(this);
-	Gun->Init(PrimaryController, *PrimaryGunTransformPtr, GunInitStatics);
-	PrimaryController->SetGun(Gun);
-}
-
-void UHandsController::SetHandsVisualization() const {
-	LeftController->SetHandsVisualization();
-	RightController->SetHandsVisualization();
-}
-
 void UHandsController::UpdateControllersVisualizationIfNeeded() {
-	static auto CurrentVisualizationType = EControllerVisualizationType::None;
 	const auto NewVisualizationType = GetNewVisualizationType();
 
 	if (NewVisualizationType != CurrentVisualizationType) {

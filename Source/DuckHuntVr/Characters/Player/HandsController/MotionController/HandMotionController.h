@@ -3,9 +3,9 @@
 #include "MotionControllerComponent.h"
 #include "HandMotionController.generated.h"
 
-class UHandsController;
 class UHandController;
 struct FHandControllerInitStatics;
+class UHandTracked;
 
 UCLASS(NotBlueprintable, NotBlueprintType, NotPlaceable)
 class DUCKHUNTVR_API UHandMotionController : public UMotionControllerComponent {
@@ -13,17 +13,17 @@ class DUCKHUNTVR_API UHandMotionController : public UMotionControllerComponent {
 public:
 	UHandMotionController();
 
-	void Init(UHandsController* Parent, EControllerHand Type);
+	void Init(EControllerHand Type);
 
 	void ClearVisualization();
+
 	UHandController* SetControllerVisualization(const FHandControllerInitStatics& InitData);
-	void SetHandsVisualization() const;
 
-	FORCEINLINE UHandsController* GetHandsController() const { return ParentController.Get(); }
+	UHandTracked* SetHandsVisualization();
+
 	FORCEINLINE EControllerHand GetHandType() const { return Hand; }
+	FORCEINLINE USkinnedMeshComponent* GetHandMesh() const { return HandMesh.Get(); }
 private:
-	TWeakObjectPtr<UHandsController> ParentController = nullptr;
-
 	EControllerHand Hand;
 
 	UPROPERTY()

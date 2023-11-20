@@ -2,9 +2,9 @@
 #include "EnhancedInputSubsystems.h"
 #include "EnhancedInputComponent.h"
 #include "InputMappingContext.h"
-#include "DuckHuntVr/Characters/Player/HandsController/HandsController.h"
 #include "DuckHuntVr/Characters/Player/HandsController/MotionController/HandMotionController.h"
 #include "Gun/Gun.h"
+#include "Kismet/GameplayStatics.h"
 
 UHandController::UHandController() {
 	PrimaryComponentTick.bStartWithTickEnabled = true;
@@ -52,8 +52,12 @@ void UHandController::EndPlay(const EEndPlayReason::Type EndPlayReason) {
 	RemoveAnimMappingContext();
 }
 
+EControllerHand UHandController::GetHandType() const {
+	return ParentMotionController->GetHandType();
+}
+
 void UHandController::InitAnimMappingContext(const FHandControllerInitStatics& InitData) {
-	if (const auto PlayerController = Cast<APlayerController>(ParentMotionController->GetHandsController()->GetCharacter()->GetController())) {
+	if (const auto PlayerController = UGameplayStatics::GetPlayerController(this, 0)) {
 		if (const auto Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer()))
 			Subsystem->AddMappingContext(InitData.AnimMappingContext, 0);
 
@@ -76,7 +80,7 @@ void UHandController::InitAnimMappingContext(const FHandControllerInitStatics& I
 }
 
 void UHandController::RemoveAnimMappingContext() const {
-	if (const auto PlayerController = Cast<APlayerController>(ParentMotionController->GetHandsController()->GetCharacter()->GetController()))
+	if (const auto PlayerController = UGameplayStatics::GetPlayerController(this, 0))
 		if (const auto Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer()))
 			Subsystem->RemoveMappingContext(AnimMappingContext.Get());
 }

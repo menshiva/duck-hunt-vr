@@ -54,7 +54,7 @@ public:
 
 	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 
-	FORCEINLINE UHandMotionController* GetMotionController() const { return ParentMotionController.Get(); }
+	EControllerHand GetHandType() const;
 	FORCEINLINE UInputMappingContext* GetFireMappingContext() const { return FireMappingContext.Get(); }
 	FORCEINLINE UInputAction* GetFireAction() const { return FireAction.Get(); }
 
