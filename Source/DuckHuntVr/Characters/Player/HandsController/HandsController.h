@@ -1,36 +1,14 @@
 ﻿#pragma once
 
-#include "MotionController/Visualization/Controller/HandController.h"
-#include "MotionController/Visualization/Controller/Gun/Gun.h"
+#include "DuckHuntVr/Characters/Player/Hands/Controller/ControllerVisualization.h"
 #include "HandsController.generated.h"
 
-class UHandMotionController;
-class UHandTracked;
+class UControllerVisualizationBase;
+class UTrackedVisualizationBase;
 
 UCLASS(NotBlueprintable, NotBlueprintType, NotPlaceable, meta=(BlueprintSpawnableComponent))
 class DUCKHUNTVR_API UHandsController : public USceneComponent {
 	GENERATED_BODY()
-
-	UPROPERTY(EditDefaultsOnly, Category="Init|Controller", DisplayName=Left, meta=(AllowPrivateAccess=true))
-	FHandControllerInitStatics LeftHandControllerInitStatics;
-
-	UPROPERTY(EditDefaultsOnly, Category="Init|Controller", DisplayName=Right, meta=(AllowPrivateAccess=true))
-	FHandControllerInitStatics RightHandControllerInitStatics;
-
-	UPROPERTY(EditDefaultsOnly, Category="Init|Gun", DisplayName=Gun, meta=(AllowPrivateAccess=true))
-	FGunInitStatics GunInitStatics;
-
-	UPROPERTY(EditDefaultsOnly, Category="Init|Gun", DisplayName=Left, meta=(AllowPrivateAccess=true))
-	FTransform LeftGunTransform;
-
-	UPROPERTY(EditDefaultsOnly, Category="Init|Gun", DisplayName=Right, meta=(AllowPrivateAccess=true))
-	FTransform RightGunTransform;
-
-	UPROPERTY(EditDefaultsOnly, Category="Init|Tracked", DisplayName=Primary, meta=(AllowPrivateAccess=true))
-	UMaterialInstance* PrimaryHandTrackedMaterial;
-
-	UPROPERTY(EditDefaultsOnly, Category="Init|Tracked", DisplayName=Secondary, meta=(AllowPrivateAccess=true))
-	UMaterialInstance* SecondaryHandTrackedMaterial;
 public:
 	UHandsController();
 
@@ -42,30 +20,20 @@ public:
 	UFUNCTION(BlueprintPure)
 	FORCEINLINE EControllerHand GetPrimaryHandType() const { return PrimaryHand; }
 private:
-	void DeterminePrimaryController(
-		UHandController* LeftHandController, UHandController* RightHandController,
-		UHandController*& PrimaryHandController, UHandController*& SecondaryHandController,
-		const FTransform*& PrimaryGunTransformPtr, const FTransform*& SecondaryGunTransformPtr
-	) const;
-
-	void SetControllerVisualization();
-
-	void SwapPrimaryControllerVisualization() const;
-
-	void DeterminePrimaryHand(
-		UHandTracked* LeftHandTracked, UHandTracked* RightHandTracked,
-		UHandTracked*& PrimaryHandTracked, UHandTracked*& SecondaryHandTracked
-	) const;
-
-	void SetHandsVisualization() const;
-
-	void SwapPrimaryHandsVisualization() const;
-
-	enum class EControllerVisualizationType : uint8_t { None, Controller, Hands };
-
-	EControllerVisualizationType GetNewVisualizationType() const;
-
+	EVisualizationType GetNewVisualizationType() const;
 	void UpdateControllersVisualizationIfNeeded();
+
+	UPROPERTY(EditDefaultsOnly, Category="Init|Controller", DisplayName=Left, meta=(AllowPrivateAccess=true))
+	TSubclassOf<UControllerVisualizationBase> LeftControllerVisualizationClass;
+
+	UPROPERTY(EditDefaultsOnly, Category="Init|Controller", DisplayName=Right, meta=(AllowPrivateAccess=true))
+	TSubclassOf<UControllerVisualizationBase> RightControllerVisualizationClass;
+
+	UPROPERTY(EditDefaultsOnly, Category="Init|Tracked", DisplayName=Left, meta=(AllowPrivateAccess=true))
+	TSubclassOf<UTrackedVisualizationBase> LeftTrackedVisualizationClass;
+
+	UPROPERTY(EditDefaultsOnly, Category="Init|Tracked", DisplayName=Right, meta=(AllowPrivateAccess=true))
+	TSubclassOf<UTrackedVisualizationBase> RightTrackedVisualizationClass;
 
 	// TODO: Make this a config variable
 	const bool AllowHandTracking = true;
@@ -73,11 +41,14 @@ private:
 	// TODO: Make this a config variable
 	EControllerHand PrimaryHand = EControllerHand::Right;
 
-	EControllerVisualizationType CurrentVisualizationType = EControllerVisualizationType::None;
+	EVisualizationType CurrentVisualizationType = EVisualizationType::None;
 
 	UPROPERTY()
 	TObjectPtr<UHandMotionController> LeftController;
 
 	UPROPERTY()
 	TObjectPtr<UHandMotionController> RightController;
+
+	TWeakObjectPtr<UHandMotionController> PrimaryController;
+	TWeakObjectPtr<UHandMotionController> SecondaryController;
 };

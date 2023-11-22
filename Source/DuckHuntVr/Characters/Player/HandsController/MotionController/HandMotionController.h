@@ -3,9 +3,13 @@
 #include "MotionControllerComponent.h"
 #include "HandMotionController.generated.h"
 
-class UHandController;
-struct FHandControllerInitStatics;
-class UHandTracked;
+class UControllerVisualizationBase;
+class UTrackedVisualizationBase;
+class IHandVisualizationInterface;
+
+enum class EVisualizationType : uint8_t {
+	None, Controller, Tracked
+};
 
 UCLASS(NotBlueprintable, NotBlueprintType, NotPlaceable)
 class DUCKHUNTVR_API UHandMotionController : public UMotionControllerComponent {
@@ -16,16 +20,14 @@ public:
 	void Init(EControllerHand Type);
 
 	void ClearVisualization();
-
-	UHandController* SetControllerVisualization(const FHandControllerInitStatics& InitData);
-
-	UHandTracked* SetHandsVisualization();
+	void SetControllerVisualization(TSubclassOf<UControllerVisualizationBase> ControllerVisualizationClass);
+	void SetTrackedVisualization(TSubclassOf<UTrackedVisualizationBase> TrackedVisualizationClass);
 
 	FORCEINLINE EControllerHand GetHandType() const { return Hand; }
-	FORCEINLINE USkinnedMeshComponent* GetHandMesh() const { return HandMesh.Get(); }
+	FORCEINLINE IHandVisualizationInterface* GetVisualizationComponent() const { return VisualizationComponent.GetInterface(); }
 private:
 	EControllerHand Hand;
 
 	UPROPERTY()
-	TObjectPtr<USkinnedMeshComponent> HandMesh = nullptr;
+	TScriptInterface<IHandVisualizationInterface> VisualizationComponent = nullptr;
 };

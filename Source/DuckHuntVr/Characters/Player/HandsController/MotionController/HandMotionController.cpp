@@ -1,6 +1,6 @@
 ﻿#include "HandMotionController.h"
-#include "Visualization/Controller/HandController.h"
-#include "Visualization/Tracked/HandTracked.h"
+#include "DuckHuntVr/Characters/Player/Hands/Controller/ControllerVisualization.h"
+#include "DuckHuntVr/Characters/Player/Hands/Tracked/TrackedVisualization.h"
 
 UHandMotionController::UHandMotionController() {
 	PrimaryComponentTick.bStartWithTickEnabled = true;
@@ -27,24 +27,20 @@ void UHandMotionController::Init(const EControllerHand Type) {
 }
 
 void UHandMotionController::ClearVisualization() {
-	if (HandMesh) {
-		HandMesh->DestroyComponent(true);
-		HandMesh = nullptr;
+	if (VisualizationComponent) {
+		VisualizationComponent->Destroy();
+		VisualizationComponent = nullptr;
 	}
 }
 
-UHandController* UHandMotionController::SetControllerVisualization(const FHandControllerInitStatics& InitData) {
-	check(!HandMesh);
-	const auto HandController = NewObject<UHandController>(this);
-	HandController->Init(this, InitData);
-	HandMesh = HandController;
-	return HandController;
+void UHandMotionController::SetControllerVisualization(const TSubclassOf<UControllerVisualizationBase> ControllerVisualizationClass) {
+	const auto ControllerVisualization = NewObject<UControllerVisualizationBase>(this, ControllerVisualizationClass);
+	ControllerVisualization->Init(this);
+	VisualizationComponent = ControllerVisualization;
 }
 
-UHandTracked* UHandMotionController::SetHandsVisualization() {
-	check(!HandMesh);
-	const auto HandTracked = NewObject<UHandTracked>(this);
-	HandTracked->Init(this);
-	HandMesh = HandTracked;
-	return HandTracked;
+void UHandMotionController::SetTrackedVisualization(const TSubclassOf<UTrackedVisualizationBase> TrackedVisualizationClass) {
+	const auto TrackedVisualization = NewObject<UTrackedVisualizationBase>(this, TrackedVisualizationClass);
+	TrackedVisualization->Init(this);
+	VisualizationComponent = TrackedVisualization;
 }
