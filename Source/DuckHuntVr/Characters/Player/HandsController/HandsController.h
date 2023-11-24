@@ -1,6 +1,6 @@
 ﻿#pragma once
 
-#include "DuckHuntVr/Characters/Player/Hands/Controller/ControllerVisualization.h"
+#include "MotionController/HandMotionController.h"
 #include "HandsController.generated.h"
 
 class UControllerVisualizationBase;

@@ -1,5 +1,6 @@
 ﻿#include "HandsController.h"
 #include "OculusXRInputFunctionLibrary.h"
+#include "DuckHuntVr/Characters/Player/Hands/HandVisualizationInterface.h"
 
 UHandsController::UHandsController() {
 	PrimaryComponentTick.bStartWithTickEnabled = true;

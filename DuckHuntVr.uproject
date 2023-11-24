@@ -29,6 +29,10 @@
 				"Win64",
 				"Android"
 			]
+		},
+		{
+			"Name": "OculusAudio",
+			"Enabled": true
 		}
 	],
 	"TargetPlatforms": [

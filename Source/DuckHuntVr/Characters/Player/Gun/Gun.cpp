@@ -2,7 +2,7 @@
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "Components/AudioComponent.h"
-#include "..\Hands\Controller\ControllerVisualization.h"
+#include "DuckHuntVr/Characters/Player/Hands/Controller/ControllerVisualization.h"
 #include "Haptics/HapticFeedbackEffect_Curve.h"
 #include "Kismet/GameplayStatics.h"
 
@@ -44,6 +44,8 @@ void UGunComponentBase::Init(UControllerVisualizationBase* Parent, const bool Sh
 		check(IsRegistered());
 
 	AttachToComponent(Parent, FAttachmentTransformRules::KeepRelativeTransform);
+	FireAudioComponent->AttachToComponent(this, FAttachmentTransformRules::KeepRelativeTransform);
+
 	InitFireMappingContext(HandInitData);
 }
 
