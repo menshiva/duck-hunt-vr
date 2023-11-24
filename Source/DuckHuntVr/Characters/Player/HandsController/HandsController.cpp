@@ -36,7 +36,8 @@ void UHandsController::SetPrimaryHandType(const EControllerHand NewPrimaryHand) 
 	if (PrimaryHand == NewPrimaryHand)
 		return;
 
-	PrimaryController->GetVisualizationComponent()->SwapPrimary(SecondaryController->GetVisualizationComponent());
+	if (CurrentVisualizationType != EVisualizationType::None)
+		PrimaryController->GetVisualizationComponent()->SwapPrimary(SecondaryController->GetVisualizationComponent());
 	Swap(PrimaryController, SecondaryController);
 
 	PrimaryHand = NewPrimaryHand;
