@@ -15,6 +15,17 @@ UTrackedVisualizationBase::UTrackedVisualizationBase() {
 
 void UTrackedVisualizationBase::Init(UHandMotionController* Parent) {
 	IHandVisualizationInterface::Init(Parent);
+
+	// We have to create a dynamic material instance based on the assigned MaterialOverride BEFORE skeletal mesh is
+	// initialized (UOculusXRHandComponent::bSkeletalMeshInitialized) and then replace MaterialOverride with it so that
+	// it will be initialized with this dynamic material and we will have the ability to control its parameters during runtime.
+	// That's because UOculusXRHandComponent::InitializeSkeletalMesh() is called only once during BeginPlay() in shipping mode
+	// and there is no specific function to update hand mesh material or the mesh itself (SetMaterial(0, ...) can't be used too
+	// because it can be overwritten by UOculusXRHandComponent::SystemGestureMaterial during runtime), so this is kinda hacky.
+	check(MaterialOverride != nullptr);
+	DynamicHandMaterial = CreateDynamicMaterialInstance(0, MaterialOverride);
+	MaterialOverride = DynamicHandMaterial.Get();
+
 	RegisterComponent();
 	AttachToComponent(Parent, FAttachmentTransformRules::KeepRelativeTransform);
 }
@@ -23,12 +34,10 @@ void UTrackedVisualizationBase::Destroy() {
 	DestroyComponent(true);
 }
 
-void UTrackedVisualizationBase::SetPrimary(const bool Primary) {
-	IHandVisualizationInterface::SetPrimary(Primary);
-	if (Primary) {
-		MaterialOverride = PrimaryMaterial;
-		bSkeletalMeshInitialized = false; // Force the mesh to be reinitialized
-	}
+void UTrackedVisualizationBase::SetPrimary(const bool InitPrimary) {
+	IHandVisualizationInterface::SetPrimary(InitPrimary);
+	Primary = InitPrimary;
+	UpdateHandMaterialColor();
 }
 
 void UTrackedVisualizationBase::SwapPrimary(IHandVisualizationInterface* OtherHandVisualization) {
@@ -36,12 +45,8 @@ void UTrackedVisualizationBase::SwapPrimary(IHandVisualizationInterface* OtherHa
 	check(Cast<UTrackedVisualizationBase>(OtherHandVisualization) != nullptr);
 
 	const auto Secondary = CastChecked<UTrackedVisualizationBase>(OtherHandVisualization);
-	Swap(MaterialOverride, Secondary->MaterialOverride);
+	Swap(Primary, Secondary->Primary);
 
-	// Force meshes reinitialization
-	// (I can use SetMaterial(0, MaterialOverride) as in UOculusXRHandComponent::InitializeSkeletalMesh(), but this won't
-	// update UOculusXRHandComponent::CachedBaseMaterial and this variable is private, so, as far as I can see, there is
-	// no other way than to force UOculusXRHandComponent::Tick() to fully reinitialize the skeletal mesh with the new material...)
-	bSkeletalMeshInitialized = false;
-	Secondary->bSkeletalMeshInitialized = false;
+	UpdateHandMaterialColor();
+	Secondary->UpdateHandMaterialColor();
 }

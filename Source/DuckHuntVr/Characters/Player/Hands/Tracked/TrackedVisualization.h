@@ -13,10 +13,15 @@ public:
 	virtual void Init(UHandMotionController* Parent) override;
 	virtual void Destroy() override;
 
-	virtual void SetPrimary(bool Primary) override;
+	virtual void SetPrimary(bool InitPrimary) override;
 	virtual void SwapPrimary(IHandVisualizationInterface* OtherHandVisualization) override;
-	virtual bool IsPrimary() const override { return MaterialOverride == PrimaryMaterial; }
-protected:
-	UPROPERTY(EditDefaultsOnly, Category=Init)
-	UMaterialInstance* PrimaryMaterial;
+	virtual bool IsPrimary() const override { return Primary; }
+private:
+	FORCEINLINE void UpdateHandMaterialColor() const {
+		DynamicHandMaterial->SetScalarParameterValue(TEXT("Primary"), IsPrimary());
+	}
+
+	TWeakObjectPtr<UMaterialInstanceDynamic> DynamicHandMaterial = nullptr;
+
+	bool Primary = false;
 };

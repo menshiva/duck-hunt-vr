@@ -18,7 +18,7 @@ public:
 	virtual void Init(UHandMotionController* Parent) override;
 	virtual void Destroy() override;
 
-	virtual void SetPrimary(bool Primary) override;
+	virtual void SetPrimary(bool InitPrimary) override;
 	virtual void SwapPrimary(IHandVisualizationInterface* OtherHandVisualization) override;
 
 	UFUNCTION(BlueprintPure)

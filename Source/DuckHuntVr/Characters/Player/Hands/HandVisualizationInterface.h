@@ -18,7 +18,7 @@ public:
 
 	virtual void Destroy() = 0;
 
-	virtual void SetPrimary(bool Primary) {
+	virtual void SetPrimary(bool InitPrimary) {
 		check(!IsPrimary()); // ensure that we call this function only after Init (both hands should be secondary). To swap hands, use SwapPrimary()
 	}
 

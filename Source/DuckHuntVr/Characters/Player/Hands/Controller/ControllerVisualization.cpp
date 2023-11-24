@@ -43,9 +43,9 @@ void UControllerVisualizationBase::Destroy() {
 	DestroyComponent(true);
 }
 
-void UControllerVisualizationBase::SetPrimary(const bool Primary) {
-	IHandVisualizationInterface::SetPrimary(Primary);
-	if (Primary) {
+void UControllerVisualizationBase::SetPrimary(const bool InitPrimary) {
+	IHandVisualizationInterface::SetPrimary(InitPrimary);
+	if (InitPrimary) {
 		GunComponent = NewObject<UGunComponentBase>(this, GunClass);
 		GunComponent->Init(this);
 	}
