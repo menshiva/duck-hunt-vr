@@ -21,21 +21,24 @@ struct FGunInitPerHand {
 
 class UControllerVisualizationBase;
 class UHapticFeedbackEffect_Curve;
+class ULaser;
 
 UCLASS(Abstract, Blueprintable, NotBlueprintType, NotPlaceable)
 class DUCKHUNTVR_API UGunComponentBase : public UStaticMeshComponent {
 	GENERATED_BODY()
 public:
 	UGunComponentBase();
+
 	void Init(UControllerVisualizationBase* Parent, bool ShouldRegister = true);
-	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 	void SetNewParentControllerVisualization(UControllerVisualizationBase* NewParent);
+
+	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 protected:
 	UPROPERTY(EditDefaultsOnly, Category="Init|Fire", DisplayName=Audio)
-	UAudioComponent* FireAudioComponent;
+	TObjectPtr<UAudioComponent> FireAudioComponent;
 
 	UPROPERTY(EditDefaultsOnly, Category="Init|Fire", DisplayName=HapticEffect)
-	UHapticFeedbackEffect_Curve* FireHapticFeedbackEffect;
+	TObjectPtr<UHapticFeedbackEffect_Curve> FireHapticFeedbackEffect;
 
 	UPROPERTY(EditDefaultsOnly, Category=Init, DisplayName=PerHand)
 	TMap<EControllerHand, FGunInitPerHand> PerHandInitData;
@@ -46,6 +49,9 @@ private:
 	void RemoveFireMappingContext() const;
 
 	void Fire();
+
+	UPROPERTY()
+	TObjectPtr<ULaser> LaserComponent;
 
 	TWeakObjectPtr<UControllerVisualizationBase> ParentControllerVisualizationComponent = nullptr;
 };

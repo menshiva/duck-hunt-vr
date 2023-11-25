@@ -25,19 +25,19 @@ public:
 	virtual bool IsPrimary() const override { return static_cast<bool>(GunComponent); }
 protected:
 	UPROPERTY(EditDefaultsOnly, Category="Init|Input|Anim", DisplayName=Context)
-	UInputMappingContext* AnimMappingContext;
+	TObjectPtr<UInputMappingContext> AnimMappingContext;
 
 	UPROPERTY(EditDefaultsOnly, Category="Init|Input|Anim", DisplayName=PointTouchAction)
-	UInputAction* AnimPointCapTouchAction;
+	TObjectPtr<UInputAction> AnimPointCapTouchAction;
 
 	UPROPERTY(EditDefaultsOnly, Category="Init|Input|Anim", DisplayName=TriggerAction)
-	UInputAction* AnimTriggerAction;
+	TObjectPtr<UInputAction> AnimTriggerAction;
 
 	UPROPERTY(EditDefaultsOnly, Category="Init|Input|Anim", DisplayName=ThumbTouchAction)
-	UInputAction* AnimThumbCapTouchAction;
+	TObjectPtr<UInputAction> AnimThumbCapTouchAction;
 
 	UPROPERTY(EditDefaultsOnly, Category="Init|Input|Anim", DisplayName=GripAction)
-	UInputAction* AnimGripAction;
+	TObjectPtr<UInputAction> AnimGripAction;
 
 	UPROPERTY(EditDefaultsOnly, Category=Init, DisplayName=Gun)
 	TSubclassOf<UGunComponentBase> GunClass;

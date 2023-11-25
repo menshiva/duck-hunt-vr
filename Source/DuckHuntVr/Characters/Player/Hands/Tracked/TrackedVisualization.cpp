@@ -2,6 +2,8 @@
 #include "DuckHuntVr/Characters/Player/HandsController/MotionController/HandMotionController.h"
 
 UTrackedVisualizationBase::UTrackedVisualizationBase() {
+	PrimaryComponentTick.bStartWithTickEnabled = true;
+	PrimaryComponentTick.bCanEverTick = true;
 	PrimaryComponentTick.bAllowTickOnDedicatedServer = false;
 
 	SetGenerateOverlapEvents(false);

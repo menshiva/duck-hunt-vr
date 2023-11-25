@@ -3,6 +3,7 @@
 #include "EnhancedInputSubsystems.h"
 #include "Components/AudioComponent.h"
 #include "DuckHuntVr/Characters/Player/Hands/Controller/ControllerVisualization.h"
+#include "DuckHuntVr/Characters/Player/Laser/Laser.h"
 #include "Haptics/HapticFeedbackEffect_Curve.h"
 #include "Kismet/GameplayStatics.h"
 
@@ -24,9 +25,8 @@ UGunComponentBase::UGunComponentBase() {
 	FireAudioComponent = CreateDefaultSubobject<UAudioComponent>(TEXT("FireAudioComponent"));
 	FireAudioComponent->SetupAttachment(this);
 
-	FireAudioComponent->PrimaryComponentTick.bStartWithTickEnabled = false;
-	FireAudioComponent->PrimaryComponentTick.bCanEverTick = false;
-	FireAudioComponent->PrimaryComponentTick.bAllowTickOnDedicatedServer = false;
+	LaserComponent = CreateDefaultSubobject<ULaser>(TEXT("LaserComponent"));
+	LaserComponent->SetupAttachment(this);
 }
 
 void UGunComponentBase::Init(UControllerVisualizationBase* Parent, const bool ShouldRegister) {
@@ -44,14 +44,14 @@ void UGunComponentBase::Init(UControllerVisualizationBase* Parent, const bool Sh
 		check(IsRegistered());
 
 	AttachToComponent(Parent, FAttachmentTransformRules::KeepRelativeTransform);
-	FireAudioComponent->AttachToComponent(this, FAttachmentTransformRules::KeepRelativeTransform);
+
+	if (ShouldRegister) {
+		FireAudioComponent->AttachToComponent(this, FAttachmentTransformRules::KeepRelativeTransform);
+		LaserComponent->AttachToComponent(this, FAttachmentTransformRules::KeepRelativeTransform, TEXT("LaserSocket"));
+		LaserComponent->RegisterComponent();
+	}
 
 	InitFireMappingContext(HandInitData);
-}
-
-void UGunComponentBase::EndPlay(const EEndPlayReason::Type EndPlayReason) {
-	RemoveFireMappingContext();
-	Super::EndPlay(EndPlayReason);
 }
 
 void UGunComponentBase::SetNewParentControllerVisualization(UControllerVisualizationBase* NewParent) {
@@ -64,6 +64,17 @@ void UGunComponentBase::SetNewParentControllerVisualization(UControllerVisualiza
 	ParentControllerVisualizationComponent = nullptr;
 
 	Init(NewParent, false);
+}
+
+void UGunComponentBase::EndPlay(const EEndPlayReason::Type EndPlayReason) {
+	FireAudioComponent->DestroyComponent();
+	FireAudioComponent = nullptr;
+
+	LaserComponent->DestroyComponent();
+	LaserComponent = nullptr;
+
+	RemoveFireMappingContext();
+	Super::EndPlay(EndPlayReason);
 }
 
 const FGunInitPerHand& UGunComponentBase::GetHandInitDataBasedOnParent() const {
