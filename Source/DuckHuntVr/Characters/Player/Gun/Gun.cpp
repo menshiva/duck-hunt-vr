@@ -24,12 +24,9 @@ UGunComponentBase::UGunComponentBase() {
 
 	FireAudioComponent = CreateDefaultSubobject<UAudioComponent>(TEXT("FireAudioComponent"));
 	FireAudioComponent->SetupAttachment(this);
-
-	LaserComponent = CreateDefaultSubobject<ULaser>(TEXT("LaserComponent"));
-	LaserComponent->SetupAttachment(this);
 }
 
-void UGunComponentBase::Init(UControllerVisualizationBase* Parent, const bool ShouldRegister) {
+void UGunComponentBase::Init(UControllerVisualizationBase* Parent, const bool CalledFirstTime) {
 	check(ParentControllerVisualizationComponent.IsExplicitlyNull());
 	check(Parent);
 
@@ -38,18 +35,11 @@ void UGunComponentBase::Init(UControllerVisualizationBase* Parent, const bool Sh
 
 	SetRelativeTransform(HandInitData.Transform);
 
-	if (ShouldRegister)
+	AttachToComponent(Parent, FAttachmentTransformRules::KeepRelativeTransform);
+	if (CalledFirstTime)
 		RegisterComponent();
 	else
 		check(IsRegistered());
-
-	AttachToComponent(Parent, FAttachmentTransformRules::KeepRelativeTransform);
-
-	if (ShouldRegister) {
-		FireAudioComponent->AttachToComponent(this, FAttachmentTransformRules::KeepRelativeTransform);
-		LaserComponent->AttachToComponent(this, FAttachmentTransformRules::KeepRelativeTransform, TEXT("LaserSocket"));
-		LaserComponent->RegisterComponent();
-	}
 
 	InitFireMappingContext(HandInitData);
 }
@@ -64,6 +54,17 @@ void UGunComponentBase::SetNewParentControllerVisualization(UControllerVisualiza
 	ParentControllerVisualizationComponent = nullptr;
 
 	Init(NewParent, false);
+}
+
+void UGunComponentBase::BeginPlay() {
+	Super::BeginPlay();
+
+	FireAudioComponent->AttachToComponent(this, FAttachmentTransformRules::KeepRelativeTransform);
+	// FireAudioComponent->RegisterComponent(); // causes auto-play when gun is created
+
+	LaserComponent = NewObject<ULaser>(this, LaserClass);
+	LaserComponent->AttachToComponent(this, FAttachmentTransformRules::KeepRelativeTransform, TEXT("LaserSocket"));
+	LaserComponent->RegisterComponent();
 }
 
 void UGunComponentBase::EndPlay(const EEndPlayReason::Type EndPlayReason) {

@@ -29,10 +29,11 @@ class DUCKHUNTVR_API UGunComponentBase : public UStaticMeshComponent {
 public:
 	UGunComponentBase();
 
-	void Init(UControllerVisualizationBase* Parent, bool ShouldRegister = true);
+	void Init(UControllerVisualizationBase* Parent, bool CalledFirstTime = true);
 	void SetNewParentControllerVisualization(UControllerVisualizationBase* NewParent);
 
-	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
+	virtual void BeginPlay() override;
+	virtual void EndPlay(EEndPlayReason::Type EndPlayReason) override;
 protected:
 	UPROPERTY(EditDefaultsOnly, Category="Init|Fire", DisplayName=Audio)
 	TObjectPtr<UAudioComponent> FireAudioComponent;
@@ -42,6 +43,9 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly, Category=Init, DisplayName=PerHand)
 	TMap<EControllerHand, FGunInitPerHand> PerHandInitData;
+
+	UPROPERTY(EditDefaultsOnly, Category=Init, DisplayName=Laser)
+	TSubclassOf<ULaser> LaserClass;
 private:
 	const FGunInitPerHand& GetHandInitDataBasedOnParent() const;
 
@@ -51,7 +55,7 @@ private:
 	void Fire();
 
 	UPROPERTY()
-	TObjectPtr<ULaser> LaserComponent;
+	TObjectPtr<ULaser> LaserComponent = nullptr;
 
 	TWeakObjectPtr<UControllerVisualizationBase> ParentControllerVisualizationComponent = nullptr;
 };

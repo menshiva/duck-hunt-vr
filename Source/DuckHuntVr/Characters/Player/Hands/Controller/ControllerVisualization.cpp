@@ -27,8 +27,8 @@ UControllerVisualizationBase::UControllerVisualizationBase() {
 void UControllerVisualizationBase::Init(UHandMotionController* Parent) {
 	IHandVisualizationInterface::Init(Parent);
 
-	RegisterComponent();
 	AttachToComponent(Parent, FAttachmentTransformRules::KeepRelativeTransform);
+	RegisterComponent();
 
 	InitAnimMappingContext();
 }
