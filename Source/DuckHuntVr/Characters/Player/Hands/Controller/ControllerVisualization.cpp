@@ -1,8 +1,6 @@
 ﻿#include "ControllerVisualization.h"
 #include "EnhancedInputSubsystems.h"
 #include "EnhancedInputComponent.h"
-#include "DuckHuntVr/Characters/Player/Gun/Gun.h"
-#include "DuckHuntVr/Characters/Player/HandsController/MotionController/HandMotionController.h"
 #include "Kismet/GameplayStatics.h"
 
 UControllerVisualizationBase::UControllerVisualizationBase() {
@@ -33,20 +31,10 @@ void UControllerVisualizationBase::Init(UHandMotionController* Parent) {
 	InitAnimMappingContext();
 }
 
-void UControllerVisualizationBase::Destroy() {
-	if (GunComponent) {
-		GunComponent->DestroyComponent();
-		GunComponent = nullptr;
-	}
-
-	RemoveAnimMappingContext();
-	DestroyComponent(true);
-}
-
 void UControllerVisualizationBase::SetPrimary(const bool InitPrimary) {
 	IHandVisualizationInterface::SetPrimary(InitPrimary);
 	if (InitPrimary) {
-		GunComponent = NewObject<UGunComponentBase>(this, GunClass);
+		GunComponent = NewObject<UGunComponent>(this);
 		GunComponent->Init(this);
 	}
 }
@@ -57,6 +45,21 @@ void UControllerVisualizationBase::SwapPrimary(IHandVisualizationInterface* Othe
 	const auto Secondary = CastChecked<UControllerVisualizationBase>(OtherHandVisualization);
 	Swap(GunComponent, Secondary->GunComponent);
 	Secondary->GunComponent->SetNewParentControllerVisualization(Secondary);
+}
+
+void UControllerVisualizationBase::UpdateLaserType() {
+	IHandVisualizationInterface::UpdateLaserType();
+	GunComponent->UpdateLaserType();
+}
+
+void UControllerVisualizationBase::Destroy() {
+	if (GunComponent) {
+		GunComponent->Destroy();
+		GunComponent = nullptr;
+	}
+
+	RemoveAnimMappingContext();
+	DestroyComponent();
 }
 
 void UControllerVisualizationBase::InitAnimMappingContext() {

@@ -11,10 +11,10 @@ public:
 	UTrackedVisualizationBase();
 
 	virtual void Init(UHandMotionController* Parent) override;
-	virtual void Destroy() override;
-
 	virtual void SetPrimary(bool InitPrimary) override;
 	virtual void SwapPrimary(IHandVisualizationInterface* OtherHandVisualization) override;
+	virtual void UpdateLaserType() override;
+	virtual void Destroy() override;
 	virtual bool IsPrimary() const override { return Primary; }
 
 	// TODO

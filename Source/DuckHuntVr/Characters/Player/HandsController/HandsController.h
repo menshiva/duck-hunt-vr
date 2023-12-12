@@ -1,5 +1,6 @@
 ﻿#pragma once
 
+#include "DuckHuntVr/Characters/Player/Laser/Laser.h"
 #include "MotionController/HandMotionController.h"
 #include "HandsController.generated.h"
 
@@ -12,13 +13,19 @@ class DUCKHUNTVR_API UHandsController : public USceneComponent {
 public:
 	UHandsController();
 
-	virtual void TickComponent(float Dt, ELevelTick Tt, FActorComponentTickFunction* Tf) override;
-
 	UFUNCTION(BlueprintCallable)
-	void SetPrimaryHandType(const EControllerHand NewPrimaryHand);
+	void SetPrimaryHandType(EControllerHand NewPrimaryHand);
 
 	UFUNCTION(BlueprintPure)
 	FORCEINLINE EControllerHand GetPrimaryHandType() const { return PrimaryHand; }
+
+	UFUNCTION(BlueprintCallable)
+	void SetLaserType(ELaserType NewLaserType);
+
+	UFUNCTION(BlueprintPure)
+	FORCEINLINE ELaserType GetLaserType() const { return LaserType; }
+
+	virtual void TickComponent(float Dt, ELevelTick Tt, FActorComponentTickFunction* Tf) override;
 private:
 	EVisualizationType GetNewVisualizationType() const;
 	void UpdateControllersVisualizationIfNeeded();
@@ -40,6 +47,9 @@ private:
 
 	// TODO: Make this a config variable
 	EControllerHand PrimaryHand = EControllerHand::Right;
+
+	// TODO: Make this a config variable
+	ELaserType LaserType = ELaserType::Laser;
 
 	EVisualizationType CurrentVisualizationType = EVisualizationType::None;
 

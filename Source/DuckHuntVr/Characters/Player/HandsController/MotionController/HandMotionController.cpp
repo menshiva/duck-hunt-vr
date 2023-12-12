@@ -1,6 +1,7 @@
 ﻿#include "HandMotionController.h"
 #include "DuckHuntVr/Characters/Player/Hands/Controller/ControllerVisualization.h"
 #include "DuckHuntVr/Characters/Player/Hands/Tracked/TrackedVisualization.h"
+#include "DuckHuntVr/Characters/Player/HandsController/HandsController.h"
 
 UHandMotionController::UHandMotionController() {
 	PrimaryComponentTick.bStartWithTickEnabled = true;
@@ -16,7 +17,8 @@ UHandMotionController::UHandMotionController() {
 	UPrimitiveComponent::SetCollisionProfileName(TEXT("NoCollision"), false);
 }
 
-void UHandMotionController::Init(const EControllerHand Type) {
+void UHandMotionController::Init(UHandsController* Parent, const EControllerHand Type) {
+	ParentController = Parent;
 	Hand = Type;
 	if (Hand == EControllerHand::Left)
 		MotionSource = IMotionController::LeftHandSourceId;

@@ -7,7 +7,7 @@
 #include "Haptics/HapticFeedbackEffect_Curve.h"
 #include "Kismet/GameplayStatics.h"
 
-UGunComponentBase::UGunComponentBase() {
+UGunComponent::UGunComponent() {
 	PrimaryComponentTick.bStartWithTickEnabled = false;
 	PrimaryComponentTick.bCanEverTick = false;
 	PrimaryComponentTick.bAllowTickOnDedicatedServer = false;
@@ -22,84 +22,84 @@ UGunComponentBase::UGunComponentBase() {
 
 	SetCastShadow(false);
 
+	struct FConstructorStatics {
+		ConstructorHelpers::FObjectFinder<UStaticMesh> GunMesh;
+		ConstructorHelpers::FObjectFinder<USoundBase> FireSound;
+		ConstructorHelpers::FObjectFinder<UHapticFeedbackEffect_Curve> FireHapticEffect;
+		FConstructorStatics()
+		: GunMesh(TEXT("StaticMesh'/Game/DuckHuntVr/Characters/Player/Gun/Model/SM_Gun.SM_Gun'")),
+		  FireSound(TEXT("SoundCue'/Game/DuckHuntVr/Characters/Player/Gun/Audio/A_Fire_Cue.A_Fire_Cue'")),
+		  FireHapticEffect(TEXT("HapticFeedbackEffect_Curve'/Game/DuckHuntVr/Characters/Player/Gun/Haptics/HFC_Fire.HFC_Fire'"))
+		{}
+	};
+	static FConstructorStatics ConstructorStatics;
+
+	UStaticMeshComponent::SetStaticMesh(ConstructorStatics.GunMesh.Object);
+
 	FireAudioComponent = CreateDefaultSubobject<UAudioComponent>(TEXT("FireAudioComponent"));
+	FireAudioComponent->SetSound(ConstructorStatics.FireSound.Object);
 	FireAudioComponent->SetupAttachment(this);
+
+	FireHapticFeedbackEffect = ConstructorStatics.FireHapticEffect.Object;
+
+	LaserComponent = CreateDefaultSubobject<ULaserComponent>(TEXT("LaserComponent"));
+	LaserComponent->SetupAttachment(this, TEXT("LaserSocket"));
 }
 
-void UGunComponentBase::Init(UControllerVisualizationBase* Parent, const bool CalledFirstTime) {
-	check(ParentControllerVisualizationComponent.IsExplicitlyNull());
-	check(Parent);
-
-	ParentControllerVisualizationComponent = Parent;
-	const auto& HandInitData = GetHandInitDataBasedOnParent();
-
-	SetRelativeTransform(HandInitData.Transform);
-
-	AttachToComponent(Parent, FAttachmentTransformRules::KeepRelativeTransform);
-	if (CalledFirstTime)
-		RegisterComponent();
-	else
-		check(IsRegistered());
-
-	InitFireMappingContext(HandInitData);
+void UGunComponent::Init(UControllerVisualizationBase* Parent) {
+	SetNewParentControllerVisualization(Parent);
+	FireAudioComponent->AttachToComponent(this, FAttachmentTransformRules::KeepRelativeTransform); // fixes audio spatialization
+	LaserComponent->Init(Parent);
+	RegisterComponent();
 }
 
-void UGunComponentBase::SetNewParentControllerVisualization(UControllerVisualizationBase* NewParent) {
-	check(!ParentControllerVisualizationComponent.IsExplicitlyNull());
-	check(NewParent);
-	check(NewParent != ParentControllerVisualizationComponent.Get());
+void UGunComponent::SetNewParentControllerVisualization(UControllerVisualizationBase* NewParent) {
+	if (!ParentControllerVisualizationComponent.IsExplicitlyNull()) {
+		RemoveFireMappingContext(ParentControllerVisualizationComponent->GetGunInitData());
+		DetachFromComponent(FDetachmentTransformRules::KeepRelativeTransform);
+	}
 
-	RemoveFireMappingContext();
-	DetachFromComponent(FDetachmentTransformRules::KeepRelativeTransform);
-	ParentControllerVisualizationComponent = nullptr;
+	ParentControllerVisualizationComponent = NewParent;
+	const auto& InitData = NewParent->GetGunInitData();
 
-	Init(NewParent, false);
+	SetRelativeTransform(InitData.Transform);
+	AttachToComponent(NewParent, FAttachmentTransformRules::KeepRelativeTransform);
+	InitFireMappingContext(InitData);
 }
 
-void UGunComponentBase::BeginPlay() {
-	Super::BeginPlay();
-
-	FireAudioComponent->AttachToComponent(this, FAttachmentTransformRules::KeepRelativeTransform);
-	// FireAudioComponent->RegisterComponent(); // causes auto-play when gun is created
-
-	LaserComponent = NewObject<ULaser>(this, LaserClass);
-	LaserComponent->AttachToComponent(this, FAttachmentTransformRules::KeepRelativeTransform, TEXT("LaserSocket"));
-	LaserComponent->RegisterComponent();
+void UGunComponent::UpdateLaserType() const {
+	LaserComponent->UpdateType();
 }
 
-void UGunComponentBase::EndPlay(const EEndPlayReason::Type EndPlayReason) {
+void UGunComponent::Destroy() {
 	FireAudioComponent->DestroyComponent();
 	FireAudioComponent = nullptr;
 
-	LaserComponent->DestroyComponent();
+	LaserComponent->Destroy();
 	LaserComponent = nullptr;
 
-	RemoveFireMappingContext();
-	Super::EndPlay(EndPlayReason);
+	RemoveFireMappingContext(ParentControllerVisualizationComponent->GetGunInitData());
+	DestroyComponent();
 }
 
-const FGunInitPerHand& UGunComponentBase::GetHandInitDataBasedOnParent() const {
-	return PerHandInitData.FindChecked(ParentControllerVisualizationComponent->GetHandType());
-}
-
-void UGunComponentBase::InitFireMappingContext(const FGunInitPerHand& HandInitData) {
+void UGunComponent::InitFireMappingContext(const FGunInitData& HandInitData) {
 	if (const auto PlayerController = UGameplayStatics::GetPlayerController(this, 0)) {
 		if (const auto Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer()))
 			Subsystem->AddMappingContext(HandInitData.FireMappingContext, 0);
 
 		if (const auto EnhancedInputComponent = Cast<UEnhancedInputComponent>(PlayerController->InputComponent))
-			EnhancedInputComponent->BindAction(HandInitData.FireAction, ETriggerEvent::Triggered, this, &UGunComponentBase::Fire);
+			EnhancedInputComponent->BindAction(HandInitData.FireAction, ETriggerEvent::Triggered, this, &UGunComponent::Fire);
 	}
 }
 
-void UGunComponentBase::RemoveFireMappingContext() const {
+void UGunComponent::RemoveFireMappingContext(const FGunInitData& HandInitData) const {
 	if (const auto PlayerController = UGameplayStatics::GetPlayerController(this, 0))
 		if (const auto Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer()))
-			Subsystem->RemoveMappingContext(GetHandInitDataBasedOnParent().FireMappingContext);
+			Subsystem->RemoveMappingContext(HandInitData.FireMappingContext);
 }
 
 // ReSharper disable once CppMemberFunctionMayBeConst
-void UGunComponentBase::Fire() {
+void UGunComponent::Fire() {
 	FireAudioComponent->Play();
 	UGameplayStatics::GetPlayerController(this, 0)->PlayHapticEffect(
 		FireHapticFeedbackEffect, ParentControllerVisualizationComponent->GetHandType()

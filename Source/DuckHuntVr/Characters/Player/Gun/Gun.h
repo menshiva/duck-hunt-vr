@@ -6,7 +6,7 @@ class UInputMappingContext;
 class UInputAction;
 
 USTRUCT(NotBlueprintable, NotBlueprintType)
-struct FGunInitPerHand {
+struct FGunInitData {
 	GENERATED_BODY()
 
 	UPROPERTY(EditDefaultsOnly)
@@ -21,41 +21,32 @@ struct FGunInitPerHand {
 
 class UControllerVisualizationBase;
 class UHapticFeedbackEffect_Curve;
-class ULaser;
+class ULaserComponent;
 
-UCLASS(Abstract, Blueprintable, NotBlueprintType, NotPlaceable)
-class DUCKHUNTVR_API UGunComponentBase : public UStaticMeshComponent {
+UCLASS(NotBlueprintable, NotBlueprintType, NotPlaceable)
+class DUCKHUNTVR_API UGunComponent : public UStaticMeshComponent {
 	GENERATED_BODY()
 public:
-	UGunComponentBase();
+	UGunComponent();
 
-	void Init(UControllerVisualizationBase* Parent, bool CalledFirstTime = true);
+	void Init(UControllerVisualizationBase* Parent);
 	void SetNewParentControllerVisualization(UControllerVisualizationBase* NewParent);
-
-	virtual void BeginPlay() override;
-	virtual void EndPlay(EEndPlayReason::Type EndPlayReason) override;
-protected:
-	UPROPERTY(EditDefaultsOnly, Category="Init|Fire", DisplayName=Audio)
-	TObjectPtr<UAudioComponent> FireAudioComponent;
-
-	UPROPERTY(EditDefaultsOnly, Category="Init|Fire", DisplayName=HapticEffect)
-	TObjectPtr<UHapticFeedbackEffect_Curve> FireHapticFeedbackEffect;
-
-	UPROPERTY(EditDefaultsOnly, Category=Init, DisplayName=PerHand)
-	TMap<EControllerHand, FGunInitPerHand> PerHandInitData;
-
-	UPROPERTY(EditDefaultsOnly, Category=Init, DisplayName=Laser)
-	TSubclassOf<ULaser> LaserClass;
+	void UpdateLaserType() const;
+	void Destroy();
 private:
-	const FGunInitPerHand& GetHandInitDataBasedOnParent() const;
-
-	void InitFireMappingContext(const FGunInitPerHand& HandInitData);
-	void RemoveFireMappingContext() const;
+	void InitFireMappingContext(const FGunInitData& HandInitData);
+	void RemoveFireMappingContext(const FGunInitData& HandInitData) const;
 
 	void Fire();
 
 	UPROPERTY()
-	TObjectPtr<ULaser> LaserComponent = nullptr;
+	TObjectPtr<UAudioComponent> FireAudioComponent;
+
+	UPROPERTY()
+	TObjectPtr<UHapticFeedbackEffect_Curve> FireHapticFeedbackEffect;
+
+	UPROPERTY()
+	TObjectPtr<ULaserComponent> LaserComponent;
 
 	TWeakObjectPtr<UControllerVisualizationBase> ParentControllerVisualizationComponent = nullptr;
 };

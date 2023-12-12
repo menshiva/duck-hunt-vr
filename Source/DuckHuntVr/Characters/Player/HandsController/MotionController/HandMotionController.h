@@ -3,6 +3,7 @@
 #include "MotionControllerComponent.h"
 #include "HandMotionController.generated.h"
 
+class UHandsController;
 class UControllerVisualizationBase;
 class UTrackedVisualizationBase;
 class IHandVisualizationInterface;
@@ -17,15 +18,18 @@ class DUCKHUNTVR_API UHandMotionController : public UMotionControllerComponent {
 public:
 	UHandMotionController();
 
-	void Init(EControllerHand Type);
+	void Init(UHandsController* Parent, EControllerHand Type);
 
 	void ClearVisualization();
 	void SetControllerVisualization(TSubclassOf<UControllerVisualizationBase> ControllerVisualizationClass);
 	void SetTrackedVisualization(TSubclassOf<UTrackedVisualizationBase> TrackedVisualizationClass);
 
+	FORCEINLINE UHandsController* GetHandsController() const { return ParentController.Get(); }
 	FORCEINLINE EControllerHand GetHandType() const { return Hand; }
 	FORCEINLINE IHandVisualizationInterface* GetVisualizationComponent() const { return VisualizationComponent.GetInterface(); }
 private:
+	TWeakObjectPtr<UHandsController> ParentController = nullptr;
+
 	EControllerHand Hand;
 
 	UPROPERTY()

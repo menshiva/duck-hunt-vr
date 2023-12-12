@@ -10,7 +10,10 @@ public class DuckHuntVr : ModuleRules
 	
 		PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore" });
 
-		PrivateDependencyModuleNames.AddRange(new string[] { "EnhancedInput", "HeadMountedDisplay", "OculusXRInput", "UMG", "Niagara" });
+		PrivateDependencyModuleNames.AddRange(new string[] {
+			"EnhancedInput", "HeadMountedDisplay", "OculusXRInput", "UMG", "Niagara",
+			"Paper2D"
+		});
 
 		// Uncomment if you are using Slate UI
 		// PrivateDependencyModuleNames.AddRange(new string[] { "Slate", "SlateCore" });

@@ -12,14 +12,12 @@ class DUCKHUNTVR_API IHandVisualizationInterface {
 	GENERATED_BODY()
 public:
 	virtual void Init(UHandMotionController* Parent) {
-		HandType = Parent->GetHandType();
-		check(HandType == EControllerHand::Left || HandType == EControllerHand::Right);
+		ParentMotionController = Parent;
 	}
 
-	virtual void Destroy() = 0;
-
 	virtual void SetPrimary(bool InitPrimary) {
-		check(!IsPrimary()); // ensure that we call this function only after Init (both hands should be secondary). To swap hands, use SwapPrimary()
+		// ensure that we call this function only after Init (both hands should be secondary). Use SwapPrimary() to swap hands
+		check(!IsPrimary());
 	}
 
 	virtual void SwapPrimary(IHandVisualizationInterface* OtherHandVisualization) {
@@ -27,9 +25,16 @@ public:
 		check(IsPrimary()); // ensure that we call this function on primary hand
 	}
 
+	virtual void UpdateLaserType() {
+		check(IsPrimary());
+	}
+
+	virtual void Destroy() = 0;
+
 	virtual bool IsPrimary() const = 0;
 
-	FORCEINLINE EControllerHand GetHandType() const { return HandType; }
+	FORCEINLINE UHandsController* GetHandsController() const { return ParentMotionController->GetHandsController(); }
+	FORCEINLINE EControllerHand GetHandType() const { return ParentMotionController->GetHandType(); }
 private:
-	EControllerHand HandType = EControllerHand::Left;
+	TWeakObjectPtr<UHandMotionController> ParentMotionController = nullptr;
 };

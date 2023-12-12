@@ -1,5 +1,4 @@
 ﻿#include "TrackedVisualization.h"
-#include "DuckHuntVr/Characters/Player/HandsController/MotionController/HandMotionController.h"
 
 UTrackedVisualizationBase::UTrackedVisualizationBase() {
 	PrimaryComponentTick.bStartWithTickEnabled = true;
@@ -32,10 +31,6 @@ void UTrackedVisualizationBase::Init(UHandMotionController* Parent) {
 	RegisterComponent();
 }
 
-void UTrackedVisualizationBase::Destroy() {
-	DestroyComponent(true);
-}
-
 void UTrackedVisualizationBase::SetPrimary(const bool InitPrimary) {
 	IHandVisualizationInterface::SetPrimary(InitPrimary);
 	Primary = InitPrimary;
@@ -51,6 +46,15 @@ void UTrackedVisualizationBase::SwapPrimary(IHandVisualizationInterface* OtherHa
 
 	UpdateHandMaterialColor();
 	Secondary->UpdateHandMaterialColor();
+}
+
+void UTrackedVisualizationBase::UpdateLaserType() {
+	IHandVisualizationInterface::UpdateLaserType();
+	// TODO
+}
+
+void UTrackedVisualizationBase::Destroy() {
+	DestroyComponent();
 }
 
 // TODO

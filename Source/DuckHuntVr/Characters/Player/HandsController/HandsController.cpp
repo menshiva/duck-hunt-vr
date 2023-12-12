@@ -12,11 +12,11 @@ UHandsController::UHandsController() {
 	UActorComponent::SetAutoActivate(true);
 
 	LeftController = CreateDefaultSubobject<UHandMotionController>(TEXT("LeftMotionController"));
-	LeftController->Init(EControllerHand::Left);
+	LeftController->Init(this, EControllerHand::Left);
 	LeftController->SetupAttachment(this);
 
 	RightController = CreateDefaultSubobject<UHandMotionController>(TEXT("RightMotionController"));
-	RightController->Init(EControllerHand::Right);
+	RightController->Init(this, EControllerHand::Right);
 	RightController->SetupAttachment(this);
 
 	PrimaryController = RightController;
@@ -27,20 +27,26 @@ UHandsController::UHandsController() {
 		Swap(PrimaryController, SecondaryController);
 }
 
-void UHandsController::TickComponent(const float Dt, const ELevelTick Tt, FActorComponentTickFunction* Tf) {
-	Super::TickComponent(Dt, Tt, Tf);
-	UpdateControllersVisualizationIfNeeded();
-}
-
 void UHandsController::SetPrimaryHandType(const EControllerHand NewPrimaryHand) {
 	if (PrimaryHand == NewPrimaryHand)
 		return;
-
+	PrimaryHand = NewPrimaryHand;
 	if (CurrentVisualizationType != EVisualizationType::None)
 		PrimaryController->GetVisualizationComponent()->SwapPrimary(SecondaryController->GetVisualizationComponent());
 	Swap(PrimaryController, SecondaryController);
+}
 
-	PrimaryHand = NewPrimaryHand;
+void UHandsController::SetLaserType(const ELaserType NewLaserType) {
+	if (LaserType == NewLaserType)
+		return;
+	LaserType = NewLaserType;
+	if (CurrentVisualizationType != EVisualizationType::None)
+		PrimaryController->GetVisualizationComponent()->UpdateLaserType();
+}
+
+void UHandsController::TickComponent(const float Dt, const ELevelTick Tt, FActorComponentTickFunction* Tf) {
+	Super::TickComponent(Dt, Tt, Tf);
+	UpdateControllersVisualizationIfNeeded();
 }
 
 EVisualizationType UHandsController::GetNewVisualizationType() const {

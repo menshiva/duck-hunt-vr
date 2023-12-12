@@ -1,12 +1,12 @@
 ﻿#pragma once
 
+#include "DuckHuntVr/Characters/Player/Gun/Gun.h"
 #include "DuckHuntVr/Characters/Player/Hands/HandVisualizationInterface.h"
 #include "ControllerVisualization.generated.h"
 
 class UHandMotionController;
 class UInputMappingContext;
 class UInputAction;
-class UGunComponentBase;
 struct FInputActionValue;
 
 UCLASS(Abstract, Blueprintable, BlueprintType, NotPlaceable)
@@ -16,13 +16,15 @@ public:
 	UControllerVisualizationBase();
 
 	virtual void Init(UHandMotionController* Parent) override;
-	virtual void Destroy() override;
-
 	virtual void SetPrimary(bool InitPrimary) override;
 	virtual void SwapPrimary(IHandVisualizationInterface* OtherHandVisualization) override;
+	virtual void UpdateLaserType() override;
+	virtual void Destroy() override;
 
 	UFUNCTION(BlueprintPure)
 	virtual bool IsPrimary() const override { return static_cast<bool>(GunComponent); }
+
+	FORCEINLINE const FGunInitData& GetGunInitData() const { return GunInitData; }
 protected:
 	UPROPERTY(EditDefaultsOnly, Category="Init|Input|Anim", DisplayName=Context)
 	TObjectPtr<UInputMappingContext> AnimMappingContext;
@@ -40,7 +42,7 @@ protected:
 	TObjectPtr<UInputAction> AnimGripAction;
 
 	UPROPERTY(EditDefaultsOnly, Category=Init, DisplayName=Gun)
-	TSubclassOf<UGunComponentBase> GunClass;
+	FGunInitData GunInitData;
 private:
 	void InitAnimMappingContext();
 	void RemoveAnimMappingContext() const;
@@ -51,7 +53,7 @@ private:
 	void AnimGripActionEvent(const FInputActionValue& Value);
 
 	UPROPERTY()
-	TObjectPtr<UGunComponentBase> GunComponent = nullptr;
+	TObjectPtr<UGunComponent> GunComponent = nullptr;
 
 	UPROPERTY(BlueprintReadOnly, meta=(AllowPrivateAccess=true))
 	bool IsPointing = false;
