@@ -1,50 +1,30 @@
-﻿#include "ControllerVisualization.h"
+﻿#include "ControllerVisualizationBase.h"
 #include "EnhancedInputSubsystems.h"
 #include "EnhancedInputComponent.h"
-#include "Kismet/GameplayStatics.h"
+#include "DuckHuntVr/Characters/Player/Gun/GunBase.h"
 
 UControllerVisualizationBase::UControllerVisualizationBase() {
-	PrimaryComponentTick.bStartWithTickEnabled = true;
 	PrimaryComponentTick.bCanEverTick = true;
-	PrimaryComponentTick.bAllowTickOnDedicatedServer = false;
-
-	SetAllowClothActors(false);
-	bResetAfterTeleport = false;
-
-	USkeletalMeshComponent::SetEnableGravity(false);
-	bApplyImpulseOnDamage = false;
-	bReplicatePhysicsToAutonomousProxy = false;
-
-	SetGenerateOverlapEvents(false);
-	CanCharacterStepUpOn = ECB_No;
-	UPrimitiveComponent::SetCollisionProfileName(TEXT("NoCollision"), false);
-
-	SetCastShadow(false);
 }
 
-void UControllerVisualizationBase::Init(UHandMotionController* Parent) {
-	IHandVisualizationInterface::Init(Parent);
-
-	AttachToComponent(Parent, FAttachmentTransformRules::KeepRelativeTransform);
-	RegisterComponent();
-
-	InitAnimMappingContext();
-}
-
-void UControllerVisualizationBase::SetPrimary(const bool InitPrimary) {
-	IHandVisualizationInterface::SetPrimary(InitPrimary);
-	if (InitPrimary) {
-		GunComponent = NewObject<UGunComponent>(this);
-		GunComponent->Init(this);
+void UControllerVisualizationBase::OnComponentDestroyed(const bool bDestroyingHierarchy) {
+	if (GunComponent) {
+		GunComponent->DestroyComponent();
+		GunComponent = nullptr;
 	}
+	RemoveAnimMappingContext();
+	Super::OnComponentDestroyed(bDestroyingHierarchy);
 }
 
-void UControllerVisualizationBase::SwapPrimary(IHandVisualizationInterface* OtherHandVisualization) {
-	IHandVisualizationInterface::SwapPrimary(OtherHandVisualization);
-	check(Cast<UControllerVisualizationBase>(OtherHandVisualization) != nullptr);
-	const auto Secondary = CastChecked<UControllerVisualizationBase>(OtherHandVisualization);
+void UControllerVisualizationBase::SwapPrimary(IHandVisualizationInterface* SecondaryHandVisualization) {
+	IHandVisualizationInterface::SwapPrimary(SecondaryHandVisualization);
+	const auto Secondary = CastChecked<UControllerVisualizationBase>(SecondaryHandVisualization);
+
+	GunComponent->DetachFromComponent(FDetachmentTransformRules::KeepRelativeTransform);
 	Swap(GunComponent, Secondary->GunComponent);
-	Secondary->GunComponent->SetNewParentControllerVisualization(Secondary);
+	Secondary->GunComponent->AttachToComponent(Secondary, FAttachmentTransformRules::KeepRelativeTransform);
+
+	Secondary->GunComponent->Init(Secondary);
 }
 
 void UControllerVisualizationBase::UpdateLaserType() {
@@ -52,18 +32,22 @@ void UControllerVisualizationBase::UpdateLaserType() {
 	GunComponent->UpdateLaserType();
 }
 
-void UControllerVisualizationBase::Destroy() {
-	if (GunComponent) {
-		GunComponent->Destroy();
-		GunComponent = nullptr;
-	}
+void UControllerVisualizationBase::InitImpl(USceneComponent* AttachmentParent, const bool Primary) {
+	SetupAttachment(AttachmentParent);
+	RegisterComponent();
 
-	RemoveAnimMappingContext();
-	DestroyComponent();
+	InitAnimMappingContext();
+
+	if (Primary) {
+		GunComponent = NewObject<UGunBase>(this, GunClass);
+		GunComponent->Init(this);
+		GunComponent->SetupAttachment(this);
+		GunComponent->RegisterComponent();
+	}
 }
 
 void UControllerVisualizationBase::InitAnimMappingContext() {
-	if (const auto PlayerController = UGameplayStatics::GetPlayerController(this, 0)) {
+	if (const auto PlayerController = GetWorld()->GetFirstPlayerController()) {
 		if (const auto Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer()))
 			Subsystem->AddMappingContext(AnimMappingContext, 0);
 
@@ -86,7 +70,7 @@ void UControllerVisualizationBase::InitAnimMappingContext() {
 }
 
 void UControllerVisualizationBase::RemoveAnimMappingContext() const {
-	if (const auto PlayerController = UGameplayStatics::GetPlayerController(this, 0))
+	if (const auto PlayerController = GetWorld()->GetFirstPlayerController())
 		if (const auto Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer()))
 			Subsystem->RemoveMappingContext(AnimMappingContext);
 }

@@ -28,7 +28,7 @@
 > ⚠️ Hand blueprints were rewritten in C++, and some logic was rewritten to:
 > 1) Make hands components instead of actors
 > 2) Use UE5 enhanced input system
-> 3) Implement custom hand positions when holding a gun
+> 3) Implement custom hand pose when holding a gun
 >
 > But in general the original content (skeletal meshes and animations) was used.
 
