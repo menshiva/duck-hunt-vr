@@ -32,6 +32,8 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category=Init)
 	TObjectPtr<UPaperSprite> CrosshairSpriteAsset;
 private:
+	constexpr static float MaxLaserDistance = 2000.0f;
+
 	ETraceTypeQuery TraceTypeQuery;
 
 	UPROPERTY()

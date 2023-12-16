@@ -134,9 +134,9 @@ void UTrackedVisualizationBase::InitImpl(USceneComponent* AttachmentParent, cons
 	if (Primary) {
 		LaserComponent = NewObject<ULaserBase>(this, LaserClass);
 		LaserComponent->UpdateType();
-		LaserComponent->Deactivate(); // TODO
 		LaserComponent->SetupAttachment(this);
 		LaserComponent->RegisterComponent();
+		LaserComponent->Deactivate(); // TODO
 	}
 
 	UpdateHandMaterialColor();

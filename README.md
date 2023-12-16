@@ -2,9 +2,9 @@
 
 ## Resources
 
-### MetaXR plugin (59.0)
+### MetaXR plugin (60.0)
 
-* https://developer.oculus.com/downloads/package/unreal-engine-5-integration/59.0
+* https://developer.oculus.com/downloads/package/unreal-engine-5-integration/60.0
 
 ### Original gameplay
 

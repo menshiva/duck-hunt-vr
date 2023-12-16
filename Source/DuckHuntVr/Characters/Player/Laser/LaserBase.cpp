@@ -9,24 +9,30 @@
 
 ULaserBase::ULaserBase() {
 	PrimaryComponentTick.bCanEverTick = true;
+	UActorComponent::SetAutoActivate(true);
 
 	TraceTypeQuery = UEngineTypes::ConvertToTraceType(ECC_GameTraceChannel1);
 }
 
 void ULaserBase::Activate(const bool bReset) {
 	Super::Activate(bReset);
-	if (NiagaraLaser)
+	if (NiagaraLaser) {
 		NiagaraLaser->Activate();
-	else if (CrosshairSprite)
-		CrosshairSprite->Activate();
+		NiagaraLaser->SetVisibility(true);
+	}
+	else if (CrosshairSprite) {
+		// No need, will happen in TickComponent if needed
+	}
 }
 
 void ULaserBase::Deactivate() {
 	Super::Deactivate();
-	if (NiagaraLaser)
+	if (NiagaraLaser) {
 		NiagaraLaser->Deactivate();
+		NiagaraLaser->SetVisibility(false);
+	}
 	else if (CrosshairSprite)
-		CrosshairSprite->Deactivate();
+		CrosshairSprite->SetVisibility(false);
 }
 
 void ULaserBase::OnComponentDestroyed(const bool bDestroyingHierarchy) {
@@ -57,8 +63,10 @@ void ULaserBase::UpdateType() {
 			NiagaraLaser->SetAsset(NiagaraLaserAsset);
 			NiagaraLaser->SetupAttachment(this);
 			NiagaraLaser->RegisterComponent();
-			if (!IsActive())
+			if (!IsActive()) {
 				NiagaraLaser->Deactivate();
+				NiagaraLaser->SetVisibility(false);
+			}
 		}
 		else if (NewType == ELaserType::Crosshair) {
 			if (NiagaraLaser) {
@@ -71,8 +79,6 @@ void ULaserBase::UpdateType() {
 			CrosshairSprite->SetSprite(CrosshairSpriteAsset);
 			CrosshairSprite->SetVisibility(false);
 			CrosshairSprite->RegisterComponent();
-			if (!IsActive())
-				CrosshairSprite->Deactivate();
 		}
 		else {
 			check(NewType == ELaserType::None);
@@ -84,9 +90,6 @@ void ULaserBase::UpdateType() {
 				CrosshairSprite->DestroyComponent();
 				CrosshairSprite = nullptr;
 			}
-			else {
-				check(false);
-			}
 		}
 	}
 }
@@ -96,7 +99,7 @@ void ULaserBase::TickComponent(const float Dt, const ELevelTick Tt, FActorCompon
 
 	const auto Start = GetComponentLocation();
 	const auto Fwd = GetForwardVector();
-	auto End = Start + Fwd * 2000.0f;
+	auto End = Start + Fwd * MaxLaserDistance;
 
     if (UKismetSystemLibrary::LineTraceSingle(
     	this,
@@ -109,28 +112,22 @@ void ULaserBase::TickComponent(const float Dt, const ELevelTick Tt, FActorCompon
 	}
 
 	if (NiagaraLaser) {
-		if (NiagaraLaser->IsActive()) {
-			UNiagaraDataInterfaceArrayFunctionLibrary::SetNiagaraArrayVectorValue(
-				NiagaraLaser,
-				"User.PointArray", 0,
-				Start, false
-			);
-			UNiagaraDataInterfaceArrayFunctionLibrary::SetNiagaraArrayVectorValue(
-				NiagaraLaser,
-				"User.PointArray", 1,
-				End, false
-			);
-		}
+		UNiagaraDataInterfaceArrayFunctionLibrary::SetNiagaraArrayVectorValue(
+			NiagaraLaser, "User.PointArray", 0,
+			Start, false
+		);
+		UNiagaraDataInterfaceArrayFunctionLibrary::SetNiagaraArrayVectorValue(
+			NiagaraLaser, "User.PointArray", 1,
+			End, false
+		);
 	}
 	else if (CrosshairSprite) {
-		if (CrosshairSprite->IsActive()) {
-			if (HitResult.bBlockingHit) {
-				CrosshairSprite->SetWorldLocationAndRotation(End, UKismetMathLibrary::MakeRotFromY(HitResult.ImpactNormal));
-				if (!CrosshairSprite->IsVisible())
-					CrosshairSprite->SetVisibility(true);
-			}
-			else if (CrosshairSprite->IsVisible())
-				CrosshairSprite->SetVisibility(false);
+		if (HitResult.bBlockingHit) {
+			CrosshairSprite->SetWorldLocationAndRotation(End, UKismetMathLibrary::MakeRotFromY(HitResult.ImpactNormal));
+			if (!CrosshairSprite->IsVisible())
+				CrosshairSprite->SetVisibility(true);
 		}
+		else if (CrosshairSprite->IsVisible())
+			CrosshairSprite->SetVisibility(false);
 	}
 }
