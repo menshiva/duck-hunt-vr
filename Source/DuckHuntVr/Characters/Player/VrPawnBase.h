@@ -2,8 +2,8 @@
 
 #include "VrPawnBase.generated.h"
 
-class UCameraComponent;
 class UHandsControllerBase;
+class UCameraComponent;
 
 UCLASS(Abstract, Blueprintable, NotBlueprintType, NotPlaceable)
 class DUCKHUNTVR_API AVrPawnBase : public APawn {
@@ -14,6 +14,9 @@ public:
 	virtual void OnConstruction(const FTransform& Transform) override;
 
 	virtual void BeginPlay() override;
+
+	void OnGunFire();
+	void OnMenuPressed();
 
 	FORCEINLINE const UHandsControllerBase* GetHandsController() const { return HandsController; }
 protected:

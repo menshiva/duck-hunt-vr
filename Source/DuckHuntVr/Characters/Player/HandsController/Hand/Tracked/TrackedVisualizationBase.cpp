@@ -1,4 +1,6 @@
 ﻿#include "TrackedVisualizationBase.h"
+#include "EnhancedInputComponent.h"
+#include "EnhancedInputSubsystems.h"
 #include "DuckHuntVr/Characters/Player/Laser/LaserBase.h"
 
 UTrackedVisualizationBase::UTrackedVisualizationBase() {
@@ -23,6 +25,11 @@ void UTrackedVisualizationBase::SwapPrimary(IHandVisualizationInterface* Seconda
 
 	UpdateHandMaterialColor();
 	Secondary->UpdateHandMaterialColor();
+}
+
+void UTrackedVisualizationBase::PlayFireEffects() {
+	IHandVisualizationInterface::PlayFireEffects();
+	// TODO
 }
 
 void UTrackedVisualizationBase::UpdateLaserType() {
@@ -118,6 +125,8 @@ void UTrackedVisualizationBase::TickComponent(const float Dt, const ELevelTick T
 }
 
 void UTrackedVisualizationBase::InitImpl(USceneComponent* AttachmentParent, const bool Primary) {
+	SetThisComponent(this);
+
 	// We have to create a dynamic material instance based on the assigned MaterialOverride BEFORE skeletal mesh is
 	// initialized (UOculusXRHandComponent::bSkeletalMeshInitialized) and then replace MaterialOverride with it so that
 	// it will be initialized with this dynamic material and we will have the ability to control its parameters during runtime.
@@ -140,4 +149,33 @@ void UTrackedVisualizationBase::InitImpl(USceneComponent* AttachmentParent, cons
 	}
 
 	UpdateHandMaterialColor();
+}
+
+void UTrackedVisualizationBase::AddMappingContexts(UEnhancedInputLocalPlayerSubsystem* Subsystem, UEnhancedInputComponent* Component) {
+	if (ActionMappingContext)
+		Subsystem->AddMappingContext(ActionMappingContext, 0);
+
+	if (SystemAction) {
+		Component->BindAction(SystemAction, ETriggerEvent::Started, this, &UTrackedVisualizationBase::OnMenuVisibilityChanged);
+		Component->BindAction(SystemAction, ETriggerEvent::Completed, this, &UTrackedVisualizationBase::OnMenuVisibilityChanged);
+	}
+
+	if (IndexPinchAction)
+		Component->BindAction(IndexPinchAction, ETriggerEvent::Triggered, this, &UTrackedVisualizationBase::OnIndexPinched);
+}
+
+void UTrackedVisualizationBase::ClearMappingContexts(UEnhancedInputLocalPlayerSubsystem* Subsystem) const {
+	if (ActionMappingContext)
+		Subsystem->RemoveMappingContext(ActionMappingContext);
+}
+
+// ReSharper disable once CppMemberFunctionMayBeConst
+void UTrackedVisualizationBase::OnMenuVisibilityChanged(const FInputActionValue& Value) {
+	IsSystemMenuShown = Value.Get<bool>();
+}
+
+// ReSharper disable once CppMemberFunctionMayBeConst
+void UTrackedVisualizationBase::OnIndexPinched() {
+	if (IsSystemMenuShown)
+		Menu();
 }

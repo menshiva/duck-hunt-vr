@@ -1,6 +1,6 @@
 ﻿#include "ControllerVisualizationBase.h"
-#include "EnhancedInputSubsystems.h"
 #include "EnhancedInputComponent.h"
+#include "EnhancedInputSubsystems.h"
 #include "DuckHuntVr/Characters/Player/Gun/GunBase.h"
 
 UControllerVisualizationBase::UControllerVisualizationBase() {
@@ -12,7 +12,6 @@ void UControllerVisualizationBase::OnComponentDestroyed(const bool bDestroyingHi
 		GunComponent->DestroyComponent();
 		GunComponent = nullptr;
 	}
-	RemoveAnimMappingContext();
 	Super::OnComponentDestroyed(bDestroyingHierarchy);
 }
 
@@ -22,9 +21,14 @@ void UControllerVisualizationBase::SwapPrimary(IHandVisualizationInterface* Seco
 
 	GunComponent->DetachFromComponent(FDetachmentTransformRules::KeepRelativeTransform);
 	Swap(GunComponent, Secondary->GunComponent);
-	Secondary->GunComponent->AttachToComponent(Secondary, FAttachmentTransformRules::KeepRelativeTransform);
 
-	Secondary->GunComponent->Init(Secondary);
+	Secondary->GunComponent->SetRelativeTransform(Secondary->GunTransform);
+	Secondary->GunComponent->AttachToComponent(Secondary, FAttachmentTransformRules::KeepRelativeTransform);
+}
+
+void UControllerVisualizationBase::PlayFireEffects() {
+	IHandVisualizationInterface::PlayFireEffects();
+	GunComponent->PlayFireEffects(GetHandType());
 }
 
 void UControllerVisualizationBase::UpdateLaserType() {
@@ -33,46 +37,45 @@ void UControllerVisualizationBase::UpdateLaserType() {
 }
 
 void UControllerVisualizationBase::InitImpl(USceneComponent* AttachmentParent, const bool Primary) {
+	SetThisComponent(this);
+
 	SetupAttachment(AttachmentParent);
 	RegisterComponent();
 
-	InitAnimMappingContext();
-
 	if (Primary) {
 		GunComponent = NewObject<UGunBase>(this, GunClass);
-		GunComponent->Init(this);
+		GunComponent->SetRelativeTransform(GunTransform);
 		GunComponent->SetupAttachment(this);
 		GunComponent->RegisterComponent();
 	}
 }
 
-void UControllerVisualizationBase::InitAnimMappingContext() {
-	if (const auto PlayerController = GetWorld()->GetFirstPlayerController()) {
-		if (const auto Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer()))
-			Subsystem->AddMappingContext(AnimMappingContext, 0);
+void UControllerVisualizationBase::AddMappingContexts(UEnhancedInputLocalPlayerSubsystem* Subsystem, UEnhancedInputComponent* Component) {
+	Subsystem->AddMappingContext(ActionMappingContext, 0);
+	Subsystem->AddMappingContext(AnimMappingContext, 0);
 
-		if (const auto EnhancedInputComponent = Cast<UEnhancedInputComponent>(PlayerController->InputComponent)) {
-			// don't know why, but binding with for example ETriggerEvent::Started | ETriggerEvent::Completed doesn't work
+	Component->BindAction(FireAction, ETriggerEvent::Triggered, this, &UControllerVisualizationBase::Fire);
+	if (MenuAction)
+		Component->BindAction(MenuAction, ETriggerEvent::Triggered, this, &UControllerVisualizationBase::Menu);
 
-			EnhancedInputComponent->BindAction(AnimPointCapTouchAction, ETriggerEvent::Started, this, &UControllerVisualizationBase::AnimPointCapTouchActionEvent);
-			EnhancedInputComponent->BindAction(AnimPointCapTouchAction, ETriggerEvent::Completed, this, &UControllerVisualizationBase::AnimPointCapTouchActionEvent);
+	// don't know why, but binding with for example ETriggerEvent::Started | ETriggerEvent::Completed doesn't work
 
-			EnhancedInputComponent->BindAction(AnimTriggerAction, ETriggerEvent::Triggered, this, &UControllerVisualizationBase::AnimTriggerActionEvent);
-			EnhancedInputComponent->BindAction(AnimTriggerAction, ETriggerEvent::Completed, this, &UControllerVisualizationBase::AnimTriggerActionEvent);
+	Component->BindAction(AnimPointCapTouchAction, ETriggerEvent::Started, this, &UControllerVisualizationBase::AnimPointCapTouchActionEvent);
+	Component->BindAction(AnimPointCapTouchAction, ETriggerEvent::Completed, this, &UControllerVisualizationBase::AnimPointCapTouchActionEvent);
 
-			EnhancedInputComponent->BindAction(AnimThumbCapTouchAction, ETriggerEvent::Started, this, &UControllerVisualizationBase::AnimThumbCapTouchActionEvent);
-			EnhancedInputComponent->BindAction(AnimThumbCapTouchAction, ETriggerEvent::Completed, this, &UControllerVisualizationBase::AnimThumbCapTouchActionEvent);
+	Component->BindAction(AnimTriggerAction, ETriggerEvent::Triggered, this, &UControllerVisualizationBase::AnimTriggerActionEvent);
+	Component->BindAction(AnimTriggerAction, ETriggerEvent::Completed, this, &UControllerVisualizationBase::AnimTriggerActionEvent);
 
-			EnhancedInputComponent->BindAction(AnimGripAction, ETriggerEvent::Triggered, this, &UControllerVisualizationBase::AnimGripActionEvent);
-			EnhancedInputComponent->BindAction(AnimGripAction, ETriggerEvent::Completed, this, &UControllerVisualizationBase::AnimGripActionEvent);
-		}
-	}
+	Component->BindAction(AnimThumbCapTouchAction, ETriggerEvent::Started, this, &UControllerVisualizationBase::AnimThumbCapTouchActionEvent);
+	Component->BindAction(AnimThumbCapTouchAction, ETriggerEvent::Completed, this, &UControllerVisualizationBase::AnimThumbCapTouchActionEvent);
+
+	Component->BindAction(AnimGripAction, ETriggerEvent::Triggered, this, &UControllerVisualizationBase::AnimGripActionEvent);
+	Component->BindAction(AnimGripAction, ETriggerEvent::Completed, this, &UControllerVisualizationBase::AnimGripActionEvent);
 }
 
-void UControllerVisualizationBase::RemoveAnimMappingContext() const {
-	if (const auto PlayerController = GetWorld()->GetFirstPlayerController())
-		if (const auto Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer()))
-			Subsystem->RemoveMappingContext(AnimMappingContext);
+void UControllerVisualizationBase::ClearMappingContexts(UEnhancedInputLocalPlayerSubsystem* Subsystem) const {
+	Subsystem->RemoveMappingContext(ActionMappingContext);
+	Subsystem->RemoveMappingContext(AnimMappingContext);
 }
 
 void UControllerVisualizationBase::AnimPointCapTouchActionEvent(const FInputActionValue& Value) {

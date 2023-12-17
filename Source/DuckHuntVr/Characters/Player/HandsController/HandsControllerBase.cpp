@@ -23,12 +23,12 @@ void UHandsControllerBase::OnComponentCreated() {
 	LeftMotionController = NewMotionControllerObject(LeftMotionControllerClass, EControllerHand::Left);
 	RightMotionController = NewMotionControllerObject(RightMotionControllerClass, EControllerHand::Right);
 
-	PrimaryController = RightMotionController;
-	SecondaryController = LeftMotionController;
+	PrimaryMotionController = RightMotionController;
+	SecondaryMotionController = LeftMotionController;
 
 	check(PrimaryHand == EControllerHand::Right || PrimaryHand == EControllerHand::Left);
 	if (PrimaryHand == EControllerHand::Left)
-		Swap(PrimaryController, SecondaryController);
+		Swap(PrimaryMotionController, SecondaryMotionController);
 }
 
 void UHandsControllerBase::OnComponentDestroyed(const bool bDestroyingHierarchy) {
@@ -55,8 +55,8 @@ void UHandsControllerBase::SetPrimaryHand(const EControllerHand NewPrimaryHand) 
 		return;
 	PrimaryHand = NewPrimaryHand;
 	if (CurrentVisualizationType != EVisualizationType::None)
-		PrimaryController->GetVisualizationComponent()->SwapPrimary(SecondaryController->GetVisualizationComponent());
-	Swap(PrimaryController, SecondaryController);
+		PrimaryMotionController->GetVisualizationComponent()->SwapPrimary(SecondaryMotionController->GetVisualizationComponent());
+	Swap(PrimaryMotionController, SecondaryMotionController);
 }
 
 void UHandsControllerBase::SetLaserType(const ELaserType NewLaserType) {
@@ -64,7 +64,12 @@ void UHandsControllerBase::SetLaserType(const ELaserType NewLaserType) {
 		return;
 	LaserType = NewLaserType;
 	if (CurrentVisualizationType != EVisualizationType::None)
-		PrimaryController->GetVisualizationComponent()->UpdateLaserType();
+		PrimaryMotionController->GetVisualizationComponent()->UpdateLaserType();
+}
+
+void UHandsControllerBase::PlayFireEffects() const {
+	if (const auto PrimaryControllerVis = PrimaryMotionController->GetVisualizationComponent())
+		PrimaryControllerVis->PlayFireEffects();
 }
 
 EVisualizationType UHandsControllerBase::GetNewVisualizationType() const {
@@ -78,8 +83,8 @@ EVisualizationType UHandsControllerBase::GetNewVisualizationType() const {
 void UHandsControllerBase::UpdateControllersVisualizationIfNeeded() {
 	const auto NewVisualizationType = GetNewVisualizationType();
 	if (NewVisualizationType != CurrentVisualizationType) {
-		PrimaryController->UpdateVisualization(NewVisualizationType, true);
-		SecondaryController->UpdateVisualization(NewVisualizationType, false);
+		PrimaryMotionController->UpdateVisualization(NewVisualizationType, true);
+		SecondaryMotionController->UpdateVisualization(NewVisualizationType, false);
 		CurrentVisualizationType = NewVisualizationType;
 	}
 }

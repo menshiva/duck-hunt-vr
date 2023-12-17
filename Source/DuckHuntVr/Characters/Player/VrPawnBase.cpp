@@ -29,3 +29,14 @@ void AVrPawnBase::BeginPlay() {
 	UKismetSystemLibrary::ExecuteConsoleCommand(this, TEXT("r.ScreenPercentage 100"));
 	UHeadMountedDisplayFunctionLibrary::SetTrackingOrigin(EHMDTrackingOrigin::Floor);
 }
+
+// ReSharper disable once CppMemberFunctionMayBeConst
+void AVrPawnBase::OnGunFire() {
+	HandsController->PlayFireEffects();
+	UKismetSystemLibrary::PrintString(this, TEXT("Gun fired"), true, true, FLinearColor::Red);
+}
+
+// ReSharper disable once CppMemberFunctionMayBeConst
+void AVrPawnBase::OnMenuPressed() {
+	UKismetSystemLibrary::PrintString(this, TEXT("Menu pressed"), true, true, FLinearColor::Red);
+}

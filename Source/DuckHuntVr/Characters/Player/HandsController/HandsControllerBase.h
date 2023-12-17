@@ -1,8 +1,10 @@
 ﻿#pragma once
 
-#include "..\Laser\LaserBase.h"
+#include "DuckHuntVr/Characters/Player/Laser/LaserBase.h"
 #include "Hand/HandMotionControllerBase.h"
 #include "HandsControllerBase.generated.h"
+
+class UHapticFeedbackEffect_Curve;
 
 UCLASS(Abstract, Blueprintable, NotBlueprintType, NotPlaceable)
 class DUCKHUNTVR_API UHandsControllerBase : public USceneComponent {
@@ -22,6 +24,8 @@ public:
 	void SetLaserType(ELaserType NewLaserType);
 
 	FORCEINLINE ELaserType GetLaserType() const { return LaserType; }
+
+	void PlayFireEffects() const;
 protected:
 	UPROPERTY(EditDefaultsOnly, Category=Subcomponents)
 	TSubclassOf<UHandMotionControllerBase> LeftMotionControllerClass;
@@ -49,6 +53,6 @@ private:
 	UPROPERTY()
 	TObjectPtr<UHandMotionControllerBase> RightMotionController;
 
-	TWeakObjectPtr<UHandMotionControllerBase> PrimaryController;
-	TWeakObjectPtr<UHandMotionControllerBase> SecondaryController;
+	TWeakObjectPtr<UHandMotionControllerBase> PrimaryMotionController;
+	TWeakObjectPtr<UHandMotionControllerBase> SecondaryMotionController;
 };

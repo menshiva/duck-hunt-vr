@@ -2,10 +2,7 @@
 
 #include "GunBase.generated.h"
 
-class UControllerVisualizationBase;
 class UHapticFeedbackEffect_Curve;
-class UInputMappingContext;
-class UInputAction;
 class ULaserBase;
 
 UCLASS(Abstract, Blueprintable, NotBlueprintType, NotPlaceable)
@@ -17,7 +14,7 @@ public:
 	virtual void OnComponentCreated() override;
 	virtual void OnComponentDestroyed(bool bDestroyingHierarchy) override;
 
-	void Init(UControllerVisualizationBase* Parent);
+	void PlayFireEffects(EControllerHand HandType) const;
 	void UpdateLaserType() const;
 protected:
 	UPROPERTY(EditDefaultsOnly, Category=Init)
@@ -29,16 +26,9 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category=Subcomponents)
 	TSubclassOf<ULaserBase> LaserClass;
 private:
-	void InitFireMappingContext(const UInputMappingContext* FireMappingContext, const UInputAction* FireAction);
-	void RemoveFireMappingContext(const UInputMappingContext* FireMappingContext) const;
-
-	void Fire();
-
 	UPROPERTY()
 	TObjectPtr<UAudioComponent> FireAudioComponent;
 
 	UPROPERTY()
 	TObjectPtr<ULaserBase> LaserComponent;
-
-	TWeakObjectPtr<UControllerVisualizationBase> ParentControllerVisualizationComponent;
 };

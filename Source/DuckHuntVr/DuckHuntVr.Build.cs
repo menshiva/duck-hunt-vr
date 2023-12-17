@@ -8,10 +8,10 @@ public class DuckHuntVr : ModuleRules
 	{
 		PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
 	
-		PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore" });
+		PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "EnhancedInput" });
 
 		PrivateDependencyModuleNames.AddRange(new string[] {
-			"EnhancedInput", "HeadMountedDisplay", "OculusXRInput", "UMG", "Niagara",
+			"HeadMountedDisplay", "OculusXRInput", "UMG", "Niagara",
 			"Paper2D", "XRBase"
 		});
 

@@ -5,8 +5,8 @@
 
 class UInputMappingContext;
 class UInputAction;
-struct FInputActionValue;
 class UGunBase;
+struct FInputActionValue;
 
 UCLASS(Abstract, Blueprintable, BlueprintType, NotPlaceable)
 class DUCKHUNTVR_API UControllerVisualizationBase : public USkeletalMeshComponent, public IHandVisualizationInterface {
@@ -14,20 +14,25 @@ class DUCKHUNTVR_API UControllerVisualizationBase : public USkeletalMeshComponen
 public:
 	UControllerVisualizationBase();
 
-	virtual void Destroy() override { DestroyComponent(); }
 	virtual void OnComponentDestroyed(bool bDestroyingHierarchy) override;
 
 	UFUNCTION(BlueprintPure)
 	virtual bool IsPrimary() const override { return static_cast<bool>(GunComponent); }
-
 	virtual void SwapPrimary(IHandVisualizationInterface* SecondaryHandVisualization) override;
-	virtual void UpdateLaserType() override;
 
-	FORCEINLINE const FTransform& GetGunTransform() const { return GunTransform; }
-	FORCEINLINE const UInputMappingContext* GetGunFireMappingContext() const { return GunFireMappingContext; }
-	FORCEINLINE const UInputAction* GetGunFireAction() const { return GunFireAction; }
+	virtual void PlayFireEffects() override;
+	virtual void UpdateLaserType() override;
 protected:
 	virtual void InitImpl(USceneComponent* AttachmentParent, bool Primary) override;
+
+	UPROPERTY(EditDefaultsOnly, Category="Init|Action", DisplayName=Context)
+	TObjectPtr<UInputMappingContext> ActionMappingContext;
+
+	UPROPERTY(EditDefaultsOnly, Category="Init|Action")
+	TObjectPtr<UInputAction> FireAction;
+
+	UPROPERTY(EditDefaultsOnly, Category="Init|Action")
+	TObjectPtr<UInputAction> MenuAction;
 
 	UPROPERTY(EditDefaultsOnly, Category="Init|Anim", DisplayName=Context)
 	TObjectPtr<UInputMappingContext> AnimMappingContext;
@@ -44,17 +49,11 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category="Init|Anim", DisplayName=GripAction)
 	TObjectPtr<UInputAction> AnimGripAction;
 
-	UPROPERTY(EditDefaultsOnly, Category=Subcomponents)
-	TSubclassOf<UGunBase> GunClass;
-
-	UPROPERTY(EditDefaultsOnly, Category="Init|Gun", DisplayName=Transform)
+	UPROPERTY(EditDefaultsOnly, Category=Init)
 	FTransform GunTransform;
 
-	UPROPERTY(EditDefaultsOnly, Category="Init|Gun", DisplayName=FireContext)
-	TObjectPtr<UInputMappingContext> GunFireMappingContext;
-
-	UPROPERTY(EditDefaultsOnly, Category="Init|Gun", DisplayName=FireAction)
-	TObjectPtr<UInputAction> GunFireAction;
+	UPROPERTY(EditDefaultsOnly, Category=Subcomponents)
+	TSubclassOf<UGunBase> GunClass;
 
 	UPROPERTY(BlueprintReadOnly)
 	bool IsPointing = false;
@@ -68,8 +67,8 @@ protected:
 	UPROPERTY(BlueprintReadOnly)
 	float GripAxis = 0.0f;
 private:
-	void InitAnimMappingContext();
-	void RemoveAnimMappingContext() const;
+	virtual void AddMappingContexts(UEnhancedInputLocalPlayerSubsystem* Subsystem, UEnhancedInputComponent* Component) override;
+	virtual void ClearMappingContexts(UEnhancedInputLocalPlayerSubsystem* Subsystem) const override;
 
 	void AnimPointCapTouchActionEvent(const FInputActionValue& Value);
 	void AnimTriggerActionEvent(const FInputActionValue& Value);
