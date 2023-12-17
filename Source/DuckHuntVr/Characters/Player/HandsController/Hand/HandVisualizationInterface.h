@@ -35,7 +35,7 @@ protected:
 	void Menu();
 private:
 	const APlayerController* GetPlayerController() const;
-	static AVrPawnBase* GetVrPawn(const APlayerController* PlayerController);
+	AVrPawnBase* GetVrPawn() const;
 
 	TWeakObjectPtr<USceneComponent> UnderlyingComponent;
 	EControllerHand HandType = EControllerHand::Left;

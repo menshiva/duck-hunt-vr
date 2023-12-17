@@ -42,13 +42,14 @@ void IHandVisualizationInterface::UpdateLaserType() {
 
 // ReSharper disable once CppMemberFunctionMayBeConst
 void IHandVisualizationInterface::Fire() {
-	if (const auto Pawn = GetVrPawn(GetPlayerController()); Pawn && IsPrimary())
-		Pawn->OnGunFire();
+	if (IsPrimary())
+		if (const auto Pawn = GetVrPawn())
+			Pawn->OnGunFire();
 }
 
 // ReSharper disable once CppMemberFunctionMayBeConst
 void IHandVisualizationInterface::Menu() {
-	if (const auto Pawn = GetVrPawn(GetPlayerController()))
+	if (const auto Pawn = GetVrPawn())
 		Pawn->OnMenuPressed();
 }
 
@@ -58,8 +59,8 @@ const APlayerController* IHandVisualizationInterface::GetPlayerController() cons
 	return nullptr;
 }
 
-AVrPawnBase* IHandVisualizationInterface::GetVrPawn(const APlayerController* PlayerController) {
-	if (PlayerController)
+AVrPawnBase* IHandVisualizationInterface::GetVrPawn() const {
+	if (const auto PlayerController = GetPlayerController())
 		return CastChecked<AVrPawnBase>(PlayerController->GetPawn());
 	return nullptr;
 }

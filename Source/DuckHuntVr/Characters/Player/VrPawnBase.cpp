@@ -2,6 +2,7 @@
 #include "Camera/CameraComponent.h"
 #include "HandsController/HandsControllerBase.h"
 #include "HeadMountedDisplayFunctionLibrary.h"
+#include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetSystemLibrary.h"
 
 AVrPawnBase::AVrPawnBase() {
@@ -38,5 +39,23 @@ void AVrPawnBase::OnGunFire() {
 
 // ReSharper disable once CppMemberFunctionMayBeConst
 void AVrPawnBase::OnMenuPressed() {
-	UKismetSystemLibrary::PrintString(this, TEXT("Menu pressed"), true, true, FLinearColor::Red);
+	const auto WillBePaused = !UGameplayStatics::IsGamePaused(this);
+
+	static EVisualizationType PrevVisualizationType = EVisualizationType::None;
+	const EVisualizationType NewisualizationType = HandsController->GetVisualizationType();
+
+	if (WillBePaused)
+		PrevVisualizationType = NewisualizationType;
+
+	if (PrevVisualizationType == NewisualizationType) {
+		UGameplayStatics::SetGamePaused(this, WillBePaused);
+		UKismetSystemLibrary::PrintString(this, WillBePaused ? TEXT("Paused") : TEXT("Unpaused"), true, true, FLinearColor::Red);
+	}
+	else {
+		// TODO: create notification
+		UKismetSystemLibrary::PrintString(
+			this, TEXT("Please return to the controller type you started the game with"),
+			true, true, FLinearColor::Green
+		);
+	}
 }

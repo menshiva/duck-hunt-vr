@@ -4,6 +4,7 @@
 
 UHandsControllerBase::UHandsControllerBase() {
 	PrimaryComponentTick.bCanEverTick = true;
+	PrimaryComponentTick.bTickEvenWhenPaused = true;
 }
 
 void UHandsControllerBase::OnComponentCreated() {
@@ -36,35 +37,39 @@ void UHandsControllerBase::OnComponentDestroyed(const bool bDestroyingHierarchy)
 		LeftMotionController->DestroyComponent();
 		LeftMotionController = nullptr;
 	}
-
 	if (RightMotionController) {
 		RightMotionController->DestroyComponent();
 		RightMotionController = nullptr;
 	}
-
 	Super::OnComponentDestroyed(bDestroyingHierarchy);
 }
 
 void UHandsControllerBase::TickComponent(const float Dt, const ELevelTick Tt, FActorComponentTickFunction* Tf) {
 	Super::TickComponent(Dt, Tt, Tf);
-	UpdateControllersVisualizationIfNeeded();
+	const auto NewVisualizationType = GetNewVisualizationType();
+	if (NewVisualizationType != CurrentVisualizationType) {
+		// TODO: set game on pause
+		PrimaryMotionController->UpdateVisualization(NewVisualizationType, true);
+		SecondaryMotionController->UpdateVisualization(NewVisualizationType, false);
+		CurrentVisualizationType = NewVisualizationType;
+	}
 }
 
 void UHandsControllerBase::SetPrimaryHand(const EControllerHand NewPrimaryHand) {
-	if (PrimaryHand == NewPrimaryHand)
-		return;
-	PrimaryHand = NewPrimaryHand;
-	if (CurrentVisualizationType != EVisualizationType::None)
-		PrimaryMotionController->GetVisualizationComponent()->SwapPrimary(SecondaryMotionController->GetVisualizationComponent());
-	Swap(PrimaryMotionController, SecondaryMotionController);
+	if (PrimaryHand != NewPrimaryHand) {
+		PrimaryHand = NewPrimaryHand;
+		if (CurrentVisualizationType != EVisualizationType::None)
+			PrimaryMotionController->GetVisualizationComponent()->SwapPrimary(SecondaryMotionController->GetVisualizationComponent());
+		Swap(PrimaryMotionController, SecondaryMotionController);
+	}
 }
 
 void UHandsControllerBase::SetLaserType(const ELaserType NewLaserType) {
-	if (LaserType == NewLaserType)
-		return;
-	LaserType = NewLaserType;
-	if (CurrentVisualizationType != EVisualizationType::None)
-		PrimaryMotionController->GetVisualizationComponent()->UpdateLaserType();
+	if (LaserType != NewLaserType) {
+		LaserType = NewLaserType;
+		if (CurrentVisualizationType != EVisualizationType::None)
+			PrimaryMotionController->GetVisualizationComponent()->UpdateLaserType();
+	}
 }
 
 void UHandsControllerBase::PlayFireEffects() const {
@@ -73,18 +78,9 @@ void UHandsControllerBase::PlayFireEffects() const {
 }
 
 EVisualizationType UHandsControllerBase::GetNewVisualizationType() const {
-	if (AllowHandTracking && UOculusXRInputFunctionLibrary::IsHandTrackingEnabled())
+	if (UOculusXRInputFunctionLibrary::IsHandTrackingEnabled())
 		return EVisualizationType::Tracked;
 	if (LeftMotionController->IsTracked() || RightMotionController->IsTracked())
 		return EVisualizationType::Controller;
 	return EVisualizationType::None;
-}
-
-void UHandsControllerBase::UpdateControllersVisualizationIfNeeded() {
-	const auto NewVisualizationType = GetNewVisualizationType();
-	if (NewVisualizationType != CurrentVisualizationType) {
-		PrimaryMotionController->UpdateVisualization(NewVisualizationType, true);
-		SecondaryMotionController->UpdateVisualization(NewVisualizationType, false);
-		CurrentVisualizationType = NewVisualizationType;
-	}
 }

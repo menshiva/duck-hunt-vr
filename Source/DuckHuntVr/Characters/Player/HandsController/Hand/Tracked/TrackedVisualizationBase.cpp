@@ -5,6 +5,7 @@
 
 UTrackedVisualizationBase::UTrackedVisualizationBase() {
 	PrimaryComponentTick.bStartWithTickEnabled = true;
+	PrimaryComponentTick.bTickEvenWhenPaused = true;
 }
 
 void UTrackedVisualizationBase::OnComponentDestroyed(const bool bDestroyingHierarchy) {

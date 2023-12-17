@@ -23,9 +23,10 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void SetLaserType(ELaserType NewLaserType);
 
-	FORCEINLINE ELaserType GetLaserType() const { return LaserType; }
-
 	void PlayFireEffects() const;
+
+	FORCEINLINE ELaserType GetLaserType() const { return LaserType; }
+	FORCEINLINE EVisualizationType GetVisualizationType() const { return CurrentVisualizationType; }
 protected:
 	UPROPERTY(EditDefaultsOnly, Category=Subcomponents)
 	TSubclassOf<UHandMotionControllerBase> LeftMotionControllerClass;
@@ -34,10 +35,6 @@ protected:
 	TSubclassOf<UHandMotionControllerBase> RightMotionControllerClass;
 private:
 	EVisualizationType GetNewVisualizationType() const;
-	void UpdateControllersVisualizationIfNeeded();
-
-	// TODO: Make this a config variable
-	const bool AllowHandTracking = true;
 
 	// TODO: Make this a config variable
 	EControllerHand PrimaryHand = EControllerHand::Right;

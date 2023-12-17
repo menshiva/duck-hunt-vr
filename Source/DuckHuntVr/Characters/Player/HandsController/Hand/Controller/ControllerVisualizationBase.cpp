@@ -5,6 +5,7 @@
 
 UControllerVisualizationBase::UControllerVisualizationBase() {
 	PrimaryComponentTick.bCanEverTick = true;
+	PrimaryComponentTick.bTickEvenWhenPaused = true;
 }
 
 void UControllerVisualizationBase::OnComponentDestroyed(const bool bDestroyingHierarchy) {

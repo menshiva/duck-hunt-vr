@@ -4,6 +4,7 @@
 
 UHandMotionControllerBase::UHandMotionControllerBase() {
 	PrimaryComponentTick.bCanEverTick = true;
+	PrimaryComponentTick.bTickEvenWhenPaused = true;
 }
 
 void UHandMotionControllerBase::OnComponentDestroyed(const bool bDestroyingHierarchy) {

@@ -4,11 +4,14 @@
 #include "PaperSpriteComponent.h"
 #include "DuckHuntVr/Characters/Player/VrPawnBase.h"
 #include "DuckHuntVr/Characters/Player/HandsController/HandsControllerBase.h"
+#include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "Kismet/KismetSystemLibrary.h"
 
 ULaserBase::ULaserBase() {
 	PrimaryComponentTick.bCanEverTick = true;
+	PrimaryComponentTick.bTickEvenWhenPaused = true;
+
 	UActorComponent::SetAutoActivate(true);
 
 	TraceTypeQuery = UEngineTypes::ConvertToTraceType(ECC_GameTraceChannel1);
@@ -120,6 +123,10 @@ void ULaserBase::TickComponent(const float Dt, const ELevelTick Tt, FActorCompon
 			NiagaraLaser, "User.PointArray", 1,
 			End, false
 		);
+		if (UGameplayStatics::IsGamePaused(this)) {
+			// I couldn't find another way :(, NiagaraLaser->SetTickableWhenPaused(true) doesn't work
+			NiagaraLaser->AdvanceSimulation(1, Dt);
+		}
 	}
 	else if (CrosshairSprite) {
 		if (HitResult.bBlockingHit) {

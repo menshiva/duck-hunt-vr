@@ -7,6 +7,7 @@ UGunBase::UGunBase() {
 	PrimaryComponentTick.bCanEverTick = false;
 
 	FireAudioComponent = CreateDefaultSubobject<UAudioComponent>(TEXT("FireAudioComponent"));
+	FireAudioComponent->SetUISound(true); // allows to play sound even when game is paused
 }
 
 void UGunBase::OnComponentCreated() {
@@ -29,12 +30,10 @@ void UGunBase::OnComponentDestroyed(const bool bDestroyingHierarchy) {
 		FireAudioComponent->DestroyComponent();
 		FireAudioComponent = nullptr;
 	}
-
 	if (LaserComponent) {
 		LaserComponent->DestroyComponent();
 		LaserComponent = nullptr;
 	}
-
 	Super::OnComponentDestroyed(bDestroyingHierarchy);
 }
 
