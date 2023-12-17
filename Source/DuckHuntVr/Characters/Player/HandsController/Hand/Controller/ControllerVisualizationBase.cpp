@@ -19,12 +19,9 @@ void UControllerVisualizationBase::OnComponentDestroyed(const bool bDestroyingHi
 void UControllerVisualizationBase::SwapPrimary(IHandVisualizationInterface* SecondaryHandVisualization) {
 	IHandVisualizationInterface::SwapPrimary(SecondaryHandVisualization);
 	const auto Secondary = CastChecked<UControllerVisualizationBase>(SecondaryHandVisualization);
-
 	GunComponent->DetachFromComponent(FDetachmentTransformRules::KeepRelativeTransform);
 	Swap(GunComponent, Secondary->GunComponent);
-
-	Secondary->GunComponent->SetRelativeTransform(Secondary->GunTransform);
-	Secondary->GunComponent->AttachToComponent(Secondary, FAttachmentTransformRules::KeepRelativeTransform);
+	Secondary->GunComponent->AttachToComponent(Secondary, FAttachmentTransformRules::KeepRelativeTransform, TEXT("GunSocket"));
 }
 
 void UControllerVisualizationBase::PlayFireEffects() {
@@ -45,8 +42,7 @@ void UControllerVisualizationBase::InitImpl(USceneComponent* AttachmentParent, c
 
 	if (Primary) {
 		GunComponent = NewObject<UGunBase>(this, GunClass);
-		GunComponent->SetRelativeTransform(GunTransform);
-		GunComponent->SetupAttachment(this);
+		GunComponent->SetupAttachment(this, TEXT("GunSocket"));
 		GunComponent->RegisterComponent();
 	}
 }

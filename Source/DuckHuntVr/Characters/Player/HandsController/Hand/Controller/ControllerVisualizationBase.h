@@ -49,9 +49,6 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category="Init|Anim", DisplayName=GripAction)
 	TObjectPtr<UInputAction> AnimGripAction;
 
-	UPROPERTY(EditDefaultsOnly, Category=Init)
-	FTransform GunTransform;
-
 	UPROPERTY(EditDefaultsOnly, Category=Subcomponents)
 	TSubclassOf<UGunBase> GunClass;
 
