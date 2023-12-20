@@ -4,6 +4,7 @@
 #include "HeadMountedDisplayFunctionLibrary.h"
 #include "Components/WidgetComponent.h"
 #include "Kismet/GameplayStatics.h"
+#include "Kismet/KismetMathLibrary.h"
 #include "Kismet/KismetSystemLibrary.h"
 
 AVrPawnBase::AVrPawnBase() {
@@ -27,6 +28,19 @@ void AVrPawnBase::BeginPlay() {
 	UHeadMountedDisplayFunctionLibrary::EnableHMD(true);
 	UKismetSystemLibrary::ExecuteConsoleCommand(this, TEXT("r.ScreenPercentage 100"));
 	UHeadMountedDisplayFunctionLibrary::SetTrackingOrigin(EHMDTrackingOrigin::Floor);
+}
+
+void AVrPawnBase::Tick(const float DeltaSeconds) {
+	Super::Tick(DeltaSeconds);
+
+	static auto PrevCameraRotation = FRotator(0.0, Camera->GetRelativeRotation().Yaw, 0.0);
+	const auto NewCameraRotation = UKismetMathLibrary::RLerp(
+		PrevCameraRotation, FRotator(0.0, Camera->GetRelativeRotation().Yaw, 0.0),
+		DeltaSeconds * 10.0f, false
+	);
+
+	InGameWidgetHolder->SetRelativeTransform(InGameWidgetHolder->GetRelativeTransform() * FTransform(NewCameraRotation - PrevCameraRotation));
+	PrevCameraRotation = NewCameraRotation;
 }
 
 // ReSharper disable once CppMemberFunctionMayBeConst

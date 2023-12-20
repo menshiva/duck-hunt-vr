@@ -13,6 +13,7 @@ public:
 	AVrPawnBase();
 
 	virtual void BeginPlay() override;
+	virtual void Tick(float DeltaSeconds) override;
 
 	void OnGunFire();
 	void OnMenuPressed();
