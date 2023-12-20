@@ -22,6 +22,7 @@
 !/Content/**/*.png
 !/Content/**/*.wav
 !/Content/**/*.obj
+!/Content/**/*.ttf
 !/Content/**/*.umap
 
 # Do not ignore README.md.
