@@ -1,27 +1,25 @@
 ﻿#include "VrPawnBase.h"
 #include "Camera/CameraComponent.h"
-#include "HandsController/HandsControllerBase.h"
+#include "HandsController/HandsController.h"
 #include "HeadMountedDisplayFunctionLibrary.h"
+#include "Components/WidgetComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetSystemLibrary.h"
 
 AVrPawnBase::AVrPawnBase() {
-	PrimaryActorTick.bCanEverTick = false;
+	PrimaryActorTick.bCanEverTick = true;
 
 	DefaultSceneRoot = CreateDefaultSubobject<USceneComponent>(TEXT("DefaultSceneRoot"));
 	SetRootComponent(DefaultSceneRoot);
 
 	Camera = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
 	Camera->SetupAttachment(DefaultSceneRoot);
-}
 
-void AVrPawnBase::OnConstruction(const FTransform& Transform) {
-	Super::OnConstruction(Transform);
-	if (HandsControllerClass) {
-		HandsController = NewObject<UHandsControllerBase>(this, HandsControllerClass);
-		HandsController->SetupAttachment(DefaultSceneRoot);
-		HandsController->RegisterComponent();
-	}
+	HandsController = CreateDefaultSubobject<UHandsController>(TEXT("HandsController"));
+	HandsController->SetupAttachment(DefaultSceneRoot);
+
+	InGameWidgetHolder = CreateDefaultSubobject<UWidgetComponent>(TEXT("InGameWidgetHolder"));
+	InGameWidgetHolder->SetupAttachment(DefaultSceneRoot);
 }
 
 void AVrPawnBase::BeginPlay() {

@@ -3,7 +3,7 @@
 #include "NiagaraDataInterfaceArrayFunctionLibrary.h"
 #include "PaperSpriteComponent.h"
 #include "DuckHuntVr/Characters/Player/VrPawnBase.h"
-#include "DuckHuntVr/Characters/Player/HandsController/HandsControllerBase.h"
+#include "..\HandsController\HandsController.h"
 #include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "Kismet/KismetSystemLibrary.h"

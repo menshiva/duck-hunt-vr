@@ -1,13 +1,13 @@
-﻿#include "HandsControllerBase.h"
+﻿#include "HandsController.h"
 #include "OculusXRInputFunctionLibrary.h"
 #include "Hand/HandVisualizationInterface.h"
 
-UHandsControllerBase::UHandsControllerBase() {
+UHandsController::UHandsController() {
 	PrimaryComponentTick.bCanEverTick = true;
 	PrimaryComponentTick.bTickEvenWhenPaused = true;
 }
 
-void UHandsControllerBase::OnComponentCreated() {
+void UHandsController::OnComponentCreated() {
 	Super::OnComponentCreated();
 
 	const auto NewMotionControllerObject = [this] (const TSubclassOf<UHandMotionControllerBase>& Class, const EControllerHand HandType) {
@@ -32,7 +32,7 @@ void UHandsControllerBase::OnComponentCreated() {
 		Swap(PrimaryMotionController, SecondaryMotionController);
 }
 
-void UHandsControllerBase::OnComponentDestroyed(const bool bDestroyingHierarchy) {
+void UHandsController::OnComponentDestroyed(const bool bDestroyingHierarchy) {
 	if (LeftMotionController) {
 		LeftMotionController->DestroyComponent();
 		LeftMotionController = nullptr;
@@ -44,7 +44,7 @@ void UHandsControllerBase::OnComponentDestroyed(const bool bDestroyingHierarchy)
 	Super::OnComponentDestroyed(bDestroyingHierarchy);
 }
 
-void UHandsControllerBase::TickComponent(const float Dt, const ELevelTick Tt, FActorComponentTickFunction* Tf) {
+void UHandsController::TickComponent(const float Dt, const ELevelTick Tt, FActorComponentTickFunction* Tf) {
 	Super::TickComponent(Dt, Tt, Tf);
 	const auto NewVisualizationType = GetNewVisualizationType();
 	if (NewVisualizationType != CurrentVisualizationType) {
@@ -55,7 +55,7 @@ void UHandsControllerBase::TickComponent(const float Dt, const ELevelTick Tt, FA
 	}
 }
 
-void UHandsControllerBase::SetPrimaryHand(const EControllerHand NewPrimaryHand) {
+void UHandsController::SetPrimaryHand(const EControllerHand NewPrimaryHand) {
 	if (PrimaryHand != NewPrimaryHand) {
 		PrimaryHand = NewPrimaryHand;
 		if (CurrentVisualizationType != EVisualizationType::None)
@@ -64,7 +64,7 @@ void UHandsControllerBase::SetPrimaryHand(const EControllerHand NewPrimaryHand) 
 	}
 }
 
-void UHandsControllerBase::SetLaserType(const ELaserType NewLaserType) {
+void UHandsController::SetLaserType(const ELaserType NewLaserType) {
 	if (LaserType != NewLaserType) {
 		LaserType = NewLaserType;
 		if (CurrentVisualizationType != EVisualizationType::None)
@@ -72,12 +72,12 @@ void UHandsControllerBase::SetLaserType(const ELaserType NewLaserType) {
 	}
 }
 
-void UHandsControllerBase::PlayFireEffects() const {
+void UHandsController::PlayFireEffects() const {
 	if (const auto PrimaryControllerVis = PrimaryMotionController->GetVisualizationComponent())
 		PrimaryControllerVis->PlayFireEffects();
 }
 
-EVisualizationType UHandsControllerBase::GetNewVisualizationType() const {
+EVisualizationType UHandsController::GetNewVisualizationType() const {
 	if (UOculusXRInputFunctionLibrary::IsHandTrackingEnabled())
 		return EVisualizationType::Tracked;
 	if (LeftMotionController->IsTracked() || RightMotionController->IsTracked())

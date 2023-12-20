@@ -2,15 +2,15 @@
 
 #include "DuckHuntVr/Characters/Player/Laser/LaserBase.h"
 #include "Hand/HandMotionControllerBase.h"
-#include "HandsControllerBase.generated.h"
+#include "HandsController.generated.h"
 
 class UHapticFeedbackEffect_Curve;
 
-UCLASS(Abstract, Blueprintable, NotBlueprintType, NotPlaceable)
-class DUCKHUNTVR_API UHandsControllerBase : public USceneComponent {
+UCLASS(Blueprintable, NotBlueprintType, NotPlaceable)
+class DUCKHUNTVR_API UHandsController : public USceneComponent {
 	GENERATED_BODY()
 public:
-	UHandsControllerBase();
+	UHandsController();
 
 	virtual void OnComponentCreated() override;
 	virtual void OnComponentDestroyed(bool bDestroyingHierarchy) override;

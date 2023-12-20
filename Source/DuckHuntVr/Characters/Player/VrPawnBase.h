@@ -2,8 +2,9 @@
 
 #include "VrPawnBase.generated.h"
 
-class UHandsControllerBase;
+class UHandsController;
 class UCameraComponent;
+class UWidgetComponent;
 
 UCLASS(Abstract, Blueprintable, NotBlueprintType, NotPlaceable)
 class DUCKHUNTVR_API AVrPawnBase : public APawn {
@@ -11,14 +12,12 @@ class DUCKHUNTVR_API AVrPawnBase : public APawn {
 public:
 	AVrPawnBase();
 
-	virtual void OnConstruction(const FTransform& Transform) override;
-
 	virtual void BeginPlay() override;
 
 	void OnGunFire();
 	void OnMenuPressed();
 
-	FORCEINLINE const UHandsControllerBase* GetHandsController() const { return HandsController; }
+	FORCEINLINE const UHandsController* GetHandsController() const { return HandsController; }
 protected:
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<USceneComponent> DefaultSceneRoot;
@@ -26,9 +25,9 @@ protected:
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<UCameraComponent> Camera;
 
-	UPROPERTY(EditDefaultsOnly, Category=Subcomponents)
-	TSubclassOf<UHandsControllerBase> HandsControllerClass;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	TObjectPtr<UHandsController> HandsController;
 
-	UPROPERTY(BlueprintReadOnly)
-	TObjectPtr<UHandsControllerBase> HandsController;
+	UPROPERTY(VisibleAnywhere)
+	TObjectPtr<UWidgetComponent> InGameWidgetHolder;
 };
