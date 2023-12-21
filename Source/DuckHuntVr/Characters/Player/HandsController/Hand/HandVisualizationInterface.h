@@ -4,7 +4,6 @@
 
 class AVrPawnBase;
 class UEnhancedInputLocalPlayerSubsystem;
-struct FInputActionValue;
 
 UINTERFACE(MinimalAPI)
 class UHandVisualizationInterface : public UInterface {

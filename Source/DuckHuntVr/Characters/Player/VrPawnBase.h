@@ -5,6 +5,7 @@
 class UHandsController;
 class UCameraComponent;
 class UWidgetComponent;
+class UInGameWidget;
 
 UCLASS(Abstract, Blueprintable, NotBlueprintType, NotPlaceable)
 class DUCKHUNTVR_API AVrPawnBase : public APawn {
@@ -26,9 +27,14 @@ protected:
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<UCameraComponent> Camera;
 
+	// TODO: remove BlueprintReadOnly
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	TObjectPtr<UHandsController> HandsController;
 
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<UWidgetComponent> InGameWidgetHolder;
+private:
+	TWeakObjectPtr<UInGameWidget> InGameWidget;
+
+	int32 BulletsNum = 3;
 };

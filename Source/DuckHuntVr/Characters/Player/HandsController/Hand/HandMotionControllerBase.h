@@ -3,9 +3,9 @@
 #include "MotionControllerComponent.h"
 #include "HandMotionControllerBase.generated.h"
 
+class IHandVisualizationInterface;
 class UControllerVisualizationBase;
 class UTrackedVisualizationBase;
-class IHandVisualizationInterface;
 
 enum class EVisualizationType : uint8_t {
 	None, Controller, Tracked

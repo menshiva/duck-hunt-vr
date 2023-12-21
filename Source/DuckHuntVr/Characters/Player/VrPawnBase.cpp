@@ -3,9 +3,9 @@
 #include "HandsController/HandsController.h"
 #include "HeadMountedDisplayFunctionLibrary.h"
 #include "Components/WidgetComponent.h"
+#include "DuckHuntVr/UI/InGame/InGameWidget.h"
 #include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetMathLibrary.h"
-#include "Kismet/KismetSystemLibrary.h"
 
 AVrPawnBase::AVrPawnBase() {
 	PrimaryActorTick.bCanEverTick = true;
@@ -25,6 +25,10 @@ AVrPawnBase::AVrPawnBase() {
 
 void AVrPawnBase::BeginPlay() {
 	Super::BeginPlay();
+
+	InGameWidget = Cast<UInGameWidget>(InGameWidgetHolder->GetUserWidgetObject());
+	InGameWidget->GetShotPanel()->SetBulletsNum(BulletsNum);
+
 	UHeadMountedDisplayFunctionLibrary::EnableHMD(true);
 	UKismetSystemLibrary::ExecuteConsoleCommand(this, TEXT("r.ScreenPercentage 100"));
 	UHeadMountedDisplayFunctionLibrary::SetTrackingOrigin(EHMDTrackingOrigin::Floor);
@@ -45,8 +49,11 @@ void AVrPawnBase::Tick(const float DeltaSeconds) {
 
 // ReSharper disable once CppMemberFunctionMayBeConst
 void AVrPawnBase::OnGunFire() {
+	InGameWidget->GetShotPanel()->SetBulletsNum(--BulletsNum);
 	HandsController->PlayFireEffects();
 	UKismetSystemLibrary::PrintString(this, TEXT("Gun fired"), true, true, FLinearColor::Red);
+	if (BulletsNum == 0) // TODO
+		BulletsNum = 3;
 }
 
 // ReSharper disable once CppMemberFunctionMayBeConst

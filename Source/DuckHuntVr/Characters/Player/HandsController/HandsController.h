@@ -4,8 +4,6 @@
 #include "Hand/HandMotionControllerBase.h"
 #include "HandsController.generated.h"
 
-class UHapticFeedbackEffect_Curve;
-
 UCLASS(Blueprintable, NotBlueprintType, NotPlaceable)
 class DUCKHUNTVR_API UHandsController : public USceneComponent {
 	GENERATED_BODY()
