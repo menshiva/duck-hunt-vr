@@ -7,6 +7,7 @@
 class UInputMappingContext;
 class UInputAction;
 class ULaserBase;
+struct FInputActionValue;
 
 UCLASS(Abstract, Blueprintable, NotBlueprintType, NotPlaceable)
 class DUCKHUNTVR_API UTrackedVisualizationBase : public UOculusXRHandComponent, public IHandVisualizationInterface {
