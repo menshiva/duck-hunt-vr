@@ -16,6 +16,10 @@ public:
 	virtual void BeginPlay() override;
 	virtual void Tick(float DeltaSeconds) override;
 
+	// TODO: rename UFUNCTION
+	UFUNCTION(BlueprintCallable)
+	static void ResetOrientationAndPosition();
+
 	void OnGunFire();
 	void OnMenuPressed();
 

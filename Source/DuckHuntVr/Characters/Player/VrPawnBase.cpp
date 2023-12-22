@@ -53,6 +53,10 @@ void AVrPawnBase::Tick(const float DeltaSeconds) {
 	}
 }
 
+void AVrPawnBase::ResetOrientationAndPosition() {
+	UHeadMountedDisplayFunctionLibrary::ResetOrientationAndPosition();
+}
+
 // ReSharper disable once CppMemberFunctionMayBeConst
 void AVrPawnBase::OnGunFire() {
 	InGameWidget->SetBulletsNum(--BulletsNum);
