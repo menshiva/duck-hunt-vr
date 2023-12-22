@@ -2,14 +2,17 @@
 
 ## Resources
 
-### MetaXR plugin (60.0)
+### Original game
 
-* https://developer.oculus.com/downloads/package/unreal-engine-5-integration/60.0
+* https://en.wikipedia.org/wiki/Duck_Hunt
 
-### Original gameplay
+#### PDF Manual
 
-* https://www.youtube.com/watch?v=x-daxzVxrQI&ab_channel=ToadSpeedgaming
-* https://www.youtube.com/watch?v=J3sfsP9W048&ab_channel=NintendoComplete
+* https://archive.org/details/DuckHuntNESHiResScans
+
+#### Gameplay
+
+* https://youtu.be/J3sfsP9W048?si=-DZhygU--Yi0hrV1
 * https://www.retrogames.cz/play_1185-NES.php
 
 ### Sprite sheets
