@@ -3,9 +3,8 @@
 #include "NiagaraDataInterfaceArrayFunctionLibrary.h"
 #include "PaperSpriteComponent.h"
 #include "DuckHuntVr/Characters/Player/VrPawnBase.h"
-#include "..\HandsController\HandsController.h"
-#include "Kismet/GameplayStatics.h"
-#include "Kismet/KismetMathLibrary.h"
+#include "DuckHuntVr/Characters/Player/HandsController/HandsController.h"
+#include "GameFramework/GameModeBase.h"
 #include "Kismet/KismetSystemLibrary.h"
 
 ULaserBase::ULaserBase() {
@@ -123,14 +122,14 @@ void ULaserBase::TickComponent(const float Dt, const ELevelTick Tt, FActorCompon
 			NiagaraLaser, "User.PointArray", 1,
 			End, false
 		);
-		if (UGameplayStatics::IsGamePaused(this)) {
+		if (GetWorld()->GetAuthGameMode()->IsPaused()) {
 			// I couldn't find another way :(, NiagaraLaser->SetTickableWhenPaused(true) doesn't work
 			NiagaraLaser->AdvanceSimulation(1, Dt);
 		}
 	}
 	else if (CrosshairSprite) {
 		if (HitResult.bBlockingHit) {
-			CrosshairSprite->SetWorldLocationAndRotation(End, UKismetMathLibrary::MakeRotFromY(HitResult.ImpactNormal));
+			CrosshairSprite->SetWorldLocationAndRotation(End, FRotationMatrix::MakeFromY(HitResult.ImpactNormal).Rotator());
 			if (!CrosshairSprite->IsVisible())
 				CrosshairSprite->SetVisibility(true);
 		}

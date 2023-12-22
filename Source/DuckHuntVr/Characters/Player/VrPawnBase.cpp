@@ -3,9 +3,9 @@
 #include "HandsController/HandsController.h"
 #include "HeadMountedDisplayFunctionLibrary.h"
 #include "Components/WidgetComponent.h"
+#include "DuckHuntVr/Gamemodes/DhGameModeBase.h"
 #include "DuckHuntVr/UI/InGame/InGameWidget.h"
-#include "Kismet/GameplayStatics.h"
-#include "Kismet/KismetMathLibrary.h"
+#include "Kismet/KismetSystemLibrary.h"
 
 AVrPawnBase::AVrPawnBase() {
 	PrimaryActorTick.bCanEverTick = true;
@@ -29,6 +29,7 @@ void AVrPawnBase::BeginPlay() {
 	InGameWidget = Cast<UInGameWidget>(InGameWidgetHolder->GetUserWidgetObject());
 	InGameWidget->SetBulletsNum(BulletsNum);
 
+	// TODO: move it somewhere
 	UHeadMountedDisplayFunctionLibrary::EnableHMD(true);
 	UKismetSystemLibrary::ExecuteConsoleCommand(this, TEXT("r.ScreenPercentage 100"));
 	UHeadMountedDisplayFunctionLibrary::SetTrackingOrigin(EHMDTrackingOrigin::Floor);
@@ -55,6 +56,7 @@ void AVrPawnBase::Tick(const float DeltaSeconds) {
 // ReSharper disable once CppMemberFunctionMayBeConst
 void AVrPawnBase::OnGunFire() {
 	InGameWidget->SetBulletsNum(--BulletsNum);
+	InGameWidgetHolder->RequestRedraw();
 	HandsController->PlayFireEffects();
 	UKismetSystemLibrary::PrintString(this, TEXT("Gun fired"), true, true, FLinearColor::Red);
 	if (BulletsNum == 0) // TODO
@@ -63,7 +65,11 @@ void AVrPawnBase::OnGunFire() {
 
 // ReSharper disable once CppMemberFunctionMayBeConst
 void AVrPawnBase::OnMenuPressed() {
-	const auto WillBePaused = !UGameplayStatics::IsGamePaused(this);
+	const auto Gm = Cast<ADhGameModeBase>(GetWorld()->GetAuthGameMode());
+	if (!Gm->AllowPausing())
+		return;
+
+	const auto WillBePaused = !Gm->IsPaused();
 
 	static EVisualizationType PrevVisualizationType = EVisualizationType::None;
 	const EVisualizationType NewisualizationType = HandsController->GetVisualizationType();
@@ -72,8 +78,14 @@ void AVrPawnBase::OnMenuPressed() {
 		PrevVisualizationType = NewisualizationType;
 
 	if (PrevVisualizationType == NewisualizationType) {
-		UGameplayStatics::SetGamePaused(this, WillBePaused);
-		UKismetSystemLibrary::PrintString(this, WillBePaused ? TEXT("Paused") : TEXT("Unpaused"), true, true, FLinearColor::Red);
+		if (WillBePaused) {
+			Gm->SetPause(GetLocalViewingPlayerController());
+			UKismetSystemLibrary::PrintString(this, TEXT("Paused"), true, true, FLinearColor::Red);
+		}
+		else {
+			Gm->ClearPause();
+			UKismetSystemLibrary::PrintString(this, TEXT("Unpaused"), true, true, FLinearColor::Red);
+		}
 	}
 	else {
 		// TODO: create notification
