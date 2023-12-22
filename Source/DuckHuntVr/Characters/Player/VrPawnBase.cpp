@@ -27,7 +27,7 @@ void AVrPawnBase::BeginPlay() {
 	Super::BeginPlay();
 
 	InGameWidget = Cast<UInGameWidget>(InGameWidgetHolder->GetUserWidgetObject());
-	InGameWidget->GetShotPanel()->SetBulletsNum(BulletsNum);
+	InGameWidget->SetBulletsNum(BulletsNum);
 
 	UHeadMountedDisplayFunctionLibrary::EnableHMD(true);
 	UKismetSystemLibrary::ExecuteConsoleCommand(this, TEXT("r.ScreenPercentage 100"));
@@ -37,19 +37,24 @@ void AVrPawnBase::BeginPlay() {
 void AVrPawnBase::Tick(const float DeltaSeconds) {
 	Super::Tick(DeltaSeconds);
 
-	static auto PrevCameraRotation = FRotator(0.0, Camera->GetRelativeRotation().Yaw, 0.0);
-	const auto NewCameraRotation = UKismetMathLibrary::RLerp(
-		PrevCameraRotation, FRotator(0.0, Camera->GetRelativeRotation().Yaw, 0.0),
-		DeltaSeconds * 10.0f, false
-	);
+	static double CurrentWidgetRotationYaw = GetActorRotation().Yaw;
 
-	InGameWidgetHolder->SetRelativeTransform(InGameWidgetHolder->GetRelativeTransform() * FTransform(NewCameraRotation - PrevCameraRotation));
-	PrevCameraRotation = NewCameraRotation;
+	// TODO: do it if 180 or 360 degree mode is enabled
+	const double NewCameraRotationYaw = Camera->GetRelativeRotation().Yaw;
+	const double CameraRotationYawOffset = NewCameraRotationYaw - CurrentWidgetRotationYaw;
+	const double Angle = FMath::Abs(CameraRotationYawOffset);
+
+	if (Angle > 60.0) {
+		const double NewWidgetRotationYaw = CurrentWidgetRotationYaw + (CameraRotationYawOffset > 0.0 ? 90.0 : -90.0);
+		const auto DiffTransform = FTransform(FRotator(0.0, NewWidgetRotationYaw, 0.0) - FRotator(0.0, CurrentWidgetRotationYaw, 0.0));
+		InGameWidgetHolder->SetRelativeTransform(InGameWidgetHolder->GetRelativeTransform() * DiffTransform);
+		CurrentWidgetRotationYaw = NewWidgetRotationYaw;
+	}
 }
 
 // ReSharper disable once CppMemberFunctionMayBeConst
 void AVrPawnBase::OnGunFire() {
-	InGameWidget->GetShotPanel()->SetBulletsNum(--BulletsNum);
+	InGameWidget->SetBulletsNum(--BulletsNum);
 	HandsController->PlayFireEffects();
 	UKismetSystemLibrary::PrintString(this, TEXT("Gun fired"), true, true, FLinearColor::Red);
 	if (BulletsNum == 0) // TODO
