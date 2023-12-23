@@ -1,8 +1,8 @@
 ﻿#pragma once
 
+#include "Laser/LaserBase.h"
 #include "VrPawn.generated.h"
 
-enum class ELaserType : uint8;
 class UCameraComponent;
 class UHandsController;
 

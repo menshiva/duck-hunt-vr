@@ -15,11 +15,10 @@ class DUCKHUNTVR_API UInGameWidget : public UUserWidget {
 public:
 	virtual void NativePreConstruct() override;
 
-	void SetTheme(ETheme NewTheme) const;
-	void SetBulletsNum(int32 NewNum) const;
+	void SetTheme(ETheme NewTheme);
 protected:
 	UPROPERTY(EditDefaultsOnly, Category="Init|Properties", meta=(DesignerRebuild))
-	ETheme DefaultTheme = ETheme::Duck;
+	ETheme Theme = ETheme::Duck;
 
 	UPROPERTY(meta=(BindWidget))
 	TObjectPtr<URoundPanelWidget> RoundPanel;

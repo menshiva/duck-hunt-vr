@@ -11,10 +11,10 @@ class DUCKHUNTVR_API URoundPanelWidget : public UUserWidget {
 public:
 	virtual void NativePreConstruct() override;
 
-	void SetRound(int32 NewRound) const;
+	void SetRound(int32 NewRound);
 protected:
 	UPROPERTY(EditAnywhere, Category="Init|Properties", meta=(ClampMin=1, ClampMax=99, DesignerRebuild))
-	int32 DefaultRound = 1;
+	int32 Round = 1;
 
 	UPROPERTY(meta=(BindWidget))
 	TObjectPtr<UTextBlock> RoundText;

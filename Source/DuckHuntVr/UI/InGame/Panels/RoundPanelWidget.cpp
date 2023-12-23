@@ -4,10 +4,11 @@
 
 void URoundPanelWidget::NativePreConstruct() {
 	Super::NativePreConstruct();
-	SetRound(DefaultRound);
+	SetRound(Round);
 }
 
-void URoundPanelWidget::SetRound(const int32 NewRound) const {
+void URoundPanelWidget::SetRound(const int32 NewRound) {
+	Round = NewRound;
 	if (RoundText)
 		RoundText->SetText(UKismetTextLibrary::Conv_IntToText(NewRound, false, false, 1, 2));
 }

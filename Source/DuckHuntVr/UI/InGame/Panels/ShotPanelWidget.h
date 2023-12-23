@@ -12,14 +12,14 @@ class DUCKHUNTVR_API UShotPanelWidget : public UUserWidget {
 public:
 	virtual void NativePreConstruct() override;
 
-	void SetTheme(ETheme NewTheme) const;
-	void SetBulletsNum(int32 NewNum) const;
+	void SetTheme(ETheme NewTheme);
+	void SetBulletsNum(int32 NewNum);
 protected:
 	UPROPERTY(EditAnywhere, Category="Init|Properties", meta=(DesignerRebuild))
-	ETheme DefaultTheme = ETheme::Duck;
+	ETheme Theme = ETheme::Duck;
 
 	UPROPERTY(EditAnywhere, Category="Init|Properties", meta=(ClampMin=0, ClampMax=3, DesignerRebuild))
-	int32 DefaultBulletsNum = 3;
+	int32 BulletsNum = 3;
 
 	UPROPERTY(EditDefaultsOnly, Category="Init|Background", DisplayName=Duck, meta=(DesignerRebuild))
 	TObjectPtr<UTexture2D> BackgroundDuck;

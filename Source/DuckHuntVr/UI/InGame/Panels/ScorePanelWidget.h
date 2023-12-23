@@ -11,10 +11,10 @@ class DUCKHUNTVR_API UScorePanelWidget : public UUserWidget {
 public:
 	virtual void NativePreConstruct() override;
 
-	void SetScore(int32 NewScore) const;
+	void SetScore(int32 NewScore);
 protected:
 	UPROPERTY(EditAnywhere, Category="Init|Properties", meta=(ClampMin=0, ClampMax=999999, DesignerRebuild))
-	int32 DefaultScore = 0;
+	int32 Score = 0;
 
 	UPROPERTY(meta=(BindWidget))
 	TObjectPtr<UTextBlock> ScoreText;
