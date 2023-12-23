@@ -3,6 +3,8 @@
 #include "MotionControllerComponent.h"
 #include "HandMotionControllerBase.generated.h"
 
+class UHandsController;
+enum class ELaserType : uint8;
 class IHandVisualizationInterface;
 class UControllerVisualizationBase;
 class UTrackedVisualizationBase;
@@ -17,12 +19,13 @@ class DUCKHUNTVR_API UHandMotionControllerBase : public UMotionControllerCompone
 public:
 	UHandMotionControllerBase();
 
+	void Init(UHandsController* HandsController, EControllerHand Hand);
 	virtual void OnComponentDestroyed(bool bDestroyingHierarchy) override;
 
-	FORCEINLINE void SetHandType(const EControllerHand NewHandType) { HandType = NewHandType; }
+	void UpdateVisualization(EVisualizationType NewVisualizationType, bool Primary, ELaserType LaserType);
 
-	void UpdateVisualization(EVisualizationType NewVisualizationType, bool Primary);
-
+	FORCEINLINE UHandsController* GetParentHandsController() const { return ParentHandsController.Get(); }
+	FORCEINLINE EControllerHand GetHandType() const { return HandType; }
 	FORCEINLINE IHandVisualizationInterface* GetVisualizationComponent() const { return VisualizationComponent.GetInterface(); }
 protected:
 	UPROPERTY(EditDefaultsOnly, Category=Subcomponents)
@@ -31,6 +34,8 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category=Subcomponents)
 	TSubclassOf<UTrackedVisualizationBase> TrackedVisualizationClass;
 private:
+	TWeakObjectPtr<UHandsController> ParentHandsController;
+
 	EControllerHand HandType = EControllerHand::Left;
 
 	UPROPERTY()

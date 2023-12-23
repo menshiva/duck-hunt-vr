@@ -10,4 +10,5 @@ public:
 	ADhGameModeBase();
 
 	virtual bool AllowPausing(APlayerController* PC = nullptr) override;
+	void SetPause(APlayerController* PC, bool Pause);
 };

@@ -4,6 +4,7 @@
 #include "DuckHuntVr/Characters/Player/HandsController/Hand/HandVisualizationInterface.h"
 #include "TrackedVisualizationBase.generated.h"
 
+enum class ELaserType : uint8;
 class UInputMappingContext;
 class UInputAction;
 class ULaserBase;
@@ -16,14 +17,13 @@ public:
 	UTrackedVisualizationBase();
 
 	virtual void OnComponentDestroyed(bool bDestroyingHierarchy) override;
+	virtual void TickComponent(float Dt, ELevelTick Tt, FActorComponentTickFunction* Tf) override;
 
 	virtual bool IsPrimary() const override { return static_cast<bool>(LaserComponent); }
 	virtual void SwapPrimary(IHandVisualizationInterface* SecondaryHandVisualization) override;
 
 	virtual void PlayFireEffects() override;
-	virtual void UpdateLaserType() override;
-
-	virtual void TickComponent(float Dt, ELevelTick Tt, FActorComponentTickFunction* Tf) override;
+	virtual void UpdateLaserType(ELaserType NewType) override;
 protected:
 	virtual void InitImpl(USceneComponent* AttachmentParent, bool Primary) override;
 

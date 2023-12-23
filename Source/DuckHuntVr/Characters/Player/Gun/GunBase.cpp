@@ -19,7 +19,6 @@ void UGunBase::OnComponentCreated() {
 
 	if (LaserClass) {
 		LaserComponent = NewObject<ULaserBase>(this, LaserClass);
-		LaserComponent->UpdateType();
 		LaserComponent->SetupAttachment(this, TEXT("LaserSocket"));
 		LaserComponent->RegisterComponent();
 	}
@@ -44,6 +43,6 @@ void UGunBase::PlayFireEffects(const EControllerHand HandType) const {
 	}
 }
 
-void UGunBase::UpdateLaserType() const {
-	LaserComponent->UpdateType();
+void UGunBase::UpdateLaserType(const ELaserType NewType) const {
+	LaserComponent->UpdateType(NewType);
 }

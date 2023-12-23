@@ -17,6 +17,10 @@ AVrPawnBase::AVrPawnBase() {
 	Camera->SetupAttachment(DefaultSceneRoot);
 
 	HandsController = CreateDefaultSubobject<UHandsController>(TEXT("HandsController"));
+	HandsController->Init(this, EControllerHand::Right, ELaserType::Laser); // TODO: get from settings (or game instance)
+	HandsController->OnGunFired.BindUObject(this, &AVrPawnBase::OnGunFired);
+	HandsController->OnMenuPressed.BindUObject(this, &AVrPawnBase::OnMenuPressed);
+	HandsController->OnVisualizationTypeChanged.BindUObject(this, &AVrPawnBase::OnVisualizationTypeChanged);
 	HandsController->SetupAttachment(DefaultSceneRoot);
 
 	InGameWidgetHolder = CreateDefaultSubobject<UWidgetComponent>(TEXT("InGameWidgetHolder"));
@@ -26,8 +30,7 @@ AVrPawnBase::AVrPawnBase() {
 void AVrPawnBase::BeginPlay() {
 	Super::BeginPlay();
 
-	InGameWidget = Cast<UInGameWidget>(InGameWidgetHolder->GetUserWidgetObject());
-	InGameWidget->SetBulletsNum(BulletsNum);
+	InGameWidget = CastChecked<UInGameWidget>(InGameWidgetHolder->GetUserWidgetObject());
 
 	// TODO: move it somewhere
 	UHeadMountedDisplayFunctionLibrary::EnableHMD(true);
@@ -53,23 +56,25 @@ void AVrPawnBase::Tick(const float DeltaSeconds) {
 	}
 }
 
+void AVrPawnBase::SetPrimaryHand(const EControllerHand NewPrimaryHand) const {
+	HandsController->SetPrimaryHand(NewPrimaryHand);
+}
+
+void AVrPawnBase::SetLaserType(const ELaserType NewLaserType) const {
+	HandsController->SetLaserType(NewLaserType);
+}
+
 void AVrPawnBase::ResetOrientationAndPosition() {
 	UHeadMountedDisplayFunctionLibrary::ResetOrientationAndPosition();
 }
 
-// ReSharper disable once CppMemberFunctionMayBeConst
-void AVrPawnBase::OnGunFire() {
-	InGameWidget->SetBulletsNum(--BulletsNum);
-	InGameWidgetHolder->RequestRedraw();
+void AVrPawnBase::OnGunFired() const {
 	HandsController->PlayFireEffects();
 	UKismetSystemLibrary::PrintString(this, TEXT("Gun fired"), true, true, FLinearColor::Red);
-	if (BulletsNum == 0) // TODO
-		BulletsNum = 3;
 }
 
-// ReSharper disable once CppMemberFunctionMayBeConst
-void AVrPawnBase::OnMenuPressed() {
-	const auto Gm = Cast<ADhGameModeBase>(GetWorld()->GetAuthGameMode());
+void AVrPawnBase::OnMenuPressed() const {
+	const auto Gm = CastChecked<ADhGameModeBase>(GetWorld()->GetAuthGameMode());
 	if (!Gm->AllowPausing())
 		return;
 
@@ -82,14 +87,8 @@ void AVrPawnBase::OnMenuPressed() {
 		PrevVisualizationType = NewisualizationType;
 
 	if (PrevVisualizationType == NewisualizationType) {
-		if (WillBePaused) {
-			Gm->SetPause(GetLocalViewingPlayerController());
-			UKismetSystemLibrary::PrintString(this, TEXT("Paused"), true, true, FLinearColor::Red);
-		}
-		else {
-			Gm->ClearPause();
-			UKismetSystemLibrary::PrintString(this, TEXT("Unpaused"), true, true, FLinearColor::Red);
-		}
+		Gm->SetPause(GetLocalViewingPlayerController(), WillBePaused);
+		UKismetSystemLibrary::PrintString(this, WillBePaused ? TEXT("Paused") : TEXT("Unpaused"), true, true, FLinearColor::Red);
 	}
 	else {
 		// TODO: create notification
@@ -98,4 +97,8 @@ void AVrPawnBase::OnMenuPressed() {
 			true, true, FLinearColor::Green
 		);
 	}
+}
+
+void AVrPawnBase::OnVisualizationTypeChanged() const {
+	// TODO: call gamestate callback and pass previous visualization type to it
 }

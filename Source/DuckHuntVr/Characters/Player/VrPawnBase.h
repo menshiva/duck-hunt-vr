@@ -2,8 +2,9 @@
 
 #include "VrPawnBase.generated.h"
 
-class UHandsController;
+enum class ELaserType : uint8;
 class UCameraComponent;
+class UHandsController;
 class UWidgetComponent;
 class UInGameWidget;
 
@@ -16,14 +17,17 @@ public:
 	virtual void BeginPlay() override;
 	virtual void Tick(float DeltaSeconds) override;
 
-	// TODO: rename UFUNCTION
+	// TODO: remove UFUNCTION
+	UFUNCTION(BlueprintCallable)
+	void SetPrimaryHand(EControllerHand NewPrimaryHand) const;
+
+	// TODO: remove UFUNCTION
+	UFUNCTION(BlueprintCallable)
+	void SetLaserType(ELaserType NewLaserType) const;
+
+	// TODO: remove UFUNCTION
 	UFUNCTION(BlueprintCallable)
 	static void ResetOrientationAndPosition();
-
-	void OnGunFire();
-	void OnMenuPressed();
-
-	FORCEINLINE const UHandsController* GetHandsController() const { return HandsController; }
 protected:
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<USceneComponent> DefaultSceneRoot;
@@ -31,14 +35,15 @@ protected:
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<UCameraComponent> Camera;
 
-	// TODO: remove BlueprintReadOnly
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<UHandsController> HandsController;
 
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<UWidgetComponent> InGameWidgetHolder;
 private:
-	TWeakObjectPtr<UInGameWidget> InGameWidget;
+	void OnGunFired() const;
+	void OnMenuPressed() const;
+	void OnVisualizationTypeChanged() const;
 
-	int32 BulletsNum = 3;
+	TWeakObjectPtr<UInGameWidget> InGameWidget;
 };

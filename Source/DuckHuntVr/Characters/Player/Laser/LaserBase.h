@@ -22,7 +22,7 @@ public:
 	virtual void Deactivate() override;
 	virtual void OnComponentDestroyed(bool bDestroyingHierarchy) override;
 
-	void UpdateType();
+	void UpdateType(ELaserType NewType);
 
 	virtual void TickComponent(float Dt, ELevelTick Tt, FActorComponentTickFunction* Tf) override;
 protected:

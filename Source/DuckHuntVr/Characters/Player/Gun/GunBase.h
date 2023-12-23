@@ -2,6 +2,7 @@
 
 #include "GunBase.generated.h"
 
+enum class ELaserType : uint8;
 class UHapticFeedbackEffect_Curve;
 class ULaserBase;
 
@@ -15,7 +16,7 @@ public:
 	virtual void OnComponentDestroyed(bool bDestroyingHierarchy) override;
 
 	void PlayFireEffects(EControllerHand HandType) const;
-	void UpdateLaserType() const;
+	void UpdateLaserType(ELaserType NewType) const;
 protected:
 	UPROPERTY(EditDefaultsOnly, Category=Init)
 	TObjectPtr<USoundBase> FireSound;

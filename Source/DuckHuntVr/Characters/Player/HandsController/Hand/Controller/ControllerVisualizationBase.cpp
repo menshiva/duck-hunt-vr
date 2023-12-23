@@ -29,9 +29,9 @@ void UControllerVisualizationBase::PlayFireEffects() {
 	GunComponent->PlayFireEffects(GetHandType());
 }
 
-void UControllerVisualizationBase::UpdateLaserType() {
-	IHandVisualizationInterface::UpdateLaserType();
-	GunComponent->UpdateLaserType();
+void UControllerVisualizationBase::UpdateLaserType(const ELaserType NewType) {
+	IHandVisualizationInterface::UpdateLaserType(NewType);
+	GunComponent->UpdateLaserType(NewType);
 }
 
 void UControllerVisualizationBase::InitImpl(USceneComponent* AttachmentParent, const bool Primary) {

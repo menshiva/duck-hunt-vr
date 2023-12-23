@@ -2,7 +2,8 @@
 
 #include "HandVisualizationInterface.generated.h"
 
-class AVrPawnBase;
+class UHandMotionControllerBase;
+enum class ELaserType : uint8;
 class UEnhancedInputLocalPlayerSubsystem;
 
 UINTERFACE(MinimalAPI)
@@ -13,16 +14,16 @@ class UHandVisualizationInterface : public UInterface {
 class DUCKHUNTVR_API IHandVisualizationInterface {
 	GENERATED_BODY()
 public:
-	void Init(USceneComponent* AttachmentParent, EControllerHand bHandType, bool Primary);
+	void Init(UHandMotionControllerBase* MotionController, bool Primary);
 	void Destroy();
 
 	virtual bool IsPrimary() const = 0;
 	virtual void SwapPrimary(IHandVisualizationInterface* SecondaryHandVisualization);
 
 	virtual void PlayFireEffects();
-	virtual void UpdateLaserType();
+	virtual void UpdateLaserType(ELaserType NewType);
 protected:
-	FORCEINLINE EControllerHand GetHandType() const { return HandType; }
+	EControllerHand GetHandType() const;
 
 	FORCEINLINE void SetThisComponent(USceneComponent* ThisComponent) { UnderlyingComponent = ThisComponent; }
 
@@ -33,9 +34,6 @@ protected:
 	void Fire();
 	void Menu();
 private:
-	const APlayerController* GetPlayerController() const;
-	AVrPawnBase* GetVrPawn() const;
-
+	TWeakObjectPtr<UHandMotionControllerBase> ParentMotionController;
 	TWeakObjectPtr<USceneComponent> UnderlyingComponent;
-	EControllerHand HandType = EControllerHand::Left;
 };

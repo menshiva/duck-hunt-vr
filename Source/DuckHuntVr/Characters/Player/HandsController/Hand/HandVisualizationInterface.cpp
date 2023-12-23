@@ -1,16 +1,18 @@
 #include "HandVisualizationInterface.h"
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
-#include "DuckHuntVr/Characters/Player/VrPawnBase.h"
+#include "DuckHuntVr/Characters/Player/HandsController/HandsController.h"
 
 static UEnhancedInputLocalPlayerSubsystem* GetEnhancedInputSubsystem(const APlayerController* PlayerController) {
 	return ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer());
 }
 
-void IHandVisualizationInterface::Init(USceneComponent* AttachmentParent, const EControllerHand bHandType, const bool Primary) {
-	HandType = bHandType;
-	InitImpl(AttachmentParent, Primary);
-	if (const auto PlayerController = GetPlayerController())
+void IHandVisualizationInterface::Init(UHandMotionControllerBase* MotionController, const bool Primary) {
+	ParentMotionController = MotionController;
+
+	InitImpl(MotionController, Primary);
+
+	if (const auto PlayerController = MotionController->GetParentHandsController()->GetPlayerController())
 		if (const auto Subsystem = GetEnhancedInputSubsystem(PlayerController))
 			if (const auto Component = Cast<UEnhancedInputComponent>(PlayerController->InputComponent))
 				AddMappingContexts(Subsystem, Component);
@@ -18,7 +20,7 @@ void IHandVisualizationInterface::Init(USceneComponent* AttachmentParent, const 
 
 void IHandVisualizationInterface::Destroy() {
 	if (UnderlyingComponent.IsValid()) {
-		if (const auto PlayerController = GetPlayerController())
+		if (const auto PlayerController = ParentMotionController->GetParentHandsController()->GetPlayerController())
 			if (const auto Subsystem = GetEnhancedInputSubsystem(PlayerController))
 				ClearMappingContexts(Subsystem);
 		UnderlyingComponent->DestroyComponent();
@@ -36,31 +38,21 @@ void IHandVisualizationInterface::PlayFireEffects() {
 	check(IsPrimary());
 }
 
-void IHandVisualizationInterface::UpdateLaserType() {
+void IHandVisualizationInterface::UpdateLaserType(const ELaserType NewType) {
 	check(IsPrimary());
+}
+
+EControllerHand IHandVisualizationInterface::GetHandType() const {
+	return ParentMotionController->GetHandType();
 }
 
 // ReSharper disable once CppMemberFunctionMayBeConst
 void IHandVisualizationInterface::Fire() {
 	if (IsPrimary())
-		if (const auto Pawn = GetVrPawn())
-			Pawn->OnGunFire();
+		ParentMotionController->GetParentHandsController()->OnGunFired.Execute();
 }
 
 // ReSharper disable once CppMemberFunctionMayBeConst
 void IHandVisualizationInterface::Menu() {
-	if (const auto Pawn = GetVrPawn())
-		Pawn->OnMenuPressed();
-}
-
-const APlayerController* IHandVisualizationInterface::GetPlayerController() const {
-	if (UnderlyingComponent.IsValid())
-		return UnderlyingComponent->GetWorld()->GetFirstPlayerController();
-	return nullptr;
-}
-
-AVrPawnBase* IHandVisualizationInterface::GetVrPawn() const {
-	if (const auto PlayerController = GetPlayerController())
-		return CastChecked<AVrPawnBase>(PlayerController->GetPawn());
-	return nullptr;
+	ParentMotionController->GetParentHandsController()->OnMenuPressed.Execute();
 }

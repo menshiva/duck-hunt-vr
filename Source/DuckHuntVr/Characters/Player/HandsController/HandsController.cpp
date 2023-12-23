@@ -1,10 +1,17 @@
 ﻿#include "HandsController.h"
 #include "OculusXRInputFunctionLibrary.h"
+#include "DuckHuntVr/Characters/Player/VrPawnBase.h"
 #include "Hand/HandVisualizationInterface.h"
 
 UHandsController::UHandsController() {
 	PrimaryComponentTick.bCanEverTick = true;
 	PrimaryComponentTick.bTickEvenWhenPaused = true;
+}
+
+void UHandsController::Init(AVrPawnBase* VrPawn, const EControllerHand DefaultPrimaryHand, const ELaserType DefaultLaserType) {
+	ParentVrPawn = VrPawn;
+	PrimaryHand = DefaultPrimaryHand;
+	LaserType = DefaultLaserType;
 }
 
 void UHandsController::OnComponentCreated() {
@@ -13,7 +20,7 @@ void UHandsController::OnComponentCreated() {
 	const auto NewMotionControllerObject = [this] (const TSubclassOf<UHandMotionControllerBase>& Class, const EControllerHand HandType) {
 		if (Class) {
 			const auto MotionController = NewObject<UHandMotionControllerBase>(this, Class);
-			MotionController->SetHandType(HandType);
+			MotionController->Init(this, HandType);
 			MotionController->SetupAttachment(this);
 			MotionController->RegisterComponent();
 			return MotionController;
@@ -48,9 +55,9 @@ void UHandsController::TickComponent(const float Dt, const ELevelTick Tt, FActor
 	Super::TickComponent(Dt, Tt, Tf);
 	const auto NewVisualizationType = GetNewVisualizationType();
 	if (NewVisualizationType != CurrentVisualizationType) {
-		// TODO: set game on pause
-		PrimaryMotionController->UpdateVisualization(NewVisualizationType, true);
-		SecondaryMotionController->UpdateVisualization(NewVisualizationType, false);
+		OnVisualizationTypeChanged.Execute();
+		PrimaryMotionController->UpdateVisualization(NewVisualizationType, true, LaserType);
+		SecondaryMotionController->UpdateVisualization(NewVisualizationType, false, LaserType);
 		CurrentVisualizationType = NewVisualizationType;
 	}
 }
@@ -68,13 +75,19 @@ void UHandsController::SetLaserType(const ELaserType NewLaserType) {
 	if (LaserType != NewLaserType) {
 		LaserType = NewLaserType;
 		if (CurrentVisualizationType != EVisualizationType::None)
-			PrimaryMotionController->GetVisualizationComponent()->UpdateLaserType();
+			PrimaryMotionController->GetVisualizationComponent()->UpdateLaserType(LaserType);
 	}
 }
 
 void UHandsController::PlayFireEffects() const {
 	if (const auto PrimaryControllerVis = PrimaryMotionController->GetVisualizationComponent())
 		PrimaryControllerVis->PlayFireEffects();
+}
+
+APlayerController* UHandsController::GetPlayerController() const {
+	if (ParentVrPawn.IsValid() && ParentVrPawn->Controller)
+		return CastChecked<APlayerController>(ParentVrPawn->Controller);
+	return nullptr;
 }
 
 EVisualizationType UHandsController::GetNewVisualizationType() const {

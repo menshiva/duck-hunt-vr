@@ -2,8 +2,6 @@
 #include "NiagaraComponent.h"
 #include "NiagaraDataInterfaceArrayFunctionLibrary.h"
 #include "PaperSpriteComponent.h"
-#include "DuckHuntVr/Characters/Player/VrPawnBase.h"
-#include "DuckHuntVr/Characters/Player/HandsController/HandsController.h"
 #include "GameFramework/GameModeBase.h"
 #include "Kismet/KismetSystemLibrary.h"
 
@@ -49,49 +47,44 @@ void ULaserBase::OnComponentDestroyed(const bool bDestroyingHierarchy) {
 	Super::OnComponentDestroyed(bDestroyingHierarchy);
 }
 
-void ULaserBase::UpdateType() {
-	if (const auto PlayerController = GetWorld()->GetFirstPlayerController()) {
-		const auto VrPawn = CastChecked<AVrPawnBase>(PlayerController->GetPawn());
-		const auto NewType = VrPawn->GetHandsController()->GetLaserType();
-
-		if (NewType == ELaserType::Laser) {
-			if (CrosshairSprite) {
-				CrosshairSprite->DestroyComponent();
-				CrosshairSprite = nullptr;
-			}
-			check(!NiagaraLaser);
-
-			NiagaraLaser = NewObject<UNiagaraComponent>(this);
-			NiagaraLaser->SetAsset(NiagaraLaserAsset);
-			NiagaraLaser->SetupAttachment(this);
-			NiagaraLaser->RegisterComponent();
-			if (!IsActive()) {
-				NiagaraLaser->Deactivate();
-				NiagaraLaser->SetVisibility(false);
-			}
+void ULaserBase::UpdateType(const ELaserType NewType) {
+	if (NewType == ELaserType::Laser) {
+		if (CrosshairSprite) {
+			CrosshairSprite->DestroyComponent();
+			CrosshairSprite = nullptr;
 		}
-		else if (NewType == ELaserType::Crosshair) {
-			if (NiagaraLaser) {
-				NiagaraLaser->DestroyComponent();
-				NiagaraLaser = nullptr;
-			}
-			check(!CrosshairSprite);
+		check(!NiagaraLaser);
 
-			CrosshairSprite = NewObject<UPaperSpriteComponent>(this);
-			CrosshairSprite->SetSprite(CrosshairSpriteAsset);
-			CrosshairSprite->SetVisibility(false);
-			CrosshairSprite->RegisterComponent();
+		NiagaraLaser = NewObject<UNiagaraComponent>(this);
+		NiagaraLaser->SetAsset(NiagaraLaserAsset);
+		NiagaraLaser->SetupAttachment(this);
+		NiagaraLaser->RegisterComponent();
+		if (!IsActive()) {
+			NiagaraLaser->Deactivate();
+			NiagaraLaser->SetVisibility(false);
 		}
-		else {
-			check(NewType == ELaserType::None);
-			if (NiagaraLaser) {
-				NiagaraLaser->DestroyComponent();
-				NiagaraLaser = nullptr;
-			}
-			else if (CrosshairSprite) {
-				CrosshairSprite->DestroyComponent();
-				CrosshairSprite = nullptr;
-			}
+	}
+	else if (NewType == ELaserType::Crosshair) {
+		if (NiagaraLaser) {
+			NiagaraLaser->DestroyComponent();
+			NiagaraLaser = nullptr;
+		}
+		check(!CrosshairSprite);
+
+		CrosshairSprite = NewObject<UPaperSpriteComponent>(this);
+		CrosshairSprite->SetSprite(CrosshairSpriteAsset);
+		CrosshairSprite->SetVisibility(false);
+		CrosshairSprite->RegisterComponent();
+	}
+	else {
+		check(NewType == ELaserType::None);
+		if (NiagaraLaser) {
+			NiagaraLaser->DestroyComponent();
+			NiagaraLaser = nullptr;
+		}
+		else if (CrosshairSprite) {
+			CrosshairSprite->DestroyComponent();
+			CrosshairSprite = nullptr;
 		}
 	}
 }

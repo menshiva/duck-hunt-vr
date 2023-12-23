@@ -3,6 +3,7 @@
 #include "DuckHuntVr/Characters/Player/HandsController/Hand/HandVisualizationInterface.h"
 #include "ControllerVisualizationBase.generated.h"
 
+enum class ELaserType : uint8;
 class UInputMappingContext;
 class UInputAction;
 class UGunBase;
@@ -21,7 +22,7 @@ public:
 	virtual void SwapPrimary(IHandVisualizationInterface* SecondaryHandVisualization) override;
 
 	virtual void PlayFireEffects() override;
-	virtual void UpdateLaserType() override;
+	virtual void UpdateLaserType(ELaserType NewType) override;
 protected:
 	virtual void InitImpl(USceneComponent* AttachmentParent, bool Primary) override;
 

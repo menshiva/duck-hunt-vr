@@ -16,28 +16,6 @@ void UTrackedVisualizationBase::OnComponentDestroyed(const bool bDestroyingHiera
 	Super::OnComponentDestroyed(bDestroyingHierarchy);
 }
 
-void UTrackedVisualizationBase::SwapPrimary(IHandVisualizationInterface* SecondaryHandVisualization) {
-	IHandVisualizationInterface::SwapPrimary(SecondaryHandVisualization);
-	const auto Secondary = CastChecked<UTrackedVisualizationBase>(SecondaryHandVisualization);
-
-	LaserComponent->DetachFromComponent(FDetachmentTransformRules::KeepRelativeTransform);
-	Swap(LaserComponent, Secondary->LaserComponent);
-	Secondary->LaserComponent->AttachToComponent(Secondary, FAttachmentTransformRules::KeepRelativeTransform);
-
-	UpdateHandMaterialColor();
-	Secondary->UpdateHandMaterialColor();
-}
-
-void UTrackedVisualizationBase::PlayFireEffects() {
-	IHandVisualizationInterface::PlayFireEffects();
-	// TODO
-}
-
-void UTrackedVisualizationBase::UpdateLaserType() {
-	IHandVisualizationInterface::UpdateLaserType();
-	LaserComponent->UpdateType();
-}
-
 // TODO
 void UTrackedVisualizationBase::TickComponent(const float Dt, const ELevelTick Tt, FActorComponentTickFunction* Tf) {
 	Super::TickComponent(Dt, Tt, Tf);
@@ -125,6 +103,28 @@ void UTrackedVisualizationBase::TickComponent(const float Dt, const ELevelTick T
 	);*/
 }
 
+void UTrackedVisualizationBase::SwapPrimary(IHandVisualizationInterface* SecondaryHandVisualization) {
+	IHandVisualizationInterface::SwapPrimary(SecondaryHandVisualization);
+	const auto Secondary = CastChecked<UTrackedVisualizationBase>(SecondaryHandVisualization);
+
+	LaserComponent->DetachFromComponent(FDetachmentTransformRules::KeepRelativeTransform);
+	Swap(LaserComponent, Secondary->LaserComponent);
+	Secondary->LaserComponent->AttachToComponent(Secondary, FAttachmentTransformRules::KeepRelativeTransform);
+
+	UpdateHandMaterialColor();
+	Secondary->UpdateHandMaterialColor();
+}
+
+void UTrackedVisualizationBase::PlayFireEffects() {
+	IHandVisualizationInterface::PlayFireEffects();
+	// TODO
+}
+
+void UTrackedVisualizationBase::UpdateLaserType(const ELaserType NewType) {
+	IHandVisualizationInterface::UpdateLaserType(NewType);
+	LaserComponent->UpdateType(NewType);
+}
+
 void UTrackedVisualizationBase::InitImpl(USceneComponent* AttachmentParent, const bool Primary) {
 	SetThisComponent(this);
 
@@ -143,7 +143,6 @@ void UTrackedVisualizationBase::InitImpl(USceneComponent* AttachmentParent, cons
 
 	if (Primary) {
 		LaserComponent = NewObject<ULaserBase>(this, LaserClass);
-		LaserComponent->UpdateType();
 		LaserComponent->SetupAttachment(this);
 		LaserComponent->RegisterComponent();
 		LaserComponent->Deactivate(); // TODO
