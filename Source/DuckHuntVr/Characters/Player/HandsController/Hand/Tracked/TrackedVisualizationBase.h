@@ -16,7 +16,7 @@ class DUCKHUNTVR_API UTrackedVisualizationBase : public UOculusXRHandComponent, 
 public:
 	UTrackedVisualizationBase();
 
-	virtual void OnComponentDestroyed(bool bDestroyingHierarchy) override;
+	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 	virtual void TickComponent(float Dt, ELevelTick Tt, FActorComponentTickFunction* Tf) override;
 
 	virtual bool IsPrimary() const override { return static_cast<bool>(LaserComponent); }

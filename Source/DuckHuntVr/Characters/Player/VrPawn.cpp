@@ -1,14 +1,11 @@
-﻿#include "VrPawnBase.h"
+﻿#include "VrPawn.h"
 #include "Camera/CameraComponent.h"
 #include "HandsController/HandsController.h"
 #include "HeadMountedDisplayFunctionLibrary.h"
-#include "Components/WidgetComponent.h"
-#include "DuckHuntVr/Gamemodes/DhGameModeBase.h"
-#include "DuckHuntVr/UI/InGame/InGameWidget.h"
 #include "Kismet/KismetSystemLibrary.h"
 
-AVrPawnBase::AVrPawnBase() {
-	PrimaryActorTick.bCanEverTick = true;
+AVrPawn::AVrPawn() {
+	PrimaryActorTick.bCanEverTick = false;
 
 	DefaultSceneRoot = CreateDefaultSubobject<USceneComponent>(TEXT("DefaultSceneRoot"));
 	SetRootComponent(DefaultSceneRoot);
@@ -18,19 +15,14 @@ AVrPawnBase::AVrPawnBase() {
 
 	HandsController = CreateDefaultSubobject<UHandsController>(TEXT("HandsController"));
 	HandsController->Init(this, EControllerHand::Right, ELaserType::Laser); // TODO: get from settings (or game instance)
-	HandsController->OnGunFired.BindUObject(this, &AVrPawnBase::OnGunFired);
-	HandsController->OnMenuPressed.BindUObject(this, &AVrPawnBase::OnMenuPressed);
-	HandsController->OnVisualizationTypeChanged.BindUObject(this, &AVrPawnBase::OnVisualizationTypeChanged);
+	HandsController->OnGunFired.BindUObject(this, &AVrPawn::OnGunFired);
+	HandsController->OnMenuPressed.BindUObject(this, &AVrPawn::OnMenuPressed);
+	HandsController->OnVisualizationTypeChanged.BindUObject(this, &AVrPawn::OnVisualizationTypeChanged);
 	HandsController->SetupAttachment(DefaultSceneRoot);
-
-	InGameWidgetHolder = CreateDefaultSubobject<UWidgetComponent>(TEXT("InGameWidgetHolder"));
-	InGameWidgetHolder->SetupAttachment(DefaultSceneRoot);
 }
 
-void AVrPawnBase::BeginPlay() {
+void AVrPawn::BeginPlay() {
 	Super::BeginPlay();
-
-	InGameWidget = CastChecked<UInGameWidget>(InGameWidgetHolder->GetUserWidgetObject());
 
 	// TODO: move it somewhere
 	UHeadMountedDisplayFunctionLibrary::EnableHMD(true);
@@ -38,7 +30,8 @@ void AVrPawnBase::BeginPlay() {
 	UHeadMountedDisplayFunctionLibrary::SetTrackingOrigin(EHMDTrackingOrigin::Floor);
 }
 
-void AVrPawnBase::Tick(const float DeltaSeconds) {
+// TODO
+/*void AVrPawn::Tick(const float DeltaSeconds) {
 	Super::Tick(DeltaSeconds);
 
 	static double CurrentWidgetRotationYaw = GetActorRotation().Yaw;
@@ -54,27 +47,28 @@ void AVrPawnBase::Tick(const float DeltaSeconds) {
 		InGameWidgetHolder->SetRelativeTransform(InGameWidgetHolder->GetRelativeTransform() * DiffTransform);
 		CurrentWidgetRotationYaw = NewWidgetRotationYaw;
 	}
-}
+}*/
 
-void AVrPawnBase::SetPrimaryHand(const EControllerHand NewPrimaryHand) const {
+void AVrPawn::SetPrimaryHand(const EControllerHand NewPrimaryHand) const {
 	HandsController->SetPrimaryHand(NewPrimaryHand);
 }
 
-void AVrPawnBase::SetLaserType(const ELaserType NewLaserType) const {
+void AVrPawn::SetLaserType(const ELaserType NewLaserType) const {
 	HandsController->SetLaserType(NewLaserType);
 }
 
-void AVrPawnBase::ResetOrientationAndPosition() {
+void AVrPawn::ResetOrientationAndPosition() {
 	UHeadMountedDisplayFunctionLibrary::ResetOrientationAndPosition();
 }
 
-void AVrPawnBase::OnGunFired() const {
+void AVrPawn::OnGunFired() const {
 	HandsController->PlayFireEffects();
 	UKismetSystemLibrary::PrintString(this, TEXT("Gun fired"), true, true, FLinearColor::Red);
 }
 
-void AVrPawnBase::OnMenuPressed() const {
-	const auto Gm = CastChecked<ADhGameModeBase>(GetWorld()->GetAuthGameMode());
+void AVrPawn::OnMenuPressed() const {
+	// TODO
+	/*const auto Gm = CastChecked<ADhGameModeBase>(GetWorld()->GetAuthGameMode());
 	if (!Gm->AllowPausing())
 		return;
 
@@ -96,9 +90,9 @@ void AVrPawnBase::OnMenuPressed() const {
 			this, TEXT("Please return to the controller type you started the game with"),
 			true, true, FLinearColor::Green
 		);
-	}
+	}*/
 }
 
-void AVrPawnBase::OnVisualizationTypeChanged() const {
+void AVrPawn::OnVisualizationTypeChanged() const {
 	// TODO: call gamestate callback and pass previous visualization type to it
 }

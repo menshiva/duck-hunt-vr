@@ -4,22 +4,22 @@
 #include "Hand/HandMotionControllerBase.h"
 #include "HandsController.generated.h"
 
-class AVrPawnBase;
+class AVrPawn;
 
 DECLARE_DELEGATE(FHandsControllerGunFireDelegate);
 DECLARE_DELEGATE(FHandsControllerMenuPressDelegate);
 DECLARE_DELEGATE(FHandsControllerVisTypeChangeDelegate);
 
-UCLASS(Blueprintable, NotBlueprintType, NotPlaceable)
+UCLASS(NotBlueprintable, NotBlueprintType, NotPlaceable)
 class DUCKHUNTVR_API UHandsController : public USceneComponent {
 	GENERATED_BODY()
 public:
 	UHandsController();
 
-	void Init(AVrPawnBase* VrPawn, EControllerHand DefaultPrimaryHand, ELaserType DefaultLaserType);
+	void Init(AVrPawn* VrPawn, EControllerHand DefaultPrimaryHand, ELaserType DefaultLaserType);
 
-	virtual void OnComponentCreated() override;
-	virtual void OnComponentDestroyed(bool bDestroyingHierarchy) override;
+	virtual void BeginPlay() override;
+	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 	virtual void TickComponent(float Dt, ELevelTick Tt, FActorComponentTickFunction* Tf) override;
 
 	void SetPrimaryHand(EControllerHand NewPrimaryHand);
@@ -33,15 +33,15 @@ public:
 	FHandsControllerMenuPressDelegate OnMenuPressed;
 	FHandsControllerVisTypeChangeDelegate OnVisualizationTypeChanged;
 protected:
-	UPROPERTY(EditDefaultsOnly, Category=Subcomponents)
+	UPROPERTY(EditAnywhere, Category=Subcomponents)
 	TSubclassOf<UHandMotionControllerBase> LeftMotionControllerClass;
 
-	UPROPERTY(EditDefaultsOnly, Category=Subcomponents)
+	UPROPERTY(EditAnywhere, Category=Subcomponents)
 	TSubclassOf<UHandMotionControllerBase> RightMotionControllerClass;
 private:
 	EVisualizationType GetNewVisualizationType() const;
 
-	TWeakObjectPtr<AVrPawnBase> ParentVrPawn;
+	TWeakObjectPtr<AVrPawn> ParentVrPawn;
 
 	EControllerHand PrimaryHand = EControllerHand::Right;
 	EVisualizationType CurrentVisualizationType = EVisualizationType::None;

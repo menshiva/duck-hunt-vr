@@ -1,6 +1,6 @@
 ﻿#include "HandsController.h"
 #include "OculusXRInputFunctionLibrary.h"
-#include "DuckHuntVr/Characters/Player/VrPawnBase.h"
+#include "DuckHuntVr/Characters/Player/VrPawn.h"
 #include "Hand/HandVisualizationInterface.h"
 
 UHandsController::UHandsController() {
@@ -8,14 +8,14 @@ UHandsController::UHandsController() {
 	PrimaryComponentTick.bTickEvenWhenPaused = true;
 }
 
-void UHandsController::Init(AVrPawnBase* VrPawn, const EControllerHand DefaultPrimaryHand, const ELaserType DefaultLaserType) {
+void UHandsController::Init(AVrPawn* VrPawn, const EControllerHand DefaultPrimaryHand, const ELaserType DefaultLaserType) {
 	ParentVrPawn = VrPawn;
 	PrimaryHand = DefaultPrimaryHand;
 	LaserType = DefaultLaserType;
 }
 
-void UHandsController::OnComponentCreated() {
-	Super::OnComponentCreated();
+void UHandsController::BeginPlay() {
+	Super::BeginPlay();
 
 	const auto NewMotionControllerObject = [this] (const TSubclassOf<UHandMotionControllerBase>& Class, const EControllerHand HandType) {
 		if (Class) {
@@ -39,7 +39,7 @@ void UHandsController::OnComponentCreated() {
 		Swap(PrimaryMotionController, SecondaryMotionController);
 }
 
-void UHandsController::OnComponentDestroyed(const bool bDestroyingHierarchy) {
+void UHandsController::EndPlay(const EEndPlayReason::Type EndPlayReason) {
 	if (LeftMotionController) {
 		LeftMotionController->DestroyComponent();
 		LeftMotionController = nullptr;
@@ -48,7 +48,7 @@ void UHandsController::OnComponentDestroyed(const bool bDestroyingHierarchy) {
 		RightMotionController->DestroyComponent();
 		RightMotionController = nullptr;
 	}
-	Super::OnComponentDestroyed(bDestroyingHierarchy);
+	Super::EndPlay(EndPlayReason);
 }
 
 void UHandsController::TickComponent(const float Dt, const ELevelTick Tt, FActorComponentTickFunction* Tf) {

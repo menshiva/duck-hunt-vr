@@ -35,7 +35,7 @@ void ULaserBase::Deactivate() {
 		CrosshairSprite->SetVisibility(false);
 }
 
-void ULaserBase::OnComponentDestroyed(const bool bDestroyingHierarchy) {
+void ULaserBase::EndPlay(const EEndPlayReason::Type EndPlayReason) {
 	if (NiagaraLaser) {
 		NiagaraLaser->DestroyComponent();
 		NiagaraLaser = nullptr;
@@ -44,7 +44,7 @@ void ULaserBase::OnComponentDestroyed(const bool bDestroyingHierarchy) {
 		CrosshairSprite->DestroyComponent();
 		CrosshairSprite = nullptr;
 	}
-	Super::OnComponentDestroyed(bDestroyingHierarchy);
+	Super::EndPlay(EndPlayReason);
 }
 
 void ULaserBase::UpdateType(const ELaserType NewType) {

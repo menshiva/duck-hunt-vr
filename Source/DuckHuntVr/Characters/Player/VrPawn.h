@@ -1,32 +1,21 @@
 ﻿#pragma once
 
-#include "VrPawnBase.generated.h"
+#include "VrPawn.generated.h"
 
 enum class ELaserType : uint8;
 class UCameraComponent;
 class UHandsController;
-class UWidgetComponent;
-class UInGameWidget;
 
-UCLASS(Abstract, Blueprintable, NotBlueprintType, NotPlaceable)
-class DUCKHUNTVR_API AVrPawnBase : public APawn {
+UCLASS(NotBlueprintable, NotBlueprintType, Placeable)
+class DUCKHUNTVR_API AVrPawn : public APawn {
 	GENERATED_BODY()
 public:
-	AVrPawnBase();
+	AVrPawn();
 
 	virtual void BeginPlay() override;
-	virtual void Tick(float DeltaSeconds) override;
 
-	// TODO: remove UFUNCTION
-	UFUNCTION(BlueprintCallable)
 	void SetPrimaryHand(EControllerHand NewPrimaryHand) const;
-
-	// TODO: remove UFUNCTION
-	UFUNCTION(BlueprintCallable)
 	void SetLaserType(ELaserType NewLaserType) const;
-
-	// TODO: remove UFUNCTION
-	UFUNCTION(BlueprintCallable)
 	static void ResetOrientationAndPosition();
 protected:
 	UPROPERTY(VisibleAnywhere)
@@ -37,13 +26,8 @@ protected:
 
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<UHandsController> HandsController;
-
-	UPROPERTY(VisibleAnywhere)
-	TObjectPtr<UWidgetComponent> InGameWidgetHolder;
 private:
 	void OnGunFired() const;
 	void OnMenuPressed() const;
 	void OnVisualizationTypeChanged() const;
-
-	TWeakObjectPtr<UInGameWidget> InGameWidget;
 };

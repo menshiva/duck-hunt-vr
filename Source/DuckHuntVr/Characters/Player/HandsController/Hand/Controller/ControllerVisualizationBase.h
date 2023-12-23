@@ -15,7 +15,7 @@ class DUCKHUNTVR_API UControllerVisualizationBase : public USkeletalMeshComponen
 public:
 	UControllerVisualizationBase();
 
-	virtual void OnComponentDestroyed(bool bDestroyingHierarchy) override;
+	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 
 	UFUNCTION(BlueprintPure)
 	virtual bool IsPrimary() const override { return static_cast<bool>(GunComponent); }

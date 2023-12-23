@@ -13,12 +13,12 @@ void UHandMotionControllerBase::Init(UHandsController* HandsController, const EC
 	HandType = Hand;
 }
 
-void UHandMotionControllerBase::OnComponentDestroyed(const bool bDestroyingHierarchy) {
+void UHandMotionControllerBase::EndPlay(const EEndPlayReason::Type EndPlayReason) {
 	if (VisualizationComponent) {
 		VisualizationComponent->Destroy();
 		VisualizationComponent = nullptr;
 	}
-	Super::OnComponentDestroyed(bDestroyingHierarchy);
+	Super::EndPlay(EndPlayReason);
 }
 
 void UHandMotionControllerBase::UpdateVisualization(const EVisualizationType NewVisualizationType, const bool Primary, const ELaserType LaserType) {

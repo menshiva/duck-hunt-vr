@@ -20,7 +20,8 @@ public:
 
 	virtual void Activate(bool bReset) override;
 	virtual void Deactivate() override;
-	virtual void OnComponentDestroyed(bool bDestroyingHierarchy) override;
+
+	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 
 	void UpdateType(ELaserType NewType);
 

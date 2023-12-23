@@ -8,12 +8,12 @@ UTrackedVisualizationBase::UTrackedVisualizationBase() {
 	PrimaryComponentTick.bTickEvenWhenPaused = true;
 }
 
-void UTrackedVisualizationBase::OnComponentDestroyed(const bool bDestroyingHierarchy) {
+void UTrackedVisualizationBase::EndPlay(const EEndPlayReason::Type EndPlayReason) {
 	if (LaserComponent) {
 		LaserComponent->DestroyComponent();
 		LaserComponent = nullptr;
 	}
-	Super::OnComponentDestroyed(bDestroyingHierarchy);
+	Super::EndPlay(EndPlayReason);
 }
 
 // TODO

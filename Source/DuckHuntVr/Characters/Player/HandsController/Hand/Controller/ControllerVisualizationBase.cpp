@@ -8,12 +8,12 @@ UControllerVisualizationBase::UControllerVisualizationBase() {
 	PrimaryComponentTick.bTickEvenWhenPaused = true;
 }
 
-void UControllerVisualizationBase::OnComponentDestroyed(const bool bDestroyingHierarchy) {
+void UControllerVisualizationBase::EndPlay(const EEndPlayReason::Type EndPlayReason) {
 	if (GunComponent) {
 		GunComponent->DestroyComponent();
 		GunComponent = nullptr;
 	}
-	Super::OnComponentDestroyed(bDestroyingHierarchy);
+	Super::EndPlay(EndPlayReason);
 }
 
 void UControllerVisualizationBase::SwapPrimary(IHandVisualizationInterface* SecondaryHandVisualization) {

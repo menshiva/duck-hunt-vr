@@ -20,7 +20,7 @@ public:
 	UHandMotionControllerBase();
 
 	void Init(UHandsController* HandsController, EControllerHand Hand);
-	virtual void OnComponentDestroyed(bool bDestroyingHierarchy) override;
+	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 
 	void UpdateVisualization(EVisualizationType NewVisualizationType, bool Primary, ELaserType LaserType);
 

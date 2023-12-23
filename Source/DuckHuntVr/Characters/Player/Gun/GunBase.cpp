@@ -10,8 +10,8 @@ UGunBase::UGunBase() {
 	FireAudioComponent->SetUISound(true); // allows to play sound even when game is paused
 }
 
-void UGunBase::OnComponentCreated() {
-	Super::OnComponentCreated();
+void UGunBase::BeginPlay() {
+	Super::BeginPlay();
 
 	FireAudioComponent->SetSound(FireSound);
 	FireAudioComponent->AttachToComponent(this, FAttachmentTransformRules::KeepRelativeTransform); // fixes audio spatialization
@@ -24,7 +24,7 @@ void UGunBase::OnComponentCreated() {
 	}
 }
 
-void UGunBase::OnComponentDestroyed(const bool bDestroyingHierarchy) {
+void UGunBase::EndPlay(const EEndPlayReason::Type EndPlayReason) {
 	if (FireAudioComponent) {
 		FireAudioComponent->DestroyComponent();
 		FireAudioComponent = nullptr;
@@ -33,7 +33,7 @@ void UGunBase::OnComponentDestroyed(const bool bDestroyingHierarchy) {
 		LaserComponent->DestroyComponent();
 		LaserComponent = nullptr;
 	}
-	Super::OnComponentDestroyed(bDestroyingHierarchy);
+	Super::EndPlay(EndPlayReason);
 }
 
 void UGunBase::PlayFireEffects(const EControllerHand HandType) const {

@@ -12,8 +12,8 @@ class DUCKHUNTVR_API UGunBase : public UStaticMeshComponent {
 public:
 	UGunBase();
 
-	virtual void OnComponentCreated() override;
-	virtual void OnComponentDestroyed(bool bDestroyingHierarchy) override;
+	virtual void BeginPlay() override;
+	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 
 	void PlayFireEffects(EControllerHand HandType) const;
 	void UpdateLaserType(ELaserType NewType) const;
