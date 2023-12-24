@@ -4,6 +4,7 @@
 #include "ShotPanelWidget.generated.h"
 
 class UImage;
+class UHorizontalBox;
 
 UCLASS(Abstract, Blueprintable, NotBlueprintType, meta=(DisableNativeTick))
 class DUCKHUNTVR_API UShotPanelWidget : public UUserWidget {
@@ -24,11 +25,5 @@ protected:
 	TObjectPtr<UImage> BackgroundSky;
 
 	UPROPERTY(meta=(BindWidget))
-	TObjectPtr<UImage> Bullet1;
-
-	UPROPERTY(meta=(BindWidget))
-	TObjectPtr<UImage> Bullet2;
-
-	UPROPERTY(meta=(BindWidget))
-	TObjectPtr<UImage> Bullet3;
+	TObjectPtr<UHorizontalBox> ImagesBox;
 };

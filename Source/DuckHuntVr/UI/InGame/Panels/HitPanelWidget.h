@@ -4,6 +4,7 @@
 #include "DuckHuntVr/UI/InGame/Theme.h"
 #include "HitPanelWidget.generated.h"
 
+class UHorizontalBox;
 class UImage;
 
 UCLASS(Abstract, Blueprintable, NotBlueprintType, meta=(DisableNativeTick))
@@ -24,47 +25,23 @@ protected:
 	UPROPERTY(EditAnywhere, EditFixedSize, Category="Init|Properties", meta=(DesignerRebuild))
 	TArray<bool> Hits;
 
-	UPROPERTY(EditDefaultsOnly, Category="Init|Miss", DisplayName=Duck, meta=(DesignerRebuild))
-	TObjectPtr<UTexture2D> MissDuck;
+	UPROPERTY(EditAnywhere, Category="Init|Stencil", DisplayName=Duck, meta=(DesignerRebuild))
+	TObjectPtr<UTexture2D> DuckStencilTexture;
 
-	UPROPERTY(EditDefaultsOnly, Category="Init|Miss", DisplayName=Clay, meta=(DesignerRebuild))
-	TObjectPtr<UTexture2D> MissClay;
+	UPROPERTY(EditAnywhere, Category="Init|Stencil", DisplayName=Clay, meta=(DesignerRebuild))
+	TObjectPtr<UTexture2D> ClayStencilTexture;
 
-	UPROPERTY(EditDefaultsOnly, Category="Init|Hit", DisplayName=Duck, meta=(DesignerRebuild))
-	TObjectPtr<UTexture2D> HitDuck;
+	UPROPERTY(EditAnywhere, Category="Init|Colors", DisplayName=Miss, meta=(sRGB="true", DesignerRebuild))
+	FLinearColor MissColor;
 
-	UPROPERTY(EditDefaultsOnly, Category="Init|Hit", DisplayName=Clay, meta=(DesignerRebuild))
-	TObjectPtr<UTexture2D> HitClay;
-
-	UPROPERTY(meta=(BindWidget))
-	TObjectPtr<UImage> Image1;
+	UPROPERTY(EditAnywhere, Category="Init|Colors", DisplayName=Hit, meta=(sRGB="true", DesignerRebuild))
+	FLinearColor HitColor;
 
 	UPROPERTY(meta=(BindWidget))
-	TObjectPtr<UImage> Image2;
+	TObjectPtr<UHorizontalBox> ImagesBox;
 
 	UPROPERTY(meta=(BindWidget))
-	TObjectPtr<UImage> Image3;
-
-	UPROPERTY(meta=(BindWidget))
-	TObjectPtr<UImage> Image4;
-
-	UPROPERTY(meta=(BindWidget))
-	TObjectPtr<UImage> Image5;
-
-	UPROPERTY(meta=(BindWidget))
-	TObjectPtr<UImage> Image6;
-
-	UPROPERTY(meta=(BindWidget))
-	TObjectPtr<UImage> Image7;
-
-	UPROPERTY(meta=(BindWidget))
-	TObjectPtr<UImage> Image8;
-
-	UPROPERTY(meta=(BindWidget))
-	TObjectPtr<UImage> Image9;
-
-	UPROPERTY(meta=(BindWidget))
-	TObjectPtr<UImage> Image10;
+	TObjectPtr<UImage> Stencil;
 private:
-	void UpdateImages();
+	void UpdateHits() const;
 };

@@ -1,4 +1,5 @@
 ﻿#include "HitPanelWidget.h"
+#include "Components/HorizontalBox.h"
 #include "Components/Image.h"
 
 UHitPanelWidget::UHitPanelWidget(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer) {
@@ -8,35 +9,45 @@ UHitPanelWidget::UHitPanelWidget(const FObjectInitializer& ObjectInitializer) : 
 void UHitPanelWidget::SynchronizeProperties() {
 	Super::SynchronizeProperties();
 	SetTheme(Theme);
+	UpdateHits();
 }
 
 void UHitPanelWidget::SetTheme(const ETheme NewTheme) {
 	Theme = NewTheme;
-	UpdateImages();
+	if (Stencil) {
+		const auto& StencilTextures = &DuckStencilTexture;
+		Stencil->SetBrushFromTexture(StencilTextures[static_cast<uint8>(Theme)]);
+	}
 }
 
 void UHitPanelWidget::SetHit(const int32 Idx, const bool Hit) {
-	check(0 <= Idx && Idx < 10);
+	check(0 <= Idx && Idx < Hits.Num());
 	Hits[Idx] = Hit;
 
-	const auto ImagesToSet = &MissDuck;
-	const auto Images = &Image1;
-	const auto& ImageToSet = ImagesToSet[static_cast<uint8>(Hit) * 2 + static_cast<uint8>(Theme)];
-	if (Images[Idx] && ImageToSet)
-		Images[Idx]->SetBrushFromTexture(ImageToSet);
+	if (ImagesBox) {
+		const auto& Slots = ImagesBox->GetSlots();
+		if (Idx < Slots.Num()) {
+			const auto& Colors = &MissColor;
+			if (const auto Image = Cast<UImage>(Slots[Idx]->Content))
+				Image->SetColorAndOpacity(Colors[Hit]);
+		}
+	}
 }
 
 void UHitPanelWidget::ResetHits() {
 	FMemory::Memzero(Hits.GetData(), Hits.Num() * sizeof(bool));
-	UpdateImages();
+	UpdateHits();
 }
 
-void UHitPanelWidget::UpdateImages() {
-	const auto ImagesToSet = &MissDuck;
-	const auto Images = &Image1;
-	for (int32 i = 0; i < 10; ++i) {
-		const auto& ImageToSet = ImagesToSet[static_cast<uint8>(Hits[i]) * 2 + static_cast<uint8>(Theme)];
-		if (Images[i] && ImageToSet)
-			Images[i]->SetBrushFromTexture(ImageToSet);
+void UHitPanelWidget::UpdateHits() const {
+	if (ImagesBox) {
+		const auto& Colors = &MissColor;
+
+		const auto& Slots = ImagesBox->GetSlots();
+		check(Slots.Num() <= Hits.Num());
+
+		for (int32 i = 0; i < Slots.Num(); ++i)
+			if (const auto Image = Cast<UImage>(Slots[i]->Content))
+				Image->SetColorAndOpacity(Colors[Hits[i]]);
 	}
 }

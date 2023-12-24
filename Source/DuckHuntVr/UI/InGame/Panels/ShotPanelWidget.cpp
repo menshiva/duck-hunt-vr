@@ -1,4 +1,5 @@
 ﻿#include "ShotPanelWidget.h"
+#include "Components/HorizontalBox.h"
 #include "Components/Image.h"
 
 void UShotPanelWidget::SynchronizeProperties() {
@@ -14,16 +15,17 @@ void UShotPanelWidget::SetSkyColor(const FLinearColor& NewColor) {
 }
 
 void UShotPanelWidget::SetBulletsNum(const int32 NewNum) {
-	check(0 <= NewNum && NewNum <= 3);
+	check(0 <= NewNum && NewNum < 4);
 	BulletsNum = NewNum;
 
-	const auto Bullets = &Bullet1;
+	if (ImagesBox) {
+		const auto& Slots = ImagesBox->GetSlots();
+		if (NewNum <= Slots.Num()) {
+			for (int32 i = 0; i < NewNum; ++i)
+				Slots[i]->Content->SetVisibility(ESlateVisibility::Hidden);
 
-	for (int32 i = 0; i < NewNum; ++i)
-		if (Bullets[i])
-			Bullets[i]->SetVisibility(ESlateVisibility::Hidden);
-
-	for (int32 i = NewNum; i < 3; ++i)
-		if (Bullets[i])
-			Bullets[i]->SetVisibility(ESlateVisibility::SelfHitTestInvisible);
+			for (int32 i = NewNum; i < Slots.Num(); ++i)
+				Slots[i]->Content->SetVisibility(ESlateVisibility::SelfHitTestInvisible);
+		}
+	}
 }
