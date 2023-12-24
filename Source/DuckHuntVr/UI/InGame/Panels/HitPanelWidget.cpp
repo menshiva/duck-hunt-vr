@@ -5,8 +5,8 @@ UHitPanelWidget::UHitPanelWidget(const FObjectInitializer& ObjectInitializer) : 
 	Hits.AddZeroed(10);
 }
 
-void UHitPanelWidget::NativePreConstruct() {
-	Super::NativePreConstruct();
+void UHitPanelWidget::SynchronizeProperties() {
+	Super::SynchronizeProperties();
 	SetTheme(Theme);
 }
 

@@ -12,7 +12,7 @@ class DUCKHUNTVR_API UHitPanelWidget : public UUserWidget {
 public:
 	explicit UHitPanelWidget(const FObjectInitializer& ObjectInitializer);
 
-	virtual void NativePreConstruct() override;
+	virtual void SynchronizeProperties() override;
 
 	void SetTheme(ETheme NewTheme);
 	void SetHit(int32 Idx, bool Hit);

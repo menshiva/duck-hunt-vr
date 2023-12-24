@@ -10,7 +10,7 @@ UCLASS(Abstract, NotBlueprintable, NotBlueprintType, NotPlaceable)
 class DUCKHUNTVR_API ADhLevelScriptActorBase : public ALevelScriptActor {
 	GENERATED_BODY()
 public:
-	
+	ADhLevelScriptActorBase();
 protected:
 	void OpenLevel(const TSoftObjectPtr<UWorld>& Level);
 
@@ -23,5 +23,5 @@ private:
 	UFUNCTION()
 	void OnFadeInSequenceEnd();
 
-	const TSoftObjectPtr<UWorld>* LevelToOpen;
+	const TSoftObjectPtr<UWorld>* LevelToOpen = nullptr;
 };

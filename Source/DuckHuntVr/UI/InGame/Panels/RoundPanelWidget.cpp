@@ -2,8 +2,8 @@
 #include "Components/TextBlock.h"
 #include "Kismet/KismetTextLibrary.h"
 
-void URoundPanelWidget::NativePreConstruct() {
-	Super::NativePreConstruct();
+void URoundPanelWidget::SynchronizeProperties() {
+	Super::SynchronizeProperties();
 	SetRound(Round);
 }
 

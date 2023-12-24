@@ -1,27 +1,16 @@
 ﻿#include "ShotPanelWidget.h"
 #include "Components/Image.h"
 
-void UShotPanelWidget::NativePreConstruct() {
-	Super::NativePreConstruct();
-	SetTheme(Theme);
+void UShotPanelWidget::SynchronizeProperties() {
+	Super::SynchronizeProperties();
+	SetSkyColor(SkyColor);
 	SetBulletsNum(BulletsNum);
 }
 
-void UShotPanelWidget::SetTheme(const ETheme NewTheme) {
-	Theme = NewTheme;
-
-	if (Background) {
-		const auto BackgroundTextures = &BackgroundDuck;
-		const auto NewBackgroundTexture = BackgroundTextures[static_cast<uint8>(NewTheme)].Get();
-		Background->SetBrushFromTexture(NewBackgroundTexture);
-	}
-
-	const auto BulletTextures = &BulletDuck;
-	const auto NewBulletTexture = BulletTextures[static_cast<uint8>(NewTheme)].Get();
-	const auto Bullets = &Bullet1;
-	for (int32 i = 0; i < 3; ++i)
-		if (Bullets[i])
-			Bullets[i]->SetBrushFromTexture(NewBulletTexture);
+void UShotPanelWidget::SetSkyColor(const FLinearColor& NewColor) {
+	SkyColor = NewColor;
+	if (BackgroundSky)
+		BackgroundSky->SetColorAndOpacity(NewColor);
 }
 
 void UShotPanelWidget::SetBulletsNum(const int32 NewNum) {
@@ -32,9 +21,9 @@ void UShotPanelWidget::SetBulletsNum(const int32 NewNum) {
 
 	for (int32 i = 0; i < NewNum; ++i)
 		if (Bullets[i])
-			Bullets[i]->SetVisibility(ESlateVisibility::SelfHitTestInvisible);
+			Bullets[i]->SetVisibility(ESlateVisibility::Hidden);
 
 	for (int32 i = NewNum; i < 3; ++i)
 		if (Bullets[i])
-			Bullets[i]->SetVisibility(ESlateVisibility::Hidden);
+			Bullets[i]->SetVisibility(ESlateVisibility::SelfHitTestInvisible);
 }

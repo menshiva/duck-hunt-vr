@@ -1,9 +1,10 @@
 ﻿#pragma once
 
-#include "InGameWidget.h"
+#include "Theme.h"
 #include "InGameUIActor.generated.h"
 
 class UWidgetComponent;
+class UInGameWidget;
 
 UCLASS(NotBlueprintable, NotBlueprintType, Placeable)
 class DUCKHUNTVR_API AInGameUI : public AActor {
@@ -11,10 +12,15 @@ class DUCKHUNTVR_API AInGameUI : public AActor {
 public:
 	AInGameUI();
 
+#if WITH_EDITOR
 	virtual void PostRegisterAllComponents() override;
+#endif
 	virtual void BeginPlay() override;
 
-	FORCEINLINE UInGameWidget* GetWidget() const { return InGameWidgetRef.Get(); }
+	void SetRound(int32 NewRound) const;
+	void SetSkyColor(const FLinearColor& NewColor);
+
+	void Redraw() const;
 protected:
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<USceneComponent> DefaultSceneRoot;
@@ -23,7 +29,10 @@ protected:
 	TObjectPtr<UWidgetComponent> InGameWidgetHolder;
 
 	UPROPERTY(EditAnywhere, Category=Init)
-	ETheme Theme = ETheme::Duck;
+	ETheme DefaultTheme = ETheme::Duck;
+
+	UPROPERTY(EditAnywhere, Category=Init)
+	FLinearColor SkyColor;
 private:
 	TWeakObjectPtr<UInGameWidget> InGameWidgetRef;
 };

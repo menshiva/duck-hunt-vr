@@ -3,6 +3,10 @@
 #include "LevelSequencePlayer.h"
 #include "Kismet/GameplayStatics.h"
 
+ADhLevelScriptActorBase::ADhLevelScriptActorBase() {
+	PrimaryActorTick.bCanEverTick = false;
+}
+
 void ADhLevelScriptActorBase::OpenLevel(const TSoftObjectPtr<UWorld>& Level) {
 	LevelToOpen = &Level;
 

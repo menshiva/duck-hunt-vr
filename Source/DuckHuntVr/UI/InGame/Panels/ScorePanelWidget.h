@@ -9,7 +9,7 @@ UCLASS(Abstract, Blueprintable, NotBlueprintType, meta=(DisableNativeTick))
 class DUCKHUNTVR_API UScorePanelWidget : public UUserWidget {
 	GENERATED_BODY()
 public:
-	virtual void NativePreConstruct() override;
+	virtual void SynchronizeProperties() override;
 
 	void SetScore(int32 NewScore);
 protected:

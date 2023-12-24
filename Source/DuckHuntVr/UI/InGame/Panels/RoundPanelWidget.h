@@ -9,7 +9,7 @@ UCLASS(Abstract, Blueprintable, NotBlueprintType, meta=(DisableNativeTick))
 class DUCKHUNTVR_API URoundPanelWidget : public UUserWidget {
 	GENERATED_BODY()
 public:
-	virtual void NativePreConstruct() override;
+	virtual void SynchronizeProperties() override;
 
 	void SetRound(int32 NewRound);
 protected:

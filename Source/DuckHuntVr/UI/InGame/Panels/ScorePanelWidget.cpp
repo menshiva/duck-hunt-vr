@@ -2,8 +2,8 @@
 #include "Components/TextBlock.h"
 #include "Kismet/KismetTextLibrary.h"
 
-void UScorePanelWidget::NativePreConstruct() {
-	Super::NativePreConstruct();
+void UScorePanelWidget::SynchronizeProperties() {
+	Super::SynchronizeProperties();
 	SetScore(Score);
 }
 
