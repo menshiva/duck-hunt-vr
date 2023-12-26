@@ -17,7 +17,9 @@ public:
 #endif
 	virtual void BeginPlay() override;
 
-	void SetRound(int32 NewRound) const;
+	void SetStateInfoFlyAway() const;
+	void ClearStateInfo() const;
+
 	void SetSkyColor(const FLinearColor& NewColor);
 
 	void Redraw() const;

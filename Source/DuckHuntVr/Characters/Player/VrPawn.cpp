@@ -30,25 +30,6 @@ void AVrPawn::BeginPlay() {
 	UHeadMountedDisplayFunctionLibrary::SetTrackingOrigin(EHMDTrackingOrigin::Floor);
 }
 
-// TODO
-/*void AVrPawn::Tick(const float DeltaSeconds) {
-	Super::Tick(DeltaSeconds);
-
-	static double CurrentWidgetRotationYaw = GetActorRotation().Yaw;
-
-	// TODO: do it if 180 or 360 degree mode is enabled
-	const double NewCameraRotationYaw = Camera->GetRelativeRotation().Yaw;
-	const double CameraRotationYawOffset = NewCameraRotationYaw - CurrentWidgetRotationYaw;
-	const double Angle = FMath::Abs(CameraRotationYawOffset);
-
-	if (Angle > 60.0) {
-		const double NewWidgetRotationYaw = CurrentWidgetRotationYaw + (CameraRotationYawOffset > 0.0 ? 90.0 : -90.0);
-		const auto DiffTransform = FTransform(FRotator(0.0, NewWidgetRotationYaw, 0.0) - FRotator(0.0, CurrentWidgetRotationYaw, 0.0));
-		InGameWidgetHolder->SetRelativeTransform(InGameWidgetHolder->GetRelativeTransform() * DiffTransform);
-		CurrentWidgetRotationYaw = NewWidgetRotationYaw;
-	}
-}*/
-
 void AVrPawn::SetPrimaryHand(const EControllerHand NewPrimaryHand) const {
 	HandsController->SetPrimaryHand(NewPrimaryHand);
 }
@@ -59,6 +40,10 @@ void AVrPawn::SetLaserType(const ELaserType NewLaserType) const {
 
 void AVrPawn::ResetOrientationAndPosition() {
 	UHeadMountedDisplayFunctionLibrary::ResetOrientationAndPosition();
+}
+
+float AVrPawn::GetCameraRotationYaw() const {
+	return Camera->GetRelativeRotation().Yaw;
 }
 
 void AVrPawn::OnGunFired() const {

@@ -3,7 +3,7 @@
 #include "DhLevelScriptActorBase.h"
 #include "DhLevelScriptActorMenu.generated.h"
 
-UCLASS(Blueprintable, NotBlueprintType, NotPlaceable)
+UCLASS(Abstract, Blueprintable, NotBlueprintType, NotPlaceable)
 class DUCKHUNTVR_API ADhLevelScriptActorMenu : public ADhLevelScriptActorBase {
 	GENERATED_BODY()
 public:

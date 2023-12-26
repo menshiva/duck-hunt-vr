@@ -11,6 +11,8 @@ class DUCKHUNTVR_API ADhLevelScriptActorBase : public ALevelScriptActor {
 	GENERATED_BODY()
 public:
 	ADhLevelScriptActorBase();
+
+	FORCEINLINE const AVrPawn* GetPawn() const { return Pawn.Get(); }
 protected:
 	void OpenLevel(const TSoftObjectPtr<UWorld>& Level);
 

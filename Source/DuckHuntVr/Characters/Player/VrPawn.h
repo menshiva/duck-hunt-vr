@@ -17,6 +17,8 @@ public:
 	void SetPrimaryHand(EControllerHand NewPrimaryHand) const;
 	void SetLaserType(ELaserType NewLaserType) const;
 	static void ResetOrientationAndPosition();
+
+	float GetCameraRotationYaw() const;
 protected:
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<USceneComponent> DefaultSceneRoot;

@@ -5,7 +5,7 @@
 
 class AInGameUI;
 
-UCLASS(Blueprintable, NotBlueprintType, NotPlaceable)
+UCLASS(Abstract, Blueprintable, NotBlueprintType, NotPlaceable)
 class DUCKHUNTVR_API ADhLevelScriptActorInGame : public ADhLevelScriptActorBase {
 	GENERATED_BODY()
 public:
@@ -16,13 +16,16 @@ public:
 #endif
 	virtual void Tick(float DeltaSeconds) override;
 
+	UFUNCTION(BlueprintImplementableEvent)
+	void SetSkyColor(const FLinearColor& Color);
+
 	// TODO: remove UFUNCTION
 	UFUNCTION(BlueprintCallable)
-	void OpenMainMenu() { OpenLevel(MainMenuLevel); }
-protected:
-	UFUNCTION(BlueprintImplementableEvent)
-	void SetRealBpSkyNewColor(const FLinearColor& NewColor);
+	void OpenMainMenuLevel() { OpenLevel(MainMenuLevel); }
 
+	FORCEINLINE const FLinearColor& GetDefaultSkyColor() const { return DefaultSkyColor; }
+	FORCEINLINE const AInGameUI* GetInGameUI() const { return InGameUI.Get(); }
+protected:
 	UPROPERTY(EditDefaultsOnly, Category=Init)
 	TSoftObjectPtr<UWorld> MainMenuLevel;
 

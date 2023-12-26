@@ -33,9 +33,12 @@ void AInGameUI::BeginPlay() {
 	SetSkyColor(SkyColor);
 }
 
-void AInGameUI::SetRound(const int32 NewRound) const {
-	if (InGameWidgetRef.IsValid())
-		InGameWidgetRef->RoundPanel->SetRound(NewRound);
+void AInGameUI::SetStateInfoFlyAway() const {
+	InGameWidgetRef->SetStateInfo(EStateInfo::FlyAway);
+}
+
+void AInGameUI::ClearStateInfo() const {
+	InGameWidgetRef->SetStateInfo(EStateInfo::None);
 }
 
 void AInGameUI::SetSkyColor(const FLinearColor& NewColor) {
