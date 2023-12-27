@@ -8,12 +8,12 @@ void UDhGameInstance::OnStart() {
 
 void UDhGameInstance::SavePrimaryHand(const EControllerHand NewPrimaryHand) {
 	PrimaryHand = NewPrimaryHand;
-	// TODO: SaveConfig();
+	SaveConfig();
 }
 
 void UDhGameInstance::SaveLaserType(const ELaserType NewLaserType) {
 	LaserType = NewLaserType;
-	// TODO: SaveConfig();
+	SaveConfig();
 }
 
 void UDhGameInstance::SetVisualizationTypeGameStartedWith(const EVisualizationType NewVisualizationType) {

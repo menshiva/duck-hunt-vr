@@ -17,8 +17,14 @@ public:
 
 	virtual void BeginPlay() override;
 
+	// TODO: remove UFUNCTION
+	UFUNCTION(BlueprintCallable)
 	void SetPrimaryHand(EControllerHand NewPrimaryHand) const;
+
+	// TODO: remove UFUNCTION
+	UFUNCTION(BlueprintCallable)
 	void SetLaserType(ELaserType NewLaserType) const;
+
 	static void ResetOrientationAndPosition();
 
 	float GetCameraRotationYaw() const;

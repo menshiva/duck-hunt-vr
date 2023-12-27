@@ -4,8 +4,7 @@
 #include "DuckHuntVr/Characters/Player/Laser/LaserType.h"
 #include "DhGameInstance.generated.h"
 
-// TODO: config
-UCLASS(NotBlueprintable, NotBlueprintType)
+UCLASS(Config=Game, NotBlueprintable, NotBlueprintType)
 class DUCKHUNTVR_API UDhGameInstance : public UGameInstance {
 	GENERATED_BODY()
 public:
@@ -19,10 +18,10 @@ public:
 	FORCEINLINE ELaserType GetLaserType() const { return LaserType; }
 	FORCEINLINE EVisualizationType GetVisualizationTypeGameStartedWith() const { return VisualizationTypeGameStartedWith; }
 private:
-	// TODO: config
+	UPROPERTY(Config)
 	EControllerHand PrimaryHand = EControllerHand::Right;
 
-	// TODO: config
+	UPROPERTY(Config)
 	ELaserType LaserType = ELaserType::Laser;
 
 	EVisualizationType VisualizationTypeGameStartedWith = EVisualizationType::None;
