@@ -5,31 +5,43 @@
 #include "DuckHuntVr/UI/InGame/InGameUIActor.h"
 #include "Kismet/KismetSystemLibrary.h"
 
+ADhGameStateBaseInGame::ADhGameStateBaseInGame() {
+	PrimaryActorTick.bCanEverTick = true;
+	PrimaryActorTick.bTickEvenWhenPaused = true;
+}
+
 void ADhGameStateBaseInGame::BeginPlay() {
 	LevelScriptActor = CastChecked<ADhLevelScriptActorInGame>(GetWorld()->GetLevelScriptActor());
 	Super::BeginPlay();
 }
 
+void ADhGameStateBaseInGame::Tick(const float DeltaSeconds) {
+	Super::Tick(DeltaSeconds);
+	// Fixes timer when game is paused
+	if (GetWorldTimerManager().TimerExists(UnpauseTimerHandle))
+		GetWorldTimerManager().Tick(DeltaSeconds);
+}
+
 void ADhGameStateBaseInGame::TogglePause() {
 	Super::TogglePause();
-
-	const auto GameMode = AuthorityGameMode.Get();
 	const auto InGameUI = LevelScriptActor->GetInGameUI();
 
-	if (!GameMode->IsPaused()) {
+	if (!IsPaused) {
+		GetWorldTimerManager().ClearTimer(UnpauseTimerHandle);
 		InGameUI->SetStateInfoPause();
 		InGameUI->Redraw();
 		LevelScriptActor->PlayPauseSound();
 		// TODO: hide ducks if any
-		GameMode->SetPause(LevelScriptActor->GetPawn()->GetPlayerController());
+		IsPaused = true;
+		AuthorityGameMode->SetPause(LevelScriptActor->GetPawn()->GetPlayerController());
 	}
 	else if (AllowedToUnpause) {
 		InGameUI->ClearStateInfo();
 		InGameUI->Redraw();
 		LevelScriptActor->PlayPauseSound();
 		// TODO: show ducks if any
-		// TODO: run ClearPause (below) after 1 sec delay
-		GameMode->ClearPause();
+		IsPaused = false;
+		GetWorldTimerManager().SetTimer(UnpauseTimerHandle, this, &ADhGameStateBaseInGame::ClearPause, 1.f, false);
 	}
 	else {
 		// TODO: create notification
@@ -44,7 +56,7 @@ void ADhGameStateBaseInGame::OnVisualizationTypeChanged(const EVisualizationType
 	Super::OnVisualizationTypeChanged(NewType);
 	const auto GameInstance = LevelScriptActor->GetDhGameInstance();
 	if (GameInstance->GetVisualizationTypeGameStartedWith() != EVisualizationType::None && NewType != EVisualizationType::None) {
-		if (!AuthorityGameMode->IsPaused()) {
+		if (!IsPaused) {
 			if (GameInstance->GetVisualizationTypeGameStartedWith() != NewType) {
 				AllowedToUnpause = false;
 				TogglePause();
@@ -53,4 +65,8 @@ void ADhGameStateBaseInGame::OnVisualizationTypeChanged(const EVisualizationType
 		else if (GameInstance->GetVisualizationTypeGameStartedWith() == NewType)
 			AllowedToUnpause = true;
 	}
+}
+
+void ADhGameStateBaseInGame::ClearPause() const {
+	AuthorityGameMode->ClearPause();
 }

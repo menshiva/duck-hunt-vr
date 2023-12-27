@@ -41,6 +41,8 @@ void ADhLevelScriptActorInGame::PlayPauseSound() const {
 }
 
 void ADhLevelScriptActorInGame::OpenMainMenuLevel() {
+	// we can just directly clear pause here instead of calling UDhGameStateBaseInGame::TogglePause(), since we are
+	// going to open another level anyway
 	const auto GameMode = GetWorld()->GetAuthGameMode();
 	if (GameMode->IsPaused())
 		GameMode->ClearPause();
