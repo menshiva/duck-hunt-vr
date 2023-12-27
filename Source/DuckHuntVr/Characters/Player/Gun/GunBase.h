@@ -1,19 +1,19 @@
 #pragma once
 
+#include "DuckHuntVr/Characters/Player/Laser/LaserType.h"
 #include "GunBase.generated.h"
 
-enum class ELaserType : uint8;
 class UHapticFeedbackEffect_Curve;
 class ULaserBase;
 
-UCLASS(Abstract, Blueprintable, NotBlueprintType, NotPlaceable)
+UCLASS(Abstract, Blueprintable, NotBlueprintType)
 class DUCKHUNTVR_API UGunBase : public UStaticMeshComponent {
 	GENERATED_BODY()
 public:
 	UGunBase();
 
 	virtual void BeginPlay() override;
-	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
+	virtual void EndPlay(EEndPlayReason::Type EndPlayReason) override;
 
 	void PlayFireEffects(EControllerHand HandType) const;
 	void UpdateLaserType(ELaserType NewType) const;

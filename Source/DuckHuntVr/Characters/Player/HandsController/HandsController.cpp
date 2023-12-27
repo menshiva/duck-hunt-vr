@@ -1,6 +1,8 @@
 ﻿#include "HandsController.h"
+#include "OculusXRFunctionLibrary.h"
 #include "OculusXRInputFunctionLibrary.h"
 #include "DuckHuntVr/Characters/Player/VrPawn.h"
+#include "Hand/HandMotionControllerBase.h"
 #include "Hand/HandVisualizationInterface.h"
 
 UHandsController::UHandsController() {
@@ -8,9 +10,13 @@ UHandsController::UHandsController() {
 	PrimaryComponentTick.bTickEvenWhenPaused = true;
 }
 
-void UHandsController::Init(AVrPawn* VrPawn, const EControllerHand DefaultPrimaryHand, const ELaserType DefaultLaserType) {
+void UHandsController::Init(
+	AVrPawn* VrPawn,
+	const EControllerHand DefaultPrimaryHand, const EVisualizationType DefaultVisType, const ELaserType DefaultLaserType
+) {
 	ParentVrPawn = VrPawn;
 	PrimaryHand = DefaultPrimaryHand;
+	CurrentVisualizationType = DefaultVisType;
 	LaserType = DefaultLaserType;
 }
 
@@ -37,6 +43,9 @@ void UHandsController::BeginPlay() {
 	check(PrimaryHand == EControllerHand::Right || PrimaryHand == EControllerHand::Left);
 	if (PrimaryHand == EControllerHand::Left)
 		Swap(PrimaryMotionController, SecondaryMotionController);
+
+	if (CurrentVisualizationType != EVisualizationType::None)
+		UpdateVisualizationType(CurrentVisualizationType);
 }
 
 void UHandsController::EndPlay(const EEndPlayReason::Type EndPlayReason) {
@@ -55,10 +64,8 @@ void UHandsController::TickComponent(const float Dt, const ELevelTick Tt, FActor
 	Super::TickComponent(Dt, Tt, Tf);
 	const auto NewVisualizationType = GetNewVisualizationType();
 	if (NewVisualizationType != CurrentVisualizationType) {
-		OnVisualizationTypeChanged.Execute();
-		PrimaryMotionController->UpdateVisualization(NewVisualizationType, true, LaserType);
-		SecondaryMotionController->UpdateVisualization(NewVisualizationType, false, LaserType);
-		CurrentVisualizationType = NewVisualizationType;
+		OnVisualizationTypeChanged.Execute(NewVisualizationType);
+		UpdateVisualizationType(NewVisualizationType);
 	}
 }
 
@@ -74,8 +81,8 @@ void UHandsController::SetPrimaryHand(const EControllerHand NewPrimaryHand) {
 void UHandsController::SetLaserType(const ELaserType NewLaserType) {
 	if (LaserType != NewLaserType) {
 		LaserType = NewLaserType;
-		if (CurrentVisualizationType != EVisualizationType::None)
-			PrimaryMotionController->GetVisualizationComponent()->UpdateLaserType(LaserType);
+		if (const auto PrimaryControllerVis = PrimaryMotionController->GetVisualizationComponent())
+			PrimaryControllerVis->UpdateLaserType(LaserType);
 	}
 }
 
@@ -84,16 +91,23 @@ void UHandsController::PlayFireEffects() const {
 		PrimaryControllerVis->PlayFireEffects();
 }
 
-APlayerController* UHandsController::GetPlayerController() const {
-	if (ParentVrPawn.IsValid() && ParentVrPawn->Controller)
-		return CastChecked<APlayerController>(ParentVrPawn->Controller);
+const APlayerController* UHandsController::GetPlayerController() const {
+	if (ParentVrPawn.IsValid())
+		return ParentVrPawn->GetPlayerController();
 	return nullptr;
 }
 
-EVisualizationType UHandsController::GetNewVisualizationType() const {
+EVisualizationType UHandsController::GetNewVisualizationType() {
 	if (UOculusXRInputFunctionLibrary::IsHandTrackingEnabled())
 		return EVisualizationType::Tracked;
-	if (LeftMotionController->IsTracked() || RightMotionController->IsTracked())
-		return EVisualizationType::Controller;
+	if (UOculusXRFunctionLibrary::IsDeviceTracked(EOculusXRTrackedDeviceType::LTouch)
+		|| UOculusXRFunctionLibrary::IsDeviceTracked(EOculusXRTrackedDeviceType::RTouch))
+			return EVisualizationType::Controller;
 	return EVisualizationType::None;
+}
+
+void UHandsController::UpdateVisualizationType(const EVisualizationType NewType) {
+	PrimaryMotionController->UpdateVisualization(NewType, true, LaserType);
+	SecondaryMotionController->UpdateVisualization(NewType, false, LaserType);
+	CurrentVisualizationType = NewType;
 }

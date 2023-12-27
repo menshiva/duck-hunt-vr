@@ -1,26 +1,23 @@
 ﻿#pragma once
 
 #include "MotionControllerComponent.h"
+#include "VisualizationType.h"
+#include "DuckHuntVr/Characters/Player/Laser/LaserType.h"
 #include "HandMotionControllerBase.generated.h"
 
 class UHandsController;
-enum class ELaserType : uint8;
 class IHandVisualizationInterface;
 class UControllerVisualizationBase;
 class UTrackedVisualizationBase;
 
-enum class EVisualizationType : uint8_t {
-	None, Controller, Tracked
-};
-
-UCLASS(Abstract, Blueprintable, NotBlueprintType, NotPlaceable)
+UCLASS(Abstract, Blueprintable, NotBlueprintType)
 class DUCKHUNTVR_API UHandMotionControllerBase : public UMotionControllerComponent {
 	GENERATED_BODY()
 public:
 	UHandMotionControllerBase();
 
 	void Init(UHandsController* HandsController, EControllerHand Hand);
-	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
+	virtual void EndPlay(EEndPlayReason::Type EndPlayReason) override;
 
 	void UpdateVisualization(EVisualizationType NewVisualizationType, bool Primary, ELaserType LaserType);
 

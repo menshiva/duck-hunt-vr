@@ -11,7 +11,7 @@ UENUM(BlueprintType)
 enum class EStateInfo : uint8 {
 	None,
 	FlyAway,
-	// TODO: Pause
+	Pause
 };
 
 UCLASS(Abstract, Blueprintable, NotBlueprintType, meta=(DisableNativeTick))
@@ -39,6 +39,9 @@ protected:
 
 	UPROPERTY(EditAnywhere, Category="Init|States", DisplayName=FlyAway, meta=(DesignerRebuild))
 	TObjectPtr<UTexture2D> FlyAwayStateTexture;
+
+	UPROPERTY(EditAnywhere, Category="Init|States", DisplayName=Pause, meta=(DesignerRebuild))
+	TObjectPtr<UTexture2D> PauseStateTexture;
 
 	UPROPERTY(meta=(BindWidget))
 	TObjectPtr<UImage> StateInfoImage;

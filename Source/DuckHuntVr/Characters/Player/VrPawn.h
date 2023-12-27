@@ -1,10 +1,13 @@
 ﻿#pragma once
 
-#include "Laser/LaserBase.h"
+#include "HandsController/Hand/VisualizationType.h"
+#include "Laser/LaserType.h"
 #include "VrPawn.generated.h"
 
 class UCameraComponent;
 class UHandsController;
+class UDhGameInstance;
+class ADhGameStateBase;
 
 UCLASS(NotBlueprintable, NotBlueprintType, Placeable)
 class DUCKHUNTVR_API AVrPawn : public APawn {
@@ -19,6 +22,8 @@ public:
 	static void ResetOrientationAndPosition();
 
 	float GetCameraRotationYaw() const;
+	EVisualizationType GetVisualizationType() const;
+	APlayerController* GetPlayerController() const { return PlayerController.Get(); }
 protected:
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<USceneComponent> DefaultSceneRoot;
@@ -31,5 +36,9 @@ protected:
 private:
 	void OnGunFired() const;
 	void OnMenuPressed() const;
-	void OnVisualizationTypeChanged() const;
+	void OnVisualizationTypeChanged(EVisualizationType NewType) const;
+
+	TWeakObjectPtr<UDhGameInstance> GameInstance;
+	TWeakObjectPtr<ADhGameStateBase> GameState;
+	TWeakObjectPtr<APlayerController> PlayerController;
 };

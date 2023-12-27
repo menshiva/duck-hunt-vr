@@ -1,6 +1,8 @@
 ﻿#include "DhLevelScriptActorInGame.h"
 #include "DuckHuntVr/Characters/Player/VrPawn.h"
 #include "DuckHuntVr/UI/InGame/InGameUIActor.h"
+#include "GameFramework/GameModeBase.h"
+#include "Kismet/GameplayStatics.h"
 
 ADhLevelScriptActorInGame::ADhLevelScriptActorInGame() {
 	PrimaryActorTick.bCanEverTick = true;
@@ -32,4 +34,15 @@ void ADhLevelScriptActorInGame::Tick(const float DeltaSeconds) {
 		InGameUI->SetActorTransform(InGameUI->GetActorTransform() * DiffTransform);
 		CurrentInGameUiRotationYaw = NewWidgetRotationYaw;
 	}
+}
+
+void ADhLevelScriptActorInGame::PlayPauseSound() const {
+	UGameplayStatics::PlaySound2D(this, PauseSound);
+}
+
+void ADhLevelScriptActorInGame::OpenMainMenuLevel() {
+	const auto GameMode = GetWorld()->GetAuthGameMode();
+	if (GameMode->IsPaused())
+		GameMode->ClearPause();
+	OpenLevel(MainMenuLevel);
 }

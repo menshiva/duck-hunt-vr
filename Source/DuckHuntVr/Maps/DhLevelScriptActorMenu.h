@@ -3,17 +3,17 @@
 #include "DhLevelScriptActorBase.h"
 #include "DhLevelScriptActorMenu.generated.h"
 
-UCLASS(Abstract, Blueprintable, NotBlueprintType, NotPlaceable)
+UCLASS(Abstract, Blueprintable, NotBlueprintType)
 class DUCKHUNTVR_API ADhLevelScriptActorMenu : public ADhLevelScriptActorBase {
 	GENERATED_BODY()
 public:
 	// TODO: remove UFUNCTION
 	UFUNCTION(BlueprintCallable)
-	void OpenDuckLevel() { OpenLevel(DuckLevel); }
+	void OpenDuckLevel();
 
 	// TODO: remove UFUNCTION
 	UFUNCTION(BlueprintCallable)
-	void OpenClayLevel() { OpenLevel(ClayLevel); }
+	void OpenClayLevel();
 protected:
 	UPROPERTY(EditDefaultsOnly, Category=Init)
 	TSoftObjectPtr<UWorld> DuckLevel;

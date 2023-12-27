@@ -18,6 +18,7 @@ public:
 	virtual void BeginPlay() override;
 
 	void SetStateInfoFlyAway() const;
+	void SetStateInfoPause() const;
 	void ClearStateInfo() const;
 
 	void SetSkyColor(const FLinearColor& NewColor);

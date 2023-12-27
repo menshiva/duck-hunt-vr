@@ -1,10 +1,16 @@
 ﻿#include "DhLevelScriptActorBase.h"
 #include "LevelSequenceActor.h"
 #include "LevelSequencePlayer.h"
+#include "DuckHuntVr/GameInstance/DhGameInstance.h"
 #include "Kismet/GameplayStatics.h"
 
 ADhLevelScriptActorBase::ADhLevelScriptActorBase() {
 	PrimaryActorTick.bCanEverTick = false;
+}
+
+void ADhLevelScriptActorBase::BeginPlay() {
+	GameInstance = CastChecked<UDhGameInstance>(GetGameInstance());
+	Super::BeginPlay();
 }
 
 void ADhLevelScriptActorBase::OpenLevel(const TSoftObjectPtr<UWorld>& Level) {

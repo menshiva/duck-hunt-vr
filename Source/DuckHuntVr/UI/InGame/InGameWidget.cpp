@@ -17,6 +17,10 @@ void UInGameWidget::SetStateInfo(const EStateInfo NewStateInfo) {
 				StateInfoImage->SetBrushFromTexture(FlyAwayStateTexture, true);
 				StateInfoImage->SetVisibility(ESlateVisibility::SelfHitTestInvisible);
 				break;
+			case EStateInfo::Pause:
+				StateInfoImage->SetBrushFromTexture(PauseStateTexture, true);
+				StateInfoImage->SetVisibility(ESlateVisibility::SelfHitTestInvisible);
+				break;
 		}
 	}
 }

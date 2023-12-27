@@ -4,19 +4,18 @@
 #include "DuckHuntVr/Characters/Player/HandsController/Hand/HandVisualizationInterface.h"
 #include "TrackedVisualizationBase.generated.h"
 
-enum class ELaserType : uint8;
 class UInputMappingContext;
 class UInputAction;
 class ULaserBase;
 struct FInputActionValue;
 
-UCLASS(Abstract, Blueprintable, NotBlueprintType, NotPlaceable)
+UCLASS(Abstract, Blueprintable, NotBlueprintType)
 class DUCKHUNTVR_API UTrackedVisualizationBase : public UOculusXRHandComponent, public IHandVisualizationInterface {
 	GENERATED_BODY()
 public:
 	UTrackedVisualizationBase();
 
-	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
+	virtual void EndPlay(EEndPlayReason::Type EndPlayReason) override;
 	virtual void TickComponent(float Dt, ELevelTick Tt, FActorComponentTickFunction* Tf) override;
 
 	virtual bool IsPrimary() const override { return static_cast<bool>(LaserComponent); }

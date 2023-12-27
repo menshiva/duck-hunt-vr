@@ -3,19 +3,18 @@
 #include "DuckHuntVr/Characters/Player/HandsController/Hand/HandVisualizationInterface.h"
 #include "ControllerVisualizationBase.generated.h"
 
-enum class ELaserType : uint8;
 class UInputMappingContext;
 class UInputAction;
 class UGunBase;
 struct FInputActionValue;
 
-UCLASS(Abstract, Blueprintable, BlueprintType, NotPlaceable)
+UCLASS(Abstract, Blueprintable, BlueprintType)
 class DUCKHUNTVR_API UControllerVisualizationBase : public USkeletalMeshComponent, public IHandVisualizationInterface {
 	GENERATED_BODY()
 public:
 	UControllerVisualizationBase();
 
-	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
+	virtual void EndPlay(EEndPlayReason::Type EndPlayReason) override;
 
 	UFUNCTION(BlueprintPure)
 	virtual bool IsPrimary() const override { return static_cast<bool>(GunComponent); }

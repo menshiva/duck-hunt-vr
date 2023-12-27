@@ -5,7 +5,7 @@
 
 class AInGameUI;
 
-UCLASS(Abstract, Blueprintable, NotBlueprintType, NotPlaceable)
+UCLASS(Abstract, Blueprintable, NotBlueprintType)
 class DUCKHUNTVR_API ADhLevelScriptActorInGame : public ADhLevelScriptActorBase {
 	GENERATED_BODY()
 public:
@@ -16,14 +16,16 @@ public:
 #endif
 	virtual void Tick(float DeltaSeconds) override;
 
+	void PlayPauseSound() const;
+
 	UFUNCTION(BlueprintImplementableEvent)
 	void SetSkyColor(const FLinearColor& Color);
+	void SetDefaultSkyColor() { SetSkyColor(DefaultSkyColor); }
 
 	// TODO: remove UFUNCTION
 	UFUNCTION(BlueprintCallable)
-	void OpenMainMenuLevel() { OpenLevel(MainMenuLevel); }
+	void OpenMainMenuLevel();
 
-	FORCEINLINE const FLinearColor& GetDefaultSkyColor() const { return DefaultSkyColor; }
 	FORCEINLINE const AInGameUI* GetInGameUI() const { return InGameUI.Get(); }
 protected:
 	UPROPERTY(EditDefaultsOnly, Category=Init)
@@ -31,6 +33,9 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly, Category=Init)
 	FLinearColor DefaultSkyColor;
+
+	UPROPERTY(EditDefaultsOnly, Category=Init)
+	TObjectPtr<USoundBase> PauseSound;
 
 	UPROPERTY(EditDefaultsOnly, Category=Subcomponents)
 	TWeakObjectPtr<AInGameUI> InGameUI;

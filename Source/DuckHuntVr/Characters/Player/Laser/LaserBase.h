@@ -1,5 +1,6 @@
 ﻿#pragma once
 
+#include "LaserType.h"
 #include "LaserBase.generated.h"
 
 class UNiagaraSystem;
@@ -7,12 +8,7 @@ class UPaperSprite;
 class UNiagaraComponent;
 class UPaperSpriteComponent;
 
-UENUM(BlueprintType)
-enum class ELaserType : uint8 {
-	None, Crosshair, Laser
-};
-
-UCLASS(Abstract, Blueprintable, NotBlueprintType, NotPlaceable)
+UCLASS(Abstract, Blueprintable, NotBlueprintType)
 class DUCKHUNTVR_API ULaserBase : public USceneComponent {
 	GENERATED_BODY()
 public:
@@ -21,7 +17,7 @@ public:
 	virtual void Activate(bool bReset) override;
 	virtual void Deactivate() override;
 
-	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
+	virtual void EndPlay(EEndPlayReason::Type EndPlayReason) override;
 
 	void UpdateType(ELaserType NewType);
 

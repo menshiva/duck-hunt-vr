@@ -11,7 +11,7 @@ public class DuckHuntVr : ModuleRules
 		PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "EnhancedInput" });
 
 		PrivateDependencyModuleNames.AddRange(new string[] {
-			"HeadMountedDisplay", "OculusXRInput", "UMG", "Niagara",
+			"HeadMountedDisplay", "OculusXRHMD", "OculusXRInput", "UMG", "Niagara",
 			"Paper2D", "XRBase", "LevelSequence", "MovieScene"
 		});
 

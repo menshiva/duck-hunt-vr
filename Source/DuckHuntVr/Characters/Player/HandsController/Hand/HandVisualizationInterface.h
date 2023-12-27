@@ -1,9 +1,9 @@
 #pragma once
 
+#include "DuckHuntVr/Characters/Player/Laser/LaserType.h"
 #include "HandVisualizationInterface.generated.h"
 
 class UHandMotionControllerBase;
-enum class ELaserType : uint8;
 class UEnhancedInputLocalPlayerSubsystem;
 
 UINTERFACE(MinimalAPI)

@@ -28,6 +28,7 @@ void AInGameUI::PostRegisterAllComponents() {
 
 void AInGameUI::BeginPlay() {
 	Super::BeginPlay();
+	InGameWidgetHolder->PrimaryComponentTick.bTickEvenWhenPaused = true;
 	InGameWidgetRef = CastChecked<UInGameWidget>(InGameWidgetHolder->GetUserWidgetObject());
 	InGameWidgetRef->HitPanel->SetTheme(DefaultTheme);
 	SetSkyColor(SkyColor);
@@ -35,6 +36,10 @@ void AInGameUI::BeginPlay() {
 
 void AInGameUI::SetStateInfoFlyAway() const {
 	InGameWidgetRef->SetStateInfo(EStateInfo::FlyAway);
+}
+
+void AInGameUI::SetStateInfoPause() const {
+	InGameWidgetRef->SetStateInfo(EStateInfo::Pause);
 }
 
 void AInGameUI::ClearStateInfo() const {

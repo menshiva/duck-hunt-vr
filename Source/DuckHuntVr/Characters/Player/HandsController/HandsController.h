@@ -1,32 +1,33 @@
 ﻿#pragma once
 
-#include "DuckHuntVr/Characters/Player/Laser/LaserBase.h"
-#include "Hand/HandMotionControllerBase.h"
+#include "DuckHuntVr/Characters/Player/Laser/LaserType.h"
+#include "Hand/VisualizationType.h"
 #include "HandsController.generated.h"
 
 class AVrPawn;
+class UHandMotionControllerBase;
 
 DECLARE_DELEGATE(FHandsControllerGunFireDelegate);
 DECLARE_DELEGATE(FHandsControllerMenuPressDelegate);
-DECLARE_DELEGATE(FHandsControllerVisTypeChangeDelegate);
+DECLARE_DELEGATE_OneParam(FHandsControllerVisTypeChangeDelegate, EVisualizationType);
 
-UCLASS(NotBlueprintable, NotBlueprintType, NotPlaceable)
+UCLASS(NotBlueprintable, NotBlueprintType)
 class DUCKHUNTVR_API UHandsController : public USceneComponent {
 	GENERATED_BODY()
 public:
 	UHandsController();
 
-	void Init(AVrPawn* VrPawn, EControllerHand DefaultPrimaryHand, ELaserType DefaultLaserType);
+	void Init(AVrPawn* VrPawn, EControllerHand DefaultPrimaryHand, EVisualizationType DefaultVisType, ELaserType DefaultLaserType);
 
 	virtual void BeginPlay() override;
-	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
+	virtual void EndPlay(EEndPlayReason::Type EndPlayReason) override;
 	virtual void TickComponent(float Dt, ELevelTick Tt, FActorComponentTickFunction* Tf) override;
 
 	void SetPrimaryHand(EControllerHand NewPrimaryHand);
 	void SetLaserType(ELaserType NewLaserType);
 	void PlayFireEffects() const;
 
-	APlayerController* GetPlayerController() const;
+	const APlayerController* GetPlayerController() const;
 	FORCEINLINE EVisualizationType GetVisualizationType() const { return CurrentVisualizationType; }
 
 	FHandsControllerGunFireDelegate OnGunFired;
@@ -39,7 +40,8 @@ protected:
 	UPROPERTY(EditAnywhere, Category=Subcomponents)
 	TSubclassOf<UHandMotionControllerBase> RightMotionControllerClass;
 private:
-	EVisualizationType GetNewVisualizationType() const;
+	static EVisualizationType GetNewVisualizationType();
+	void UpdateVisualizationType(EVisualizationType NewType);
 
 	TWeakObjectPtr<AVrPawn> ParentVrPawn;
 

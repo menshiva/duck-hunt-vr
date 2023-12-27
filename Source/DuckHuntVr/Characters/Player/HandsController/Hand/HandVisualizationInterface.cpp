@@ -1,6 +1,7 @@
 #include "HandVisualizationInterface.h"
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
+#include "HandMotionControllerBase.h"
 #include "DuckHuntVr/Characters/Player/HandsController/HandsController.h"
 
 static UEnhancedInputLocalPlayerSubsystem* GetEnhancedInputSubsystem(const APlayerController* PlayerController) {
