@@ -24,6 +24,9 @@ public:
 	virtual void UpdateLaserType(ELaserType NewType) override;
 protected:
 	virtual void InitImpl(USceneComponent* AttachmentParent, bool Primary) override;
+	virtual void AddMappingContexts(UEnhancedInputLocalPlayerSubsystem* Subsystem, UEnhancedInputComponent* Component) override;
+	virtual void ClearMappingContexts(UEnhancedInputLocalPlayerSubsystem* Subsystem) const override;
+	virtual ULaserBase* GetLaser() const override;
 
 	UPROPERTY(EditDefaultsOnly, Category="Init|Action", DisplayName=Context)
 	TObjectPtr<UInputMappingContext> ActionMappingContext;
@@ -64,9 +67,6 @@ protected:
 	UPROPERTY(BlueprintReadOnly)
 	float GripAxis = 0.0f;
 private:
-	virtual void AddMappingContexts(UEnhancedInputLocalPlayerSubsystem* Subsystem, UEnhancedInputComponent* Component) override;
-	virtual void ClearMappingContexts(UEnhancedInputLocalPlayerSubsystem* Subsystem) const override;
-
 	void AnimPointCapTouchActionEvent(const FInputActionValue& Value);
 	void AnimTriggerActionEvent(const FInputActionValue& Value);
 	void AnimThumbCapTouchActionEvent(const FInputActionValue& Value);

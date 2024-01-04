@@ -3,6 +3,7 @@
 #include "EnhancedInputSubsystems.h"
 #include "HandMotionControllerBase.h"
 #include "DuckHuntVr/Characters/Player/HandsController/HandsController.h"
+#include "DuckHuntVr/Characters/Player/Laser/LaserBase.h"
 
 static UEnhancedInputLocalPlayerSubsystem* GetEnhancedInputSubsystem(const APlayerController* PlayerController) {
 	return ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer());
@@ -49,8 +50,14 @@ EControllerHand IHandVisualizationInterface::GetHandType() const {
 
 // ReSharper disable once CppMemberFunctionMayBeConst
 void IHandVisualizationInterface::Fire() {
-	if (IsPrimary())
-		ParentMotionController->GetParentHandsController()->OnGunFired.Execute();
+	if (IsPrimary()) {
+		const auto Laser = GetLaser();
+		const bool IsUi = Laser->GetCurrentHitType() == HitType::UI;
+
+		ParentMotionController->GetParentHandsController()->OnGunFired.Execute(IsUi);
+		if (IsUi)
+			Laser->ClickUI();
+	}
 }
 
 // ReSharper disable once CppMemberFunctionMayBeConst

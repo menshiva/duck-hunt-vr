@@ -2,6 +2,7 @@
 #include "NiagaraComponent.h"
 #include "NiagaraDataInterfaceArrayFunctionLibrary.h"
 #include "PaperSpriteComponent.h"
+#include "Components/WidgetInteractionComponent.h"
 #include "GameFramework/GameModeBase.h"
 #include "Kismet/KismetSystemLibrary.h"
 
@@ -11,11 +12,18 @@ ULaserBase::ULaserBase() {
 
 	UActorComponent::SetAutoActivate(true);
 
-	TraceTypeQuery = UEngineTypes::ConvertToTraceType(ECC_GameTraceChannel1);
+	TargetTraceTypeQuery = UEngineTypes::ConvertToTraceType(ECC_GameTraceChannel1);
+
+	WidgetInteractor = CreateDefaultSubobject<UWidgetInteractionComponent>(TEXT("WidgetInteractor"));
+	WidgetInteractor->PointerIndex = 1;
+	WidgetInteractor->InteractionDistance = MaxLaserDistance;
 }
 
 void ULaserBase::Activate(const bool bReset) {
 	Super::Activate(bReset);
+
+	WidgetInteractor->Activate();
+
 	if (NiagaraLaser) {
 		NiagaraLaser->Activate();
 		NiagaraLaser->SetVisibility(true);
@@ -27,6 +35,10 @@ void ULaserBase::Activate(const bool bReset) {
 
 void ULaserBase::Deactivate() {
 	Super::Deactivate();
+
+	CurrentHitType = HitType::None;
+	WidgetInteractor->Deactivate();
+
 	if (NiagaraLaser) {
 		NiagaraLaser->Deactivate();
 		NiagaraLaser->SetVisibility(false);
@@ -35,7 +47,18 @@ void ULaserBase::Deactivate() {
 		CrosshairSprite->SetVisibility(false);
 }
 
+void ULaserBase::BeginPlay() {
+	Super::BeginPlay();
+	WidgetInteractor->SetupAttachment(this);
+	WidgetInteractor->RegisterComponent();
+}
+
 void ULaserBase::EndPlay(const EEndPlayReason::Type EndPlayReason) {
+	if (WidgetInteractor) {
+		WidgetInteractor->DestroyComponent();
+		WidgetInteractor = nullptr;
+	}
+
 	if (NiagaraLaser) {
 		NiagaraLaser->DestroyComponent();
 		NiagaraLaser = nullptr;
@@ -44,6 +67,7 @@ void ULaserBase::EndPlay(const EEndPlayReason::Type EndPlayReason) {
 		CrosshairSprite->DestroyComponent();
 		CrosshairSprite = nullptr;
 	}
+
 	Super::EndPlay(EndPlayReason);
 }
 
@@ -89,6 +113,11 @@ void ULaserBase::UpdateType(const ELaserType NewType) {
 	}
 }
 
+void ULaserBase::ClickUI() const {
+	WidgetInteractor->PressPointerKey(EKeys::LeftMouseButton);
+	WidgetInteractor->ReleasePointerKey(EKeys::LeftMouseButton);
+}
+
 void ULaserBase::TickComponent(const float Dt, const ELevelTick Tt, FActorComponentTickFunction* Tf) {
 	Super::TickComponent(Dt, Tt, Tf);
 
@@ -96,14 +125,23 @@ void ULaserBase::TickComponent(const float Dt, const ELevelTick Tt, FActorCompon
 	const auto Fwd = GetForwardVector();
 	auto End = Start + Fwd * MaxLaserDistance;
 
-    if (UKismetSystemLibrary::LineTraceSingle(
+	if (WidgetInteractor->IsOverInteractableWidget()) {
+		CurrentHitType = HitType::UI;
+		HitResult = WidgetInteractor->GetLastHitResult();
+		End = HitResult.ImpactPoint;
+	}
+	else if (UKismetSystemLibrary::LineTraceSingle(
     	this,
     	Start, End,
-    	TraceTypeQuery, false, {},
+    	TargetTraceTypeQuery, false, {},
     	EDrawDebugTrace::None, HitResult, true,
     	FLinearColor::Black, FLinearColor::Red, 0
     )) {
+		CurrentHitType = HitType::Target;
 		End = HitResult.ImpactPoint;
+	}
+	else {
+		CurrentHitType = HitType::None;
 	}
 
 	if (NiagaraLaser) {

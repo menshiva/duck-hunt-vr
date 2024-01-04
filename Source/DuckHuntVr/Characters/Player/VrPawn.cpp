@@ -61,8 +61,9 @@ EVisualizationType AVrPawn::GetVisualizationType() const {
 	return HandsController->GetVisualizationType();
 }
 
-void AVrPawn::OnGunFired() const {
+void AVrPawn::OnGunFired(const bool IsUI) const {
 	HandsController->PlayFireEffects();
+	// TODO: decrease bullet count only if not UI
 }
 
 void AVrPawn::OnMenuPressed() const {

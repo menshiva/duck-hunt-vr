@@ -42,7 +42,3 @@ void UGunBase::PlayFireEffects(const EControllerHand HandType) const {
 		FireAudioComponent->Play();
 	}
 }
-
-void UGunBase::UpdateLaserType(const ELaserType NewType) const {
-	LaserComponent->UpdateType(NewType);
-}

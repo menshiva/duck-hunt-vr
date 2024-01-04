@@ -1,6 +1,5 @@
 #pragma once
 
-#include "DuckHuntVr/Characters/Player/Laser/LaserType.h"
 #include "GunBase.generated.h"
 
 class UHapticFeedbackEffect_Curve;
@@ -16,7 +15,8 @@ public:
 	virtual void EndPlay(EEndPlayReason::Type EndPlayReason) override;
 
 	void PlayFireEffects(EControllerHand HandType) const;
-	void UpdateLaserType(ELaserType NewType) const;
+
+	FORCEINLINE ULaserBase* GetLaser() const { return LaserComponent; }
 protected:
 	UPROPERTY(EditDefaultsOnly, Category=Init)
 	TObjectPtr<USoundBase> FireSound;

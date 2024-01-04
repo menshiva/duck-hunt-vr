@@ -40,7 +40,7 @@ protected:
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<UHandsController> HandsController;
 private:
-	void OnGunFired() const;
+	void OnGunFired(bool IsUI) const;
 	void OnMenuPressed() const;
 	void OnVisualizationTypeChanged(EVisualizationType NewType) const;
 

@@ -7,7 +7,7 @@
 class AVrPawn;
 class UHandMotionControllerBase;
 
-DECLARE_DELEGATE(FHandsControllerGunFireDelegate);
+DECLARE_DELEGATE_OneParam(FHandsControllerGunFireDelegate, bool);
 DECLARE_DELEGATE(FHandsControllerMenuPressDelegate);
 DECLARE_DELEGATE_OneParam(FHandsControllerVisTypeChangeDelegate, EVisualizationType);
 

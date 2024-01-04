@@ -2,6 +2,7 @@
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "DuckHuntVr/Characters/Player/Gun/GunBase.h"
+#include "DuckHuntVr/Characters/Player/Laser/LaserBase.h"
 
 UControllerVisualizationBase::UControllerVisualizationBase() {
 	PrimaryComponentTick.bCanEverTick = true;
@@ -31,7 +32,7 @@ void UControllerVisualizationBase::PlayFireEffects() {
 
 void UControllerVisualizationBase::UpdateLaserType(const ELaserType NewType) {
 	IHandVisualizationInterface::UpdateLaserType(NewType);
-	GunComponent->UpdateLaserType(NewType);
+	GunComponent->GetLaser()->UpdateType(NewType);
 }
 
 void UControllerVisualizationBase::InitImpl(USceneComponent* AttachmentParent, const bool Primary) {
@@ -73,6 +74,10 @@ void UControllerVisualizationBase::AddMappingContexts(UEnhancedInputLocalPlayerS
 void UControllerVisualizationBase::ClearMappingContexts(UEnhancedInputLocalPlayerSubsystem* Subsystem) const {
 	Subsystem->RemoveMappingContext(ActionMappingContext);
 	Subsystem->RemoveMappingContext(AnimMappingContext);
+}
+
+ULaserBase* UControllerVisualizationBase::GetLaser() const {
+	return GunComponent->GetLaser();
 }
 
 void UControllerVisualizationBase::AnimPointCapTouchActionEvent(const FInputActionValue& Value) {
