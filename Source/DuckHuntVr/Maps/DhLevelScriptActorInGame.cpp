@@ -1,5 +1,6 @@
 ﻿#include "DhLevelScriptActorInGame.h"
 #include "DuckHuntVr/Characters/Player/VrPawn.h"
+#include "DuckHuntVr/GameInstance/DhGameInstance.h"
 #include "DuckHuntVr/UI/InGame/InGameUIActor.h"
 #include "GameFramework/GameModeBase.h"
 #include "Kismet/GameplayStatics.h"
@@ -41,6 +42,7 @@ void ADhLevelScriptActorInGame::PlayPauseSound() const {
 }
 
 void ADhLevelScriptActorInGame::OpenMainMenuLevel() {
+	GameInstance->SetGameStarted(false);
 	// we can just directly clear pause here instead of calling UDhGameStateBaseInGame::TogglePause(), since we are
 	// going to open another level anyway
 	const auto GameMode = GetWorld()->GetAuthGameMode();

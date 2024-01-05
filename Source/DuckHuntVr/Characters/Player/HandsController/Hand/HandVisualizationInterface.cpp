@@ -52,11 +52,16 @@ EControllerHand IHandVisualizationInterface::GetHandType() const {
 void IHandVisualizationInterface::Fire() {
 	if (IsPrimary()) {
 		const auto Laser = GetLaser();
-		const bool IsUi = Laser->GetCurrentHitType() == HitType::UI;
-
-		ParentMotionController->GetParentHandsController()->OnGunFired.Execute(IsUi);
-		if (IsUi)
+		if (!Laser->IsUiHit()) {
+			const auto& HitResult = Laser->GetHitResult();
+			const auto TargetActor = HitResult.GetActor(); // TODO: Cast to target
+			if (ParentMotionController->GetParentHandsController()->OnGunFired.Execute(TargetActor))
+				PlayFireEffects();
+		}
+		else {
+			PlayFireEffects();
 			Laser->ClickUI();
+		}
 	}
 }
 

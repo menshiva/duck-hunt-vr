@@ -14,6 +14,7 @@ public:
 	virtual void BeginPlay() override;
 	virtual void Tick(float DeltaSeconds) override;
 
+	virtual bool OnGunFired(void* TargetActor) override;
 	virtual void TogglePause() override;
 	virtual void OnVisualizationTypeChanged(EVisualizationType NewType) override;
 protected:
@@ -27,7 +28,7 @@ private:
 
 	TWeakObjectPtr<ADhLevelScriptActorInGame> LevelScriptActor;
 
-	bool IsPaused = false;
+	bool IsMenuShown = false;
 	bool AllowedToUnpause = true;
 	FTimerHandle UnpauseTimerHandle;
 };

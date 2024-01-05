@@ -86,11 +86,6 @@ void UHandsController::SetLaserType(const ELaserType NewLaserType) {
 	}
 }
 
-void UHandsController::PlayFireEffects() const {
-	if (const auto PrimaryControllerVis = PrimaryMotionController->GetVisualizationComponent())
-		PrimaryControllerVis->PlayFireEffects();
-}
-
 const APlayerController* UHandsController::GetPlayerController() const {
 	if (ParentVrPawn.IsValid())
 		return ParentVrPawn->GetPlayerController();

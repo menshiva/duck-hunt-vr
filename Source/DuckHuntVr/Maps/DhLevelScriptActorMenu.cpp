@@ -3,11 +3,13 @@
 #include "DuckHuntVr/GameInstance/DhGameInstance.h"
 
 void ADhLevelScriptActorMenu::OpenDuckLevel() {
-	GameInstance->SetVisualizationTypeGameStartedWith(Pawn->GetVisualizationType());
+	GameInstance->SetGameMapOpenedFromMenu(true);
+	GameInstance->SetGameVisualizationType(Pawn->GetVisualizationType());
 	OpenLevel(DuckLevel);
 }
 
 void ADhLevelScriptActorMenu::OpenClayLevel() {
-	GameInstance->SetVisualizationTypeGameStartedWith(Pawn->GetVisualizationType());
+	GameInstance->SetGameMapOpenedFromMenu(true);
+	GameInstance->SetGameVisualizationType(Pawn->GetVisualizationType());
 	OpenLevel(ClayLevel);
 }

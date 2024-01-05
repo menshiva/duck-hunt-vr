@@ -22,6 +22,8 @@ public:
 	void ClearStateInfo() const;
 
 	void SetSkyColor(const FLinearColor& NewColor);
+	bool RemoveBullet() const;
+	void ResetBullets() const;
 
 	void Redraw() const;
 protected:

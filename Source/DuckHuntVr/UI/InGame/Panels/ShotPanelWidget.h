@@ -13,17 +13,20 @@ public:
 	virtual void SynchronizeProperties() override;
 
 	void SetSkyColor(const FLinearColor& NewColor);
-	void SetBulletsNum(int32 NewNum);
+	bool RemoveBullet();
+	void ResetBullets();
 protected:
 	UPROPERTY(EditAnywhere, Category="Init|Properties", meta=(sRGB="true", DesignerRebuild))
 	FLinearColor SkyColor = FLinearColor::White;
 
 	UPROPERTY(EditAnywhere, Category="Init|Properties", meta=(ClampMin=0, ClampMax=3, DesignerRebuild))
-	int32 BulletsNum = 3;
+	int32 DefaultBulletsNum = 3;
 
 	UPROPERTY(meta=(BindWidget))
 	TObjectPtr<UImage> BackgroundSky;
 
 	UPROPERTY(meta=(BindWidget))
 	TObjectPtr<UHorizontalBox> ImagesBox;
+private:
+	int32 BulletsNum = DefaultBulletsNum;
 };

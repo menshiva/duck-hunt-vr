@@ -5,7 +5,7 @@
 void UShotPanelWidget::SynchronizeProperties() {
 	Super::SynchronizeProperties();
 	SetSkyColor(SkyColor);
-	SetBulletsNum(BulletsNum);
+	ResetBullets();
 }
 
 void UShotPanelWidget::SetSkyColor(const FLinearColor& NewColor) {
@@ -14,17 +14,27 @@ void UShotPanelWidget::SetSkyColor(const FLinearColor& NewColor) {
 		BackgroundSky->SetColorAndOpacity(NewColor);
 }
 
-void UShotPanelWidget::SetBulletsNum(const int32 NewNum) {
-	check(0 <= NewNum && NewNum < 4);
-	BulletsNum = NewNum;
+bool UShotPanelWidget::RemoveBullet() {
+	if (BulletsNum) {
+		--BulletsNum;
+		const auto& Slots = ImagesBox->GetSlots();
+		if (BulletsNum < Slots.Num())
+			Slots[BulletsNum]->Content->SetVisibility(ESlateVisibility::SelfHitTestInvisible);
+		return true;
+	}
+	return false;
+}
 
+void UShotPanelWidget::ResetBullets() {
+	BulletsNum = DefaultBulletsNum;
+	check(0 <= BulletsNum && BulletsNum < 4);
 	if (ImagesBox) {
 		const auto& Slots = ImagesBox->GetSlots();
-		if (NewNum <= Slots.Num()) {
-			for (int32 i = 0; i < NewNum; ++i)
+		if (BulletsNum <= Slots.Num()) {
+			for (int32 i = 0; i < BulletsNum; ++i)
 				Slots[i]->Content->SetVisibility(ESlateVisibility::Hidden);
 
-			for (int32 i = NewNum; i < Slots.Num(); ++i)
+			for (int32 i = BulletsNum; i < Slots.Num(); ++i)
 				Slots[i]->Content->SetVisibility(ESlateVisibility::SelfHitTestInvisible);
 		}
 	}

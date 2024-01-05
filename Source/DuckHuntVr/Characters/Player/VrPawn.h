@@ -29,7 +29,8 @@ public:
 
 	float GetCameraRotationYaw() const;
 	EVisualizationType GetVisualizationType() const;
-	APlayerController* GetPlayerController() const { return PlayerController.Get(); }
+	FORCEINLINE APlayerController* GetPlayerController() const { return PlayerController.Get(); }
+	FORCEINLINE ADhGameStateBase* GetGameState() const { return GameState.Get(); }
 protected:
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<USceneComponent> DefaultSceneRoot;
@@ -40,7 +41,7 @@ protected:
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<UHandsController> HandsController;
 private:
-	void OnGunFired(bool IsUI) const;
+	bool OnGunFired(void* TargetActor) const;
 	void OnMenuPressed() const;
 	void OnVisualizationTypeChanged(EVisualizationType NewType) const;
 

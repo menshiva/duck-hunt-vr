@@ -9,12 +9,6 @@ class UWidgetInteractionComponent;
 class UNiagaraComponent;
 class UPaperSpriteComponent;
 
-enum class HitType : uint8 {
-	None,
-	UI,
-	Target,
-};
-
 UCLASS(Abstract, Blueprintable, NotBlueprintType)
 class DUCKHUNTVR_API ULaserBase : public USceneComponent {
 	GENERATED_BODY()
@@ -32,7 +26,8 @@ public:
 
 	virtual void TickComponent(float Dt, ELevelTick Tt, FActorComponentTickFunction* Tf) override;
 
-	FORCEINLINE HitType GetCurrentHitType() const { return CurrentHitType; }
+	FORCEINLINE bool IsUiHit() const { return UiHit; }
+	FORCEINLINE const FHitResult& GetHitResult() const { return HitResult; }
 protected:
 	UPROPERTY(EditDefaultsOnly, Category=Init)
 	TObjectPtr<UNiagaraSystem> NiagaraLaserAsset;
@@ -53,6 +48,6 @@ private:
 	UPROPERTY()
 	TObjectPtr<UPaperSpriteComponent> CrosshairSprite;
 
-	HitType CurrentHitType = HitType::None;
+	bool UiHit = false;
 	FHitResult HitResult;
 };

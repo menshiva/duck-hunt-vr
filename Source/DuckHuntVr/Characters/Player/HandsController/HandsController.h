@@ -7,7 +7,7 @@
 class AVrPawn;
 class UHandMotionControllerBase;
 
-DECLARE_DELEGATE_OneParam(FHandsControllerGunFireDelegate, bool);
+DECLARE_DELEGATE_RetVal_OneParam(bool, FHandsControllerGunFireDelegate, void*);
 DECLARE_DELEGATE(FHandsControllerMenuPressDelegate);
 DECLARE_DELEGATE_OneParam(FHandsControllerVisTypeChangeDelegate, EVisualizationType);
 
@@ -25,7 +25,6 @@ public:
 
 	void SetPrimaryHand(EControllerHand NewPrimaryHand);
 	void SetLaserType(ELaserType NewLaserType);
-	void PlayFireEffects() const;
 
 	const APlayerController* GetPlayerController() const;
 	FORCEINLINE EVisualizationType GetVisualizationType() const { return CurrentVisualizationType; }

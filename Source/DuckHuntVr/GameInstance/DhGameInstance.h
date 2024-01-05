@@ -4,7 +4,7 @@
 #include "DuckHuntVr/Characters/Player/Laser/LaserType.h"
 #include "DhGameInstance.generated.h"
 
-UCLASS(Config=Game, NotBlueprintable, NotBlueprintType)
+UCLASS(Config=Game, NotBlueprintable, BlueprintType)
 class DUCKHUNTVR_API UDhGameInstance : public UGameInstance {
 	GENERATED_BODY()
 public:
@@ -12,11 +12,23 @@ public:
 
 	void SavePrimaryHand(EControllerHand NewPrimaryHand);
 	void SaveLaserType(ELaserType NewLaserType);
-	void SetVisualizationTypeGameStartedWith(const EVisualizationType NewVisualizationType);
+
+	FORCEINLINE void SetGameMapOpenedFromMenu(const bool NewGameMapOpenedFromMenu) {
+		GameMapOpenedFromMenu = NewGameMapOpenedFromMenu;
+	}
+
+	UFUNCTION(BlueprintCallable)
+	FORCEINLINE void SetGameStarted(const bool NewGameStarted) { GameStarted = NewGameStarted; }
+
+	FORCEINLINE void SetGameVisualizationType(const EVisualizationType NewVisualizationType) {
+		GameVisualizationType = NewVisualizationType;
+	}
 
 	FORCEINLINE EControllerHand GetPrimaryHand() const { return PrimaryHand; }
 	FORCEINLINE ELaserType GetLaserType() const { return LaserType; }
-	FORCEINLINE EVisualizationType GetVisualizationTypeGameStartedWith() const { return VisualizationTypeGameStartedWith; }
+	FORCEINLINE bool HasGameMapOpenedFromMenu() const { return GameMapOpenedFromMenu; }
+	FORCEINLINE bool HasGameStarted() const { return GameStarted; }
+	FORCEINLINE EVisualizationType GetGameVisualizationType() const { return GameVisualizationType; }
 private:
 	UPROPERTY(Config)
 	EControllerHand PrimaryHand = EControllerHand::Right;
@@ -24,5 +36,7 @@ private:
 	UPROPERTY(Config)
 	ELaserType LaserType = ELaserType::Laser;
 
-	EVisualizationType VisualizationTypeGameStartedWith = EVisualizationType::None;
+	bool GameMapOpenedFromMenu = false; // TODO: remove
+	bool GameStarted = false;
+	EVisualizationType GameVisualizationType = EVisualizationType::None;
 };

@@ -29,7 +29,7 @@ void AVrPawn::BeginPlay() {
 	HandsController->Init(
 		this,
 		GameInstance->GetPrimaryHand(),
-		GameInstance->GetVisualizationTypeGameStartedWith(),
+		GameInstance->GetGameVisualizationType(),
 		GameInstance->GetLaserType()
 	);
 
@@ -40,13 +40,17 @@ void AVrPawn::BeginPlay() {
 }
 
 void AVrPawn::SetPrimaryHand(const EControllerHand NewPrimaryHand) const {
-	GameInstance->SavePrimaryHand(NewPrimaryHand);
-	HandsController->SetPrimaryHand(NewPrimaryHand);
+	if (!GameInstance->HasGameStarted()) {
+		GameInstance->SavePrimaryHand(NewPrimaryHand);
+		HandsController->SetPrimaryHand(NewPrimaryHand);
+	}
 }
 
 void AVrPawn::SetLaserType(const ELaserType NewLaserType) const {
-	GameInstance->SaveLaserType(NewLaserType);
-	HandsController->SetLaserType(NewLaserType);
+	if (!GameInstance->HasGameStarted()) {
+		GameInstance->SaveLaserType(NewLaserType);
+		HandsController->SetLaserType(NewLaserType);
+	}
 }
 
 void AVrPawn::ResetOrientationAndPosition() {
@@ -61,9 +65,8 @@ EVisualizationType AVrPawn::GetVisualizationType() const {
 	return HandsController->GetVisualizationType();
 }
 
-void AVrPawn::OnGunFired(const bool IsUI) const {
-	HandsController->PlayFireEffects();
-	// TODO: decrease bullet count only if not UI
+bool AVrPawn::OnGunFired(void* TargetActor) const {
+	return GameState->OnGunFired(TargetActor);
 }
 
 void AVrPawn::OnMenuPressed() const {

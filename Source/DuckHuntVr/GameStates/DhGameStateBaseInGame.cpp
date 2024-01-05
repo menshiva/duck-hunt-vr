@@ -22,17 +22,46 @@ void ADhGameStateBaseInGame::Tick(const float DeltaSeconds) {
 		GetWorldTimerManager().Tick(DeltaSeconds);
 }
 
+bool ADhGameStateBaseInGame::OnGunFired(void* TargetActor) {
+	Super::OnGunFired(TargetActor);
+
+	if (IsMenuShown)
+		return true;
+	if (AuthorityGameMode->IsPaused())
+		return false; // so that targets can't be shot during 1 sec delay
+
+	const auto GameInstance = LevelScriptActor->GetDhGameInstance();
+	if (GameInstance->HasGameMapOpenedFromMenu() && !GameInstance->HasGameStarted())
+		return false;
+
+	const auto InGameUI = LevelScriptActor->GetInGameUI();
+	if (InGameUI->RemoveBullet()) {
+		InGameUI->Redraw();
+		if (TargetActor) {
+			// TODO: kill target
+		}
+		return true;
+	}
+
+	if (!GameInstance->HasGameMapOpenedFromMenu()) {
+		InGameUI->ResetBullets();
+		InGameUI->Redraw();
+	}
+
+	return false;
+}
+
 void ADhGameStateBaseInGame::TogglePause() {
 	Super::TogglePause();
 	const auto InGameUI = LevelScriptActor->GetInGameUI();
 
-	if (!IsPaused) {
+	if (!IsMenuShown) {
 		GetWorldTimerManager().ClearTimer(UnpauseTimerHandle);
 		InGameUI->SetStateInfoPause();
 		InGameUI->Redraw();
 		LevelScriptActor->PlayPauseSound();
 		// TODO: hide ducks if any
-		IsPaused = true;
+		IsMenuShown = true;
 		AuthorityGameMode->SetPause(LevelScriptActor->GetPawn()->GetPlayerController());
 	}
 	else if (AllowedToUnpause) {
@@ -40,7 +69,7 @@ void ADhGameStateBaseInGame::TogglePause() {
 		InGameUI->Redraw();
 		LevelScriptActor->PlayPauseSound();
 		// TODO: show ducks if any
-		IsPaused = false;
+		IsMenuShown = false;
 		GetWorldTimerManager().SetTimer(UnpauseTimerHandle, this, &ADhGameStateBaseInGame::ClearPause, 1.f, false);
 	}
 	else {
@@ -55,14 +84,14 @@ void ADhGameStateBaseInGame::TogglePause() {
 void ADhGameStateBaseInGame::OnVisualizationTypeChanged(const EVisualizationType NewType) {
 	Super::OnVisualizationTypeChanged(NewType);
 	const auto GameInstance = LevelScriptActor->GetDhGameInstance();
-	if (GameInstance->GetVisualizationTypeGameStartedWith() != EVisualizationType::None && NewType != EVisualizationType::None) {
-		if (!IsPaused) {
-			if (GameInstance->GetVisualizationTypeGameStartedWith() != NewType) {
+	if (GameInstance->HasGameStarted() && NewType != EVisualizationType::None) {
+		if (!IsMenuShown) {
+			if (GameInstance->GetGameVisualizationType() != NewType) {
 				AllowedToUnpause = false;
 				TogglePause();
 			}
 		}
-		else if (GameInstance->GetVisualizationTypeGameStartedWith() == NewType)
+		else if (GameInstance->GetGameVisualizationType() == NewType)
 			AllowedToUnpause = true;
 	}
 }

@@ -8,6 +8,7 @@ UCLASS(NotBlueprintable, NotBlueprintType)
 class DUCKHUNTVR_API ADhGameStateBase : public AGameStateBase {
 	GENERATED_BODY()
 public:
+	virtual bool OnGunFired(void* TargetActor) { return true; }
 	virtual void TogglePause() {}
 	virtual void OnVisualizationTypeChanged(EVisualizationType NewType) {}
 };

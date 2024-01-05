@@ -15,7 +15,3 @@ void UDhGameInstance::SaveLaserType(const ELaserType NewLaserType) {
 	LaserType = NewLaserType;
 	SaveConfig();
 }
-
-void UDhGameInstance::SetVisualizationTypeGameStartedWith(const EVisualizationType NewVisualizationType) {
-	VisualizationTypeGameStartedWith = NewVisualizationType;
-}

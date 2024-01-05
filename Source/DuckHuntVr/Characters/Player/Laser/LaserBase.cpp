@@ -36,7 +36,7 @@ void ULaserBase::Activate(const bool bReset) {
 void ULaserBase::Deactivate() {
 	Super::Deactivate();
 
-	CurrentHitType = HitType::None;
+	UiHit = false;
 	WidgetInteractor->Deactivate();
 
 	if (NiagaraLaser) {
@@ -125,8 +125,8 @@ void ULaserBase::TickComponent(const float Dt, const ELevelTick Tt, FActorCompon
 	const auto Fwd = GetForwardVector();
 	auto End = Start + Fwd * MaxLaserDistance;
 
-	if (WidgetInteractor->IsOverInteractableWidget()) {
-		CurrentHitType = HitType::UI;
+	UiHit = WidgetInteractor->IsOverInteractableWidget();
+	if (UiHit) {
 		HitResult = WidgetInteractor->GetLastHitResult();
 		End = HitResult.ImpactPoint;
 	}
@@ -137,11 +137,7 @@ void ULaserBase::TickComponent(const float Dt, const ELevelTick Tt, FActorCompon
     	EDrawDebugTrace::None, HitResult, true,
     	FLinearColor::Black, FLinearColor::Red, 0
     )) {
-		CurrentHitType = HitType::Target;
 		End = HitResult.ImpactPoint;
-	}
-	else {
-		CurrentHitType = HitType::None;
 	}
 
 	if (NiagaraLaser) {

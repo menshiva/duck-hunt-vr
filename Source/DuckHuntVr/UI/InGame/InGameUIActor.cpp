@@ -52,6 +52,14 @@ void AInGameUI::SetSkyColor(const FLinearColor& NewColor) {
 		InGameWidgetRef->ShotPanel->SetSkyColor(NewColor);
 }
 
+bool AInGameUI::RemoveBullet() const {
+	return InGameWidgetRef->ShotPanel->RemoveBullet();
+}
+
+void AInGameUI::ResetBullets() const {
+	InGameWidgetRef->ShotPanel->ResetBullets();
+}
+
 void AInGameUI::Redraw() const {
 	InGameWidgetHolder->RequestRedraw();
 }
