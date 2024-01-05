@@ -1,4 +1,6 @@
 ﻿#include "DhLevelScriptActorInGame.h"
+#include "LevelSequenceActor.h"
+#include "LevelSequencePlayer.h"
 #include "DuckHuntVr/Characters/Player/VrPawn.h"
 #include "DuckHuntVr/GameInstance/DhGameInstance.h"
 #include "DuckHuntVr/UI/InGame/InGameUIActor.h"
@@ -19,6 +21,13 @@ void ADhLevelScriptActorInGame::OnConstruction(const FTransform& Transform) {
 	SetSkyColor(DefaultSkyColor);
 }
 #endif
+
+void ADhLevelScriptActorInGame::BeginPlay() {
+	Super::BeginPlay();
+	const auto Player = StartGameSequence->GetSequencePlayer();
+	Player->OnFinished.Clear();
+	Player->OnFinished.AddDynamic(this, &ADhLevelScriptActorInGame::OnStartGameSequenceEnd);
+}
 
 void ADhLevelScriptActorInGame::Tick(const float DeltaSeconds) {
 	Super::Tick(DeltaSeconds);
@@ -49,4 +58,9 @@ void ADhLevelScriptActorInGame::OpenMainMenuLevel() {
 	if (GameMode->IsPaused())
 		GameMode->ClearPause();
 	OpenLevel(MainMenuLevel);
+}
+
+// ReSharper disable once CppMemberFunctionMayBeConst
+void ADhLevelScriptActorInGame::OnStartGameSequenceEnd() {
+	GameInstance->SetGameStarted(true);
 }

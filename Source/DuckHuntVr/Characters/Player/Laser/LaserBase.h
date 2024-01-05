@@ -39,6 +39,8 @@ private:
 
 	ETraceTypeQuery TargetTraceTypeQuery;
 
+	ELaserType Type = ELaserType::None;
+
 	UPROPERTY()
 	TObjectPtr<UWidgetInteractionComponent> WidgetInteractor;
 

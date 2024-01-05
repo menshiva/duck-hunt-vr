@@ -14,6 +14,7 @@ public:
 #if WITH_EDITOR
 	virtual void OnConstruction(const FTransform& Transform) override;
 #endif
+	virtual void BeginPlay() override;
 	virtual void Tick(float DeltaSeconds) override;
 
 	void PlayPauseSound() const;
@@ -31,6 +32,9 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category=Init)
 	TSoftObjectPtr<UWorld> MainMenuLevel;
 
+	UPROPERTY(EditDefaultsOnly, Category=Subcomponents)
+	TWeakObjectPtr<ALevelSequenceActor> StartGameSequence;
+
 	UPROPERTY(EditDefaultsOnly, Category=Init)
 	FLinearColor DefaultSkyColor;
 
@@ -39,4 +43,7 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly, Category=Subcomponents)
 	TWeakObjectPtr<AInGameUI> InGameUI;
+private:
+	UFUNCTION()
+	void OnStartGameSequenceEnd();
 };

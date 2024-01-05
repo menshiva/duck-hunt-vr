@@ -72,7 +72,11 @@ void ULaserBase::EndPlay(const EEndPlayReason::Type EndPlayReason) {
 }
 
 void ULaserBase::UpdateType(const ELaserType NewType) {
-	if (NewType == ELaserType::Laser) {
+	if (Type == NewType)
+		return;
+	Type = NewType;
+
+	if (Type == ELaserType::Laser) {
 		if (CrosshairSprite) {
 			CrosshairSprite->DestroyComponent();
 			CrosshairSprite = nullptr;
@@ -88,27 +92,17 @@ void ULaserBase::UpdateType(const ELaserType NewType) {
 			NiagaraLaser->SetVisibility(false);
 		}
 	}
-	else if (NewType == ELaserType::Crosshair) {
-		if (NiagaraLaser) {
-			NiagaraLaser->DestroyComponent();
-			NiagaraLaser = nullptr;
-		}
-		check(!CrosshairSprite);
-
-		CrosshairSprite = NewObject<UPaperSpriteComponent>(this);
-		CrosshairSprite->SetSprite(CrosshairSpriteAsset);
-		CrosshairSprite->SetVisibility(false);
-		CrosshairSprite->RegisterComponent();
-	}
 	else {
-		check(NewType == ELaserType::None);
+		check(Type == ELaserType::Crosshair || Type == ELaserType::None);
 		if (NiagaraLaser) {
 			NiagaraLaser->DestroyComponent();
 			NiagaraLaser = nullptr;
 		}
-		else if (CrosshairSprite) {
-			CrosshairSprite->DestroyComponent();
-			CrosshairSprite = nullptr;
+		if (!CrosshairSprite) {
+			CrosshairSprite = NewObject<UPaperSpriteComponent>(this);
+			CrosshairSprite->SetSprite(CrosshairSpriteAsset);
+			CrosshairSprite->SetVisibility(false);
+			CrosshairSprite->RegisterComponent();
 		}
 	}
 }
@@ -155,7 +149,7 @@ void ULaserBase::TickComponent(const float Dt, const ELevelTick Tt, FActorCompon
 		}
 	}
 	else if (CrosshairSprite) {
-		if (HitResult.bBlockingHit) {
+		if ((Type == ELaserType::Crosshair && HitResult.bBlockingHit) || UiHit) {
 			CrosshairSprite->SetWorldLocationAndRotation(End, FRotationMatrix::MakeFromY(HitResult.ImpactNormal).Rotator());
 			if (!CrosshairSprite->IsVisible())
 				CrosshairSprite->SetVisibility(true);
