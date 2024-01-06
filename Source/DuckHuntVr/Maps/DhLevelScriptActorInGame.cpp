@@ -2,7 +2,6 @@
 #include "LevelSequenceActor.h"
 #include "LevelSequencePlayer.h"
 #include "DuckHuntVr/Characters/Player/VrPawn.h"
-#include "DuckHuntVr/GameInstance/DhGameInstance.h"
 #include "DuckHuntVr/UI/InGame/InGameUIActor.h"
 #include "GameFramework/GameModeBase.h"
 #include "Kismet/GameplayStatics.h"
@@ -14,20 +13,11 @@ ADhLevelScriptActorInGame::ADhLevelScriptActorInGame() {
 #if WITH_EDITOR
 void ADhLevelScriptActorInGame::OnConstruction(const FTransform& Transform) {
 	Super::OnConstruction(Transform);
-	if (!InGameUI.IsExplicitlyNull()) {
+	if (!InGameUI.IsExplicitlyNull())
 		InGameUI->SetSkyColor(DefaultSkyColor);
-		InGameUI->Redraw();
-	}
 	SetSkyColor(DefaultSkyColor);
 }
 #endif
-
-void ADhLevelScriptActorInGame::BeginPlay() {
-	Super::BeginPlay();
-	const auto Player = StartGameSequence->GetSequencePlayer();
-	Player->OnFinished.Clear();
-	Player->OnFinished.AddDynamic(this, &ADhLevelScriptActorInGame::OnStartGameSequenceEnd);
-}
 
 void ADhLevelScriptActorInGame::Tick(const float DeltaSeconds) {
 	Super::Tick(DeltaSeconds);
@@ -46,21 +36,22 @@ void ADhLevelScriptActorInGame::Tick(const float DeltaSeconds) {
 	}
 }
 
+void ADhLevelScriptActorInGame::PlayStartGameSequence(const FOnMovieSceneSequencePlayerEvent& OnFinishedEvent) const {
+	const auto Player = StartGameSequence->GetSequencePlayer();
+	Player->OnFinished = OnFinishedEvent;
+	Player->Play();
+}
+
 void ADhLevelScriptActorInGame::PlayPauseSound() const {
 	UGameplayStatics::PlaySound2D(this, PauseSound);
 }
 
 void ADhLevelScriptActorInGame::OpenMainMenuLevel() {
-	GameInstance->SetGameStarted(false);
-	// we can just directly clear pause here instead of calling UDhGameStateBaseInGame::TogglePause(), since we are
-	// going to open another level anyway
 	const auto GameMode = GetWorld()->GetAuthGameMode();
-	if (GameMode->IsPaused())
+	if (GameMode->IsPaused()) {
+		// we can just directly clear pause here instead of calling UDhGameStateBaseInGame::TogglePause(), since we are
+		// going to open another level anyway
 		GameMode->ClearPause();
+	}
 	OpenLevel(MainMenuLevel);
-}
-
-// ReSharper disable once CppMemberFunctionMayBeConst
-void ADhLevelScriptActorInGame::OnStartGameSequenceEnd() {
-	GameInstance->SetGameStarted(true);
 }

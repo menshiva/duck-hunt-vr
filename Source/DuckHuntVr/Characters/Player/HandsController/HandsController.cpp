@@ -64,7 +64,8 @@ void UHandsController::TickComponent(const float Dt, const ELevelTick Tt, FActor
 	Super::TickComponent(Dt, Tt, Tf);
 	const auto NewVisualizationType = GetNewVisualizationType();
 	if (NewVisualizationType != CurrentVisualizationType) {
-		OnVisualizationTypeChanged.Execute(NewVisualizationType);
+		if (OnVisualizationTypeChanged.IsBound())
+			OnVisualizationTypeChanged.Execute(NewVisualizationType);
 		UpdateVisualizationType(NewVisualizationType);
 	}
 }

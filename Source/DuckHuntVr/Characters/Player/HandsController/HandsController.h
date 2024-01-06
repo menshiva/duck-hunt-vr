@@ -7,7 +7,7 @@
 class AVrPawn;
 class UHandMotionControllerBase;
 
-DECLARE_DELEGATE_RetVal_OneParam(bool, FHandsControllerGunFireDelegate, void*);
+DECLARE_DELEGATE_RetVal_OneParam(bool, FHandsControllerGunFireDelegate, const AActor*);
 DECLARE_DELEGATE(FHandsControllerMenuPressDelegate);
 DECLARE_DELEGATE_OneParam(FHandsControllerVisTypeChangeDelegate, EVisualizationType);
 

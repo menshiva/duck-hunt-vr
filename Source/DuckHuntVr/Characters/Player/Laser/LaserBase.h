@@ -27,7 +27,7 @@ public:
 	virtual void TickComponent(float Dt, ELevelTick Tt, FActorComponentTickFunction* Tf) override;
 
 	FORCEINLINE bool IsUiHit() const { return UiHit; }
-	FORCEINLINE const FHitResult& GetHitResult() const { return HitResult; }
+	FORCEINLINE AActor* GetHitActor() const { return HitResult.GetActor(); }
 protected:
 	UPROPERTY(EditDefaultsOnly, Category=Init)
 	TObjectPtr<UNiagaraSystem> NiagaraLaserAsset;

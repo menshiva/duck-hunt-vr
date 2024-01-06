@@ -24,8 +24,6 @@ public:
 	void SetSkyColor(const FLinearColor& NewColor);
 	bool RemoveBullet() const;
 	void ResetBullets() const;
-
-	void Redraw() const;
 protected:
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<USceneComponent> DefaultSceneRoot;

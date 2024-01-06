@@ -53,9 +53,8 @@ void IHandVisualizationInterface::Fire() {
 	if (IsPrimary()) {
 		const auto Laser = GetLaser();
 		if (!Laser->IsUiHit()) {
-			const auto& HitResult = Laser->GetHitResult();
-			const auto TargetActor = HitResult.GetActor(); // TODO: Cast to target
-			if (ParentMotionController->GetParentHandsController()->OnGunFired.Execute(TargetActor))
+			const auto HandsController = ParentMotionController->GetParentHandsController();
+			if (!HandsController->OnGunFired.IsBound() || HandsController->OnGunFired.Execute(Laser->GetHitActor()))
 				PlayFireEffects();
 		}
 		else {
@@ -67,5 +66,7 @@ void IHandVisualizationInterface::Fire() {
 
 // ReSharper disable once CppMemberFunctionMayBeConst
 void IHandVisualizationInterface::Menu() {
-	ParentMotionController->GetParentHandsController()->OnMenuPressed.Execute();
+	const auto HandsController = ParentMotionController->GetParentHandsController();
+	if (HandsController->OnMenuPressed.IsBound())
+		HandsController->OnMenuPressed.Execute();
 }

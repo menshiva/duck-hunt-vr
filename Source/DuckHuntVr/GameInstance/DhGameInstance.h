@@ -17,9 +17,6 @@ public:
 		GameMapOpenedFromMenu = NewGameMapOpenedFromMenu;
 	}
 
-	UFUNCTION(BlueprintCallable)
-	FORCEINLINE void SetGameStarted(const bool NewGameStarted) { GameStarted = NewGameStarted; }
-
 	FORCEINLINE void SetGameVisualizationType(const EVisualizationType NewVisualizationType) {
 		GameVisualizationType = NewVisualizationType;
 	}
@@ -27,7 +24,6 @@ public:
 	FORCEINLINE EControllerHand GetPrimaryHand() const { return PrimaryHand; }
 	FORCEINLINE ELaserType GetLaserType() const { return LaserType; }
 	FORCEINLINE bool HasGameMapOpenedFromMenu() const { return GameMapOpenedFromMenu; }
-	FORCEINLINE bool HasGameStarted() const { return GameStarted; }
 	FORCEINLINE EVisualizationType GetGameVisualizationType() const { return GameVisualizationType; }
 private:
 	UPROPERTY(Config)
@@ -37,6 +33,5 @@ private:
 	ELaserType LaserType = ELaserType::Laser;
 
 	bool GameMapOpenedFromMenu = false; // TODO: remove
-	bool GameStarted = false;
 	EVisualizationType GameVisualizationType = EVisualizationType::None;
 };

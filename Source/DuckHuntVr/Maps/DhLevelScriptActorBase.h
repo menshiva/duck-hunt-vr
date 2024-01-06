@@ -12,11 +12,7 @@ class DUCKHUNTVR_API ADhLevelScriptActorBase : public ALevelScriptActor {
 	GENERATED_BODY()
 public:
 	ADhLevelScriptActorBase();
-
 	virtual void BeginPlay() override;
-
-	FORCEINLINE const AVrPawn* GetPawn() const { return Pawn.Get(); }
-	FORCEINLINE UDhGameInstance* GetDhGameInstance() const { return GameInstance.Get(); }
 protected:
 	void OpenLevel(const TSoftObjectPtr<UWorld>& Level);
 

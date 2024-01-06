@@ -3,7 +3,7 @@
 #include "HandsController/HandsController.h"
 #include "HeadMountedDisplayFunctionLibrary.h"
 #include "DuckHuntVr/GameInstance/DhGameInstance.h"
-#include "DuckHuntVr/GameStates/DhGameStateBase.h"
+#include "DuckHuntVr/GameStates/DhGameState.h"
 
 AVrPawn::AVrPawn() {
 	PrimaryActorTick.bCanEverTick = false;
@@ -15,16 +15,19 @@ AVrPawn::AVrPawn() {
 	Camera->SetupAttachment(DefaultSceneRoot);
 
 	HandsController = CreateDefaultSubobject<UHandsController>(TEXT("HandsController"));
-	HandsController->OnGunFired.BindUObject(this, &AVrPawn::OnGunFired);
-	HandsController->OnMenuPressed.BindUObject(this, &AVrPawn::OnMenuPressed);
-	HandsController->OnVisualizationTypeChanged.BindUObject(this, &AVrPawn::OnVisualizationTypeChanged);
 	HandsController->SetupAttachment(DefaultSceneRoot);
 }
 
 void AVrPawn::BeginPlay() {
 	GameInstance = CastChecked<UDhGameInstance>(GetGameInstance());
-	GameState = CastChecked<ADhGameStateBase>(GetWorld()->GetGameState());
+	GameState = Cast<ADhGameState>(GetWorld()->GetGameState());
 	PlayerController = CastChecked<APlayerController>(Controller);
+
+	if (!GameState.IsExplicitlyNull()) {
+		HandsController->OnGunFired.BindUObject(GameState.Get(), &ADhGameState::OnGunFired);
+		HandsController->OnMenuPressed.BindUObject(GameState.Get(), &ADhGameState::TogglePause);
+		HandsController->OnVisualizationTypeChanged.BindUObject(GameState.Get(), &ADhGameState::OnVisualizationTypeChanged);
+	}
 
 	HandsController->Init(
 		this,
@@ -40,17 +43,13 @@ void AVrPawn::BeginPlay() {
 }
 
 void AVrPawn::SetPrimaryHand(const EControllerHand NewPrimaryHand) const {
-	if (!GameInstance->HasGameStarted()) {
-		GameInstance->SavePrimaryHand(NewPrimaryHand);
-		HandsController->SetPrimaryHand(NewPrimaryHand);
-	}
+	GameInstance->SavePrimaryHand(NewPrimaryHand);
+	HandsController->SetPrimaryHand(NewPrimaryHand);
 }
 
 void AVrPawn::SetLaserType(const ELaserType NewLaserType) const {
-	if (!GameInstance->HasGameStarted()) {
-		GameInstance->SaveLaserType(NewLaserType);
-		HandsController->SetLaserType(NewLaserType);
-	}
+	GameInstance->SaveLaserType(NewLaserType);
+	HandsController->SetLaserType(NewLaserType);
 }
 
 void AVrPawn::ResetOrientationAndPosition() {
@@ -63,16 +62,4 @@ float AVrPawn::GetCameraRotationYaw() const {
 
 EVisualizationType AVrPawn::GetVisualizationType() const {
 	return HandsController->GetVisualizationType();
-}
-
-bool AVrPawn::OnGunFired(void* TargetActor) const {
-	return GameState->OnGunFired(TargetActor);
-}
-
-void AVrPawn::OnMenuPressed() const {
-	GameState->TogglePause();
-}
-
-void AVrPawn::OnVisualizationTypeChanged(const EVisualizationType NewType) const {
-	GameState->OnVisualizationTypeChanged(NewType);
 }

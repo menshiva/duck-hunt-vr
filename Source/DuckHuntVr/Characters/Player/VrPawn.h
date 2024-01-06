@@ -7,7 +7,7 @@
 class UCameraComponent;
 class UHandsController;
 class UDhGameInstance;
-class ADhGameStateBase;
+class ADhGameState;
 
 UCLASS(NotBlueprintable, NotBlueprintType, Placeable)
 class DUCKHUNTVR_API AVrPawn : public APawn {
@@ -30,7 +30,6 @@ public:
 	float GetCameraRotationYaw() const;
 	EVisualizationType GetVisualizationType() const;
 	FORCEINLINE APlayerController* GetPlayerController() const { return PlayerController.Get(); }
-	FORCEINLINE ADhGameStateBase* GetGameState() const { return GameState.Get(); }
 protected:
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<USceneComponent> DefaultSceneRoot;
@@ -41,11 +40,7 @@ protected:
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<UHandsController> HandsController;
 private:
-	bool OnGunFired(void* TargetActor) const;
-	void OnMenuPressed() const;
-	void OnVisualizationTypeChanged(EVisualizationType NewType) const;
-
 	TWeakObjectPtr<UDhGameInstance> GameInstance;
-	TWeakObjectPtr<ADhGameStateBase> GameState;
+	TWeakObjectPtr<ADhGameState> GameState;
 	TWeakObjectPtr<APlayerController> PlayerController;
 };

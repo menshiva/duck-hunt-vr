@@ -59,7 +59,3 @@ bool AInGameUI::RemoveBullet() const {
 void AInGameUI::ResetBullets() const {
 	InGameWidgetRef->ShotPanel->ResetBullets();
 }
-
-void AInGameUI::Redraw() const {
-	InGameWidgetHolder->RequestRedraw();
-}
