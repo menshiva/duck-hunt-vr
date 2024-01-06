@@ -27,7 +27,7 @@ protected:
 	virtual void InitImpl(USceneComponent* AttachmentParent, bool Primary) override;
 	virtual void AddMappingContexts(UEnhancedInputLocalPlayerSubsystem* Subsystem, UEnhancedInputComponent* Component) override;
 	virtual void ClearMappingContexts(UEnhancedInputLocalPlayerSubsystem* Subsystem) const override;
-	virtual ULaserBase* GetLaser() const override { return LaserComponent; }
+	virtual const ULaserBase* GetLaser() const override { return LaserComponent; }
 
 	UPROPERTY(EditDefaultsOnly, Category="Init|Action", DisplayName=Context)
 	TObjectPtr<UInputMappingContext> ActionMappingContext;

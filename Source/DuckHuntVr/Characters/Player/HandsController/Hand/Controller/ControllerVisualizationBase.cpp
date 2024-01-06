@@ -76,7 +76,7 @@ void UControllerVisualizationBase::ClearMappingContexts(UEnhancedInputLocalPlaye
 	Subsystem->RemoveMappingContext(AnimMappingContext);
 }
 
-ULaserBase* UControllerVisualizationBase::GetLaser() const {
+const ULaserBase* UControllerVisualizationBase::GetLaser() const {
 	return GunComponent->GetLaser();
 }
 

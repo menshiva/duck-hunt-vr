@@ -26,10 +26,10 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void OpenMainMenuLevel();
 
-	FORCEINLINE const AInGameUI* GetInGameUI() const { return InGameUI.Get(); }
-
 	FORCEINLINE AVrPawn* GetPawn() const { return Pawn.Get(); }
 	FORCEINLINE UDhGameInstance* GetDhGameInstance() const { return GameInstance.Get(); }
+
+	FORCEINLINE const AInGameUI* GetInGameUI() const { return InGameUI.Get(); }
 protected:
 	UFUNCTION(BlueprintImplementableEvent)
 	void SetSkyColor(const FLinearColor& Color);

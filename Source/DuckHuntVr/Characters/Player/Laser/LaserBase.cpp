@@ -72,10 +72,7 @@ void ULaserBase::EndPlay(const EEndPlayReason::Type EndPlayReason) {
 }
 
 void ULaserBase::UpdateType(const ELaserType NewType) {
-	if (Type == NewType)
-		return;
 	Type = NewType;
-
 	if (Type == ELaserType::Laser) {
 		if (CrosshairSprite) {
 			CrosshairSprite->DestroyComponent();
