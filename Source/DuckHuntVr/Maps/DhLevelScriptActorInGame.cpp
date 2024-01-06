@@ -6,10 +6,6 @@
 #include "GameFramework/GameModeBase.h"
 #include "Kismet/GameplayStatics.h"
 
-ADhLevelScriptActorInGame::ADhLevelScriptActorInGame() {
-	PrimaryActorTick.bCanEverTick = true;
-}
-
 #if WITH_EDITOR
 void ADhLevelScriptActorInGame::OnConstruction(const FTransform& Transform) {
 	Super::OnConstruction(Transform);

@@ -25,6 +25,7 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void SetLaserType(ELaserType NewLaserType) const;
 
+	static bool IsHmdWorn();
 	static void ResetOrientationAndPosition();
 
 	float GetCameraRotationYaw() const;

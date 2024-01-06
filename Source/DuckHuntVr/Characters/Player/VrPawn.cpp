@@ -2,6 +2,7 @@
 #include "Camera/CameraComponent.h"
 #include "HandsController/HandsController.h"
 #include "HeadMountedDisplayFunctionLibrary.h"
+#include "OculusXRFunctionLibrary.h"
 #include "DuckHuntVr/GameInstance/DhGameInstance.h"
 #include "DuckHuntVr/GameStates/DhGameState.h"
 
@@ -50,6 +51,10 @@ void AVrPawn::SetPrimaryHand(const EControllerHand NewPrimaryHand) const {
 void AVrPawn::SetLaserType(const ELaserType NewLaserType) const {
 	GameInstance->SaveLaserType(NewLaserType);
 	HandsController->SetLaserType(NewLaserType);
+}
+
+bool AVrPawn::IsHmdWorn() {
+	return UHeadMountedDisplayFunctionLibrary::GetHMDWornState() == EHMDWornState::Worn;
 }
 
 void AVrPawn::ResetOrientationAndPosition() {

@@ -5,7 +5,7 @@
 #include "Kismet/GameplayStatics.h"
 
 ADhLevelScriptActorBase::ADhLevelScriptActorBase() {
-	PrimaryActorTick.bCanEverTick = false;
+	PrimaryActorTick.bCanEverTick = true;
 }
 
 void ADhLevelScriptActorBase::BeginPlay() {

@@ -10,8 +10,6 @@ UCLASS(Abstract, Blueprintable, NotBlueprintType)
 class DUCKHUNTVR_API ADhLevelScriptActorInGame : public ADhLevelScriptActorBase {
 	GENERATED_BODY()
 public:
-	ADhLevelScriptActorInGame();
-
 #if WITH_EDITOR
 	virtual void OnConstruction(const FTransform& Transform) override;
 #endif
@@ -48,9 +46,6 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly, Category=Init)
 	TObjectPtr<USoundBase> PauseSound;
-
-	UPROPERTY(EditDefaultsOnly, Category=Subcomponents)
-	TWeakObjectPtr<ALevelSequenceActor> StartGameSequence;
 
 	UPROPERTY(EditDefaultsOnly, Category=Subcomponents)
 	TWeakObjectPtr<AInGameUI> InGameUI;

@@ -7,6 +7,8 @@ UCLASS(Abstract, Blueprintable, NotBlueprintType)
 class DUCKHUNTVR_API ADhLevelScriptActorMenu : public ADhLevelScriptActorBase {
 	GENERATED_BODY()
 public:
+	virtual void Tick(float DeltaSeconds) override;
+
 	// TODO: remove UFUNCTION
 	UFUNCTION(BlueprintCallable)
 	void OpenDuckLevel();
@@ -20,4 +22,6 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly, Category=Init)
 	TSoftObjectPtr<UWorld> ClayLevel;
+private:
+	bool IsHmdWorn = false;
 };
