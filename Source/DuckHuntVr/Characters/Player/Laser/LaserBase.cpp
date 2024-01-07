@@ -116,7 +116,7 @@ void ULaserBase::TickComponent(const float Dt, const ELevelTick Tt, FActorCompon
 	const auto Fwd = GetForwardVector();
 	auto End = Start + Fwd * MaxLaserDistance;
 
-	UiHit = WidgetInteractor->IsOverInteractableWidget();
+	UiHit = WidgetInteractor->IsOverHitTestVisibleWidget();
 	if (UiHit) {
 		HitResult = WidgetInteractor->GetLastHitResult();
 		End = HitResult.ImpactPoint;
