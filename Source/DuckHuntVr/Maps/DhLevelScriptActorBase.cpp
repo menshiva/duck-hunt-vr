@@ -14,16 +14,33 @@ void ADhLevelScriptActorBase::BeginPlay() {
 }
 
 void ADhLevelScriptActorBase::OpenLevel(const TSoftObjectPtr<UWorld>& Level) {
-	LevelToOpen = &Level;
+	LevelNameToOpen = FPackageName::ObjectPathToPackageName(Level.ToString());
+
+	FLoadPackageAsyncDelegate LoadPackageAsyncDelegate;
+	LoadPackageAsyncDelegate.BindUObject(this, &ADhLevelScriptActorBase::OnAsyncMapLoadCompleted);
+	LoadPackageAsync(LevelNameToOpen, LoadPackageAsyncDelegate, 0, PKG_ContainsMap);
 
 	const auto Player = FadeInSequence->GetSequencePlayer();
 	Player->OnPause.Clear();
 	Player->OnPause.AddDynamic(this, &ADhLevelScriptActorBase::OnFadeInSequenceEnd);
-
 	Player->Play();
+}
+
+void ADhLevelScriptActorBase::OnAsyncMapLoadCompleted(const FName&, UPackage*, const EAsyncLoadingResult::Type Result) {
+	if (Result == EAsyncLoadingResult::Succeeded) {
+		AsyncMapLoadCompleted = true;
+		if (FadeInSequenceCompleted)
+			OpenLevelImpl();
+	}
 }
 
 // ReSharper disable once CppMemberFunctionMayBeConst
 void ADhLevelScriptActorBase::OnFadeInSequenceEnd() {
-	UGameplayStatics::OpenLevelBySoftObjectPtr(this, *LevelToOpen, true);
+	FadeInSequenceCompleted = true;
+	if (AsyncMapLoadCompleted)
+		OpenLevelImpl();
+}
+
+void ADhLevelScriptActorBase::OpenLevelImpl() const {
+	UGameplayStatics::OpenLevel(this, FName(LevelNameToOpen), true);
 }

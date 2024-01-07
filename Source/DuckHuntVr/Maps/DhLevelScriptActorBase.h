@@ -27,8 +27,14 @@ protected:
 
 	TWeakObjectPtr<UDhGameInstance> GameInstance;
 private:
+	void OnAsyncMapLoadCompleted(const FName&, UPackage*, EAsyncLoadingResult::Type Result);
+
 	UFUNCTION()
 	void OnFadeInSequenceEnd();
 
-	const TSoftObjectPtr<UWorld>* LevelToOpen = nullptr;
+	void OpenLevelImpl() const;
+
+	FString LevelNameToOpen;
+	bool AsyncMapLoadCompleted = false;
+	bool FadeInSequenceCompleted = false;
 };
