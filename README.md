@@ -26,6 +26,10 @@
 
 * https://www.101soundboards.com/boards/10108-duck-hunt-sounds
 
+### Fonts
+
+* [All fonts](Content/DuckHuntVr/UI/Fonts) have been generated myself out of sprite sheets using [FontForge](https://fontforge.org/en-US/).
+
 ### Hand models and animations (for controllers)
 
 > ⚠️ Hand blueprints were rewritten in C++, and some logic was rewritten to:
