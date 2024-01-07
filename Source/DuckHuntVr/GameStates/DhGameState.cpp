@@ -55,11 +55,21 @@ void ADhGameState::TogglePause() {
 		OnGamePaused(false);
 	}
 	else {
+		const auto GameVisType = LevelScriptActor->GetDhGameInstance()->GetGameVisualizationType();
+		check(GameVisType != EVisualizationType::None);
 		// TODO: create notification
-		UKismetSystemLibrary::PrintString(
-			this, TEXT("Please return to the controller type you started the game with or restart the game."),
-			true, true, FLinearColor::Green
-		);
+		if (GameVisType == EVisualizationType::Controller) {
+			UKismetSystemLibrary::PrintString(
+				this, TEXT("Switch back to controllers or restart the game."),
+				true, true, FLinearColor::Green
+			);
+		}
+		else {
+			UKismetSystemLibrary::PrintString(
+				this, TEXT("Switch back to hand tracking or restart the game."),
+				true, true, FLinearColor::Green
+			);
+		}
 	}
 }
 
