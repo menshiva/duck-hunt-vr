@@ -9,7 +9,7 @@ void ADhLevelScriptActorMenu::Tick(const float DeltaSeconds) {
 
 	const bool NewHmdWorn = AVrPawn::IsHmdWorn();
 	if (!IsHmdWorn && NewHmdWorn)
-		StartGameSequence->SequencePlayer->Play();
+		IntroSequence->SequencePlayer->Play();
 	IsHmdWorn = NewHmdWorn;
 }
 

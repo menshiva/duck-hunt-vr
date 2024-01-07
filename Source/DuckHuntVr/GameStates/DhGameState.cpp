@@ -14,7 +14,7 @@ ADhGameState::ADhGameState() {
 void ADhGameState::BeginPlay() {
 	LevelScriptActor = CastChecked<ADhLevelScriptActorInGame>(GetWorld()->GetLevelScriptActor());
 	Super::BeginPlay();
-	OnInit();
+	OnStartNewGame();
 }
 
 void ADhGameState::Tick(const float DeltaSeconds) {
@@ -28,7 +28,7 @@ void ADhGameState::Restart() {
 	const auto CurrentVisType = LevelScriptActor->GetPawn()->GetVisualizationType();
 	if (CurrentVisType != EVisualizationType::None)
 		LevelScriptActor->GetDhGameInstance()->SetGameVisualizationType(CurrentVisType);
-	OnInit();
+	OnStartNewGame();
 }
 
 bool ADhGameState::OnGunFired(const AActor* HitActor) const {
@@ -97,7 +97,7 @@ void ADhGameState::SwitchStateInternal(const State NewState) {
 	CurrentState = NewState;
 }
 
-void ADhGameState::OnInit() {
+void ADhGameState::OnStartNewGame() {
 	CurrentState = PreviousState = State::LevelSequence;
 	AllowedToUnpause = true;
 	GetWorldTimerManager().ClearTimer(UnpauseTimerHandle);

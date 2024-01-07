@@ -5,6 +5,7 @@
 
 class FOnMovieSceneSequencePlayerEvent;
 class AInGameUI;
+class ULevelSequence;
 
 UCLASS(Abstract, Blueprintable, NotBlueprintType)
 class DUCKHUNTVR_API ADhLevelScriptActorInGame : public ADhLevelScriptActorBase {
@@ -15,8 +16,17 @@ public:
 #endif
 	virtual void Tick(float DeltaSeconds) override;
 
-	void PlayStartGameSequence(const FOnMovieSceneSequencePlayerEvent& OnFinishedEvent) const;
+	FORCEINLINE void PlayStartGameSequence(const FOnMovieSceneSequencePlayerEvent& OnFinishedEvent) const {
+		PlayLevelSequence(StartGameSequence.Get(), OnFinishedEvent);
+	}
+
+	FORCEINLINE void PlayStartRoundSequence(const FOnMovieSceneSequencePlayerEvent& OnFinishedEvent) const {
+		if (StartRoundSequence)
+			PlayLevelSequence(StartRoundSequence.Get(), OnFinishedEvent);
+	}
+
 	void PlayPauseSound() const;
+
 	FORCEINLINE void SetDefaultSkyColor() { SetSkyColor(DefaultSkyColor); }
 	FORCEINLINE void SetFlyAwaySkyColor() { SetSkyColor(FlyAwaySkyColor); }
 
@@ -45,8 +55,16 @@ protected:
 	FLinearColor FlyAwaySkyColor;
 
 	UPROPERTY(EditDefaultsOnly, Category=Init)
+	TObjectPtr<ULevelSequence> StartGameSequence;
+
+	UPROPERTY(EditDefaultsOnly, Category=Init)
+	TObjectPtr<ULevelSequence> StartRoundSequence;
+
+	UPROPERTY(EditDefaultsOnly, Category=Init)
 	TObjectPtr<USoundBase> PauseSound;
 
 	UPROPERTY(EditDefaultsOnly, Category=Subcomponents)
 	TWeakObjectPtr<AInGameUI> InGameUI;
+private:
+	void PlayLevelSequence(ULevelSequence* Sequence, const FOnMovieSceneSequencePlayerEvent& OnFinishedEvent) const;
 };

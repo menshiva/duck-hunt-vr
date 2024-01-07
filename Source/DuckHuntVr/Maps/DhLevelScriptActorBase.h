@@ -20,7 +20,7 @@ protected:
 	TWeakObjectPtr<ALevelSequenceActor> FadeInSequence;
 
 	UPROPERTY(EditDefaultsOnly, Category=Subcomponents)
-	TWeakObjectPtr<ALevelSequenceActor> StartGameSequence;
+	TWeakObjectPtr<ALevelSequenceActor> IntroSequence;
 
 	UPROPERTY(EditDefaultsOnly, Category=Subcomponents)
 	TWeakObjectPtr<AVrPawn> Pawn;

@@ -9,6 +9,9 @@ void URoundPanelWidget::SynchronizeProperties() {
 
 void URoundPanelWidget::SetRound(const int32 NewRound) {
 	Round = NewRound;
-	if (RoundText)
-		RoundText->SetText(UKismetTextLibrary::Conv_IntToText(NewRound, false, false, 1, 2));
+	if (RoundText) {
+		const auto RoundTextString = FString(TEXT("R=")) +
+			UKismetTextLibrary::Conv_IntToText(NewRound, false, false, 1, 2).ToString();
+		RoundText->SetText(FText::FromString(RoundTextString));
+	}
 }

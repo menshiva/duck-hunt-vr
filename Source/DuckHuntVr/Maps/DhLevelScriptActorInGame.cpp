@@ -32,12 +32,6 @@ void ADhLevelScriptActorInGame::Tick(const float DeltaSeconds) {
 	}
 }
 
-void ADhLevelScriptActorInGame::PlayStartGameSequence(const FOnMovieSceneSequencePlayerEvent& OnFinishedEvent) const {
-	const auto Player = StartGameSequence->GetSequencePlayer();
-	Player->OnFinished = OnFinishedEvent;
-	Player->Play();
-}
-
 void ADhLevelScriptActorInGame::PlayPauseSound() const {
 	UGameplayStatics::PlaySound2D(this, PauseSound);
 }
@@ -50,4 +44,16 @@ void ADhLevelScriptActorInGame::OpenMainMenuLevel() {
 		GameMode->ClearPause();
 	}
 	OpenLevel(MainMenuLevel);
+}
+
+void ADhLevelScriptActorInGame::PlayLevelSequence(
+	ULevelSequence* Sequence,
+	const FOnMovieSceneSequencePlayerEvent& OnFinishedEvent
+) const {
+	if (const auto Player = IntroSequence->GetSequencePlayer())
+		Player->Stop();
+	IntroSequence->SetSequence(Sequence);
+	const auto Player = IntroSequence->GetSequencePlayer();
+	Player->OnFinished = OnFinishedEvent;
+	Player->Play();
 }

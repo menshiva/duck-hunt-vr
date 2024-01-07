@@ -34,7 +34,7 @@ protected:
 private:
 	void SwitchStateInternal(State NewState);
 
-	void OnInit();
+	void OnStartNewGame();
 
 	UFUNCTION()
 	void OnGameStarted();
