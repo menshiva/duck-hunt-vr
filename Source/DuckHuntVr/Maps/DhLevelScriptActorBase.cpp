@@ -14,6 +14,9 @@ void ADhLevelScriptActorBase::BeginPlay() {
 }
 
 void ADhLevelScriptActorBase::OpenLevel(const TSoftObjectPtr<UWorld>& Level) {
+	if (const auto Player = IntroSequence->GetSequencePlayer())
+		Player->Stop();
+
 	LevelNameToOpen = FPackageName::ObjectPathToPackageName(Level.ToString());
 
 	FLoadPackageAsyncDelegate LoadPackageAsyncDelegate;
