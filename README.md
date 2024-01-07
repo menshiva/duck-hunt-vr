@@ -6,11 +6,11 @@
 
 * https://en.wikipedia.org/wiki/Duck_Hunt
 
-#### PDF Manual
+### PDF Manual
 
 * https://archive.org/details/DuckHuntNESHiResScans
 
-#### Gameplay
+### Gameplay
 
 * https://youtu.be/J3sfsP9W048?si=-DZhygU--Yi0hrV1
 * https://www.retrogames.cz/play_1185-NES.php
@@ -28,7 +28,9 @@
 
 ### Fonts
 
-* [All fonts](Content/DuckHuntVr/UI/Fonts) have been generated myself out of sprite sheets using [FontForge](https://fontforge.org/en-US/).
+* One [font](Content/DuckHuntVr/UI/Font) used in the game was generated myself out of sprite sheets using
+[Pixels.svg](https://codepen.io/shshaw/pen/XbxvNj) and [FontForge](https://fontforge.org/en-US/), so be aware that a lot
+of symbols are missing.
 
 ### Hand models and animations (for controllers)
 
