@@ -2,6 +2,7 @@
 
 #include "Blueprint/UserWidget.h"
 #include "Panels/HitPanelWidget.h"
+#include "Panels/MenuPanelWidget.h"
 #include "Panels/RoundPanelWidget.h"
 #include "Panels/ScorePanelWidget.h"
 #include "Panels/ShotPanelWidget.h"
@@ -21,6 +22,9 @@ public:
 	virtual void SynchronizeProperties() override;
 
 	void SetStateInfo(EStateInfo NewStateInfo);
+
+	UPROPERTY(meta=(BindWidget))
+	TObjectPtr<UMenuPanelWidget> MenuPanel;
 
 	UPROPERTY(meta=(BindWidget))
 	TObjectPtr<URoundPanelWidget> RoundPanel;

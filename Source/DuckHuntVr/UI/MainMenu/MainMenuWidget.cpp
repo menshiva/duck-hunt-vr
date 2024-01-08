@@ -4,32 +4,17 @@
 
 void UMainMenuWidget::NativeConstruct() {
 	Super::NativeConstruct();
-	MenuLevelScript = Cast<ADhLevelScriptActorMenu>(GetWorld()->GetLevelScriptActor());
+	const auto MenuLevelScript = Cast<ADhLevelScriptActorMenu>(GetWorld()->GetLevelScriptActor());
 
-	FOnButtonClickedEvent OnGameAButtonClicked;
-	OnGameAButtonClicked.AddDynamic(this, &UMainMenuWidget::OnGameAButtonClicked);
-	GameAButton->SetOnClickEvent(OnGameAButtonClicked);
+	GameAButton->SetOnClickEvent([MenuLevelScript] {
+		MenuLevelScript->OpenDuckLevel(1);
+	});
 
-	FOnButtonClickedEvent OnGameBButtonClicked;
-	OnGameBButtonClicked.AddDynamic(this, &UMainMenuWidget::OnGameBButtonClicked);
-	GameBButton->SetOnClickEvent(OnGameBButtonClicked);
+	GameBButton->SetOnClickEvent([MenuLevelScript] {
+		MenuLevelScript->OpenDuckLevel(2);
+	});
 
-	FOnButtonClickedEvent OnGameCButtonClicked;
-	OnGameCButtonClicked.AddDynamic(this, &UMainMenuWidget::OnGameCButtonClicked);
-	GameCButton->SetOnClickEvent(OnGameCButtonClicked);
-}
-
-// ReSharper disable once CppMemberFunctionMayBeConst
-void UMainMenuWidget::OnGameAButtonClicked() {
-	MenuLevelScript->OpenDuckLevel(1);
-}
-
-// ReSharper disable once CppMemberFunctionMayBeConst
-void UMainMenuWidget::OnGameBButtonClicked() {
-	MenuLevelScript->OpenDuckLevel(2);
-}
-
-// ReSharper disable once CppMemberFunctionMayBeConst
-void UMainMenuWidget::OnGameCButtonClicked() {
-	MenuLevelScript->OpenClayLevel();
+	GameCButton->SetOnClickEvent([MenuLevelScript] {
+		MenuLevelScript->OpenClayLevel();
+	});
 }

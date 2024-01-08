@@ -34,16 +34,20 @@ void AInGameUI::BeginPlay() {
 	SetSkyColor(SkyColor);
 }
 
+void AInGameUI::SetStateInfoPause() const {
+	InGameWidgetRef->SetStateInfo(EStateInfo::Pause);
+	if (!InGameWidgetRef->MenuPanel->IsVisible())
+		InGameWidgetRef->MenuPanel->SetVisibility(ESlateVisibility::SelfHitTestInvisible);
+}
+
 void AInGameUI::SetStateInfoFlyAway() const {
 	InGameWidgetRef->SetStateInfo(EStateInfo::FlyAway);
 }
 
-void AInGameUI::SetStateInfoPause() const {
-	InGameWidgetRef->SetStateInfo(EStateInfo::Pause);
-}
-
 void AInGameUI::ClearStateInfo() const {
 	InGameWidgetRef->SetStateInfo(EStateInfo::None);
+	if (InGameWidgetRef->MenuPanel->IsVisible())
+		InGameWidgetRef->MenuPanel->SetVisibility(ESlateVisibility::Hidden);
 }
 
 void AInGameUI::SetSkyColor(const FLinearColor& NewColor) {

@@ -1,23 +1,22 @@
 ﻿#pragma once
 
 #include "Blueprint/UserWidget.h"
-#include "MainMenuWidget.generated.h"
+#include "MenuPanelWidget.generated.h"
 
 class UButtonWidget;
-class ADhLevelScriptActorMenu;
 
 UCLASS(Abstract, Blueprintable, NotBlueprintType, meta=(DisableNativeTick))
-class DUCKHUNTVR_API UMainMenuWidget : public UUserWidget {
+class DUCKHUNTVR_API UMenuPanelWidget : public UUserWidget {
 	GENERATED_BODY()
 public:
 	virtual void NativeConstruct() override;
 protected:
 	UPROPERTY(meta=(BindWidget))
-	TObjectPtr<UButtonWidget> GameAButton;
+	TObjectPtr<UButtonWidget> RestartButton;
 
 	UPROPERTY(meta=(BindWidget))
-	TObjectPtr<UButtonWidget> GameBButton;
+	TObjectPtr<UButtonWidget> OrientationButton;
 
 	UPROPERTY(meta=(BindWidget))
-	TObjectPtr<UButtonWidget> GameCButton;
+	TObjectPtr<UButtonWidget> MainMenuButton;
 };

@@ -15,7 +15,7 @@ public:
 
 	virtual void SynchronizeProperties() override;
 
-	void SetOnClickEvent(const FOnButtonClickedEvent& OnClickEvent) const;
+	void SetOnClickEvent(TFunction<void()> Event);
 protected:
 	UPROPERTY(EditAnywhere, Category="Init|Properties", meta=(DesignerRebuild))
 	FText DefaultText;
@@ -37,4 +37,9 @@ private:
 
 	UFUNCTION()
 	void OnInternalButtonUnhovered();
+
+	UFUNCTION()
+	void OnInternalButtonClicked();
+
+	TFunction<void()> OnClick;
 };

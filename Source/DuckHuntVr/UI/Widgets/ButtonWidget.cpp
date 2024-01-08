@@ -18,9 +18,10 @@ void UButtonWidget::SynchronizeProperties() {
 	}
 }
 
-void UButtonWidget::SetOnClickEvent(const FOnButtonClickedEvent& OnClickEvent) const {
+void UButtonWidget::SetOnClickEvent(TFunction<void()> Event) {
+	OnClick = MoveTemp(Event);
 	if (InternalButton)
-		InternalButton->OnClicked = OnClickEvent;
+		InternalButton->OnClicked.AddDynamic(this, &UButtonWidget::OnInternalButtonClicked);
 }
 
 // ReSharper disable once CppMemberFunctionMayBeConst
@@ -33,4 +34,10 @@ void UButtonWidget::OnInternalButtonHovered() {
 void UButtonWidget::OnInternalButtonUnhovered() {
 	if (CursorImage)
 		CursorImage->SetVisibility(ESlateVisibility::Hidden);
+}
+
+// ReSharper disable once CppMemberFunctionMayBeConst
+void UButtonWidget::OnInternalButtonClicked() {
+	if (OnClick)
+		OnClick();
 }

@@ -30,8 +30,6 @@ public:
 	FORCEINLINE void SetDefaultSkyColor() { SetSkyColor(DefaultSkyColor); }
 	FORCEINLINE void SetFlyAwaySkyColor() { SetSkyColor(FlyAwaySkyColor); }
 
-	// TODO: remove UFUNCTION
-	UFUNCTION(BlueprintCallable)
 	void OpenMainMenuLevel();
 
 	FORCEINLINE AVrPawn* GetPawn() const { return Pawn.Get(); }

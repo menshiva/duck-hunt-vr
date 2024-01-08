@@ -32,6 +32,7 @@ public:
 
 	float GetCameraRotationYaw() const;
 	EVisualizationType GetVisualizationType() const;
+	FORCEINLINE ADhGameState* GetGameState() const { return GameState.Get(); }
 	FORCEINLINE APlayerController* GetPlayerController() const { return PlayerController.Get(); }
 protected:
 	UPROPERTY(VisibleAnywhere)
