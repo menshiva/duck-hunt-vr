@@ -53,6 +53,10 @@ void AVrPawn::SetLaserType(const ELaserType NewLaserType) const {
 	HandsController->SetLaserType(NewLaserType);
 }
 
+void AVrPawn::ForceStopFireEffects() const {
+	HandsController->ForceStopFireEffects();
+}
+
 bool AVrPawn::IsHmdWorn() {
 	return UHeadMountedDisplayFunctionLibrary::GetHMDWornState() == EHMDWornState::Worn;
 }

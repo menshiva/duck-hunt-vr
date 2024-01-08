@@ -25,6 +25,8 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void SetLaserType(ELaserType NewLaserType) const;
 
+	void ForceStopFireEffects() const;
+
 	static bool IsHmdWorn();
 	static void ResetOrientationAndPosition();
 

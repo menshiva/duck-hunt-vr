@@ -120,6 +120,11 @@ void UTrackedVisualizationBase::PlayFireEffects() {
 	// TODO
 }
 
+void UTrackedVisualizationBase::ForceStopFireEffects() {
+	IHandVisualizationInterface::ForceStopFireEffects();
+	// TODO
+}
+
 void UTrackedVisualizationBase::UpdateLaserType(const ELaserType NewType) {
 	IHandVisualizationInterface::UpdateLaserType(NewType);
 	LaserComponent->UpdateType(NewType);

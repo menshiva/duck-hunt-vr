@@ -42,3 +42,9 @@ void UGunBase::PlayFireEffects(const EControllerHand HandType) const {
 		FireAudioComponent->Play();
 	}
 }
+
+void UGunBase::ForceStopFireEffects() const {
+	if (const auto PlayerController = GetWorld()->GetFirstPlayerController())
+		PlayerController->SetDisableHaptics(true);
+	FireAudioComponent->Stop();
+}

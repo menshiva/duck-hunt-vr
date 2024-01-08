@@ -30,6 +30,11 @@ void UControllerVisualizationBase::PlayFireEffects() {
 	GunComponent->PlayFireEffects(GetHandType());
 }
 
+void UControllerVisualizationBase::ForceStopFireEffects() {
+	IHandVisualizationInterface::ForceStopFireEffects();
+	GunComponent->ForceStopFireEffects();
+}
+
 void UControllerVisualizationBase::UpdateLaserType(const ELaserType NewType) {
 	IHandVisualizationInterface::UpdateLaserType(NewType);
 	GunComponent->GetLaser()->UpdateType(NewType);

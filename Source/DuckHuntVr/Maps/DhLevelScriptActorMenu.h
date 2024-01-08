@@ -9,12 +9,7 @@ class DUCKHUNTVR_API ADhLevelScriptActorMenu : public ADhLevelScriptActorBase {
 public:
 	virtual void Tick(float DeltaSeconds) override;
 
-	// TODO: remove UFUNCTION
-	UFUNCTION(BlueprintCallable)
-	void OpenDuckLevel();
-
-	// TODO: remove UFUNCTION
-	UFUNCTION(BlueprintCallable)
+	void OpenDuckLevel(int32 NumDucks);
 	void OpenClayLevel();
 protected:
 	UPROPERTY(EditDefaultsOnly, Category=Init)

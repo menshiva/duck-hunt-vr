@@ -26,6 +26,8 @@ public:
 	void SetPrimaryHand(EControllerHand NewPrimaryHand);
 	void SetLaserType(ELaserType NewLaserType);
 
+	void ForceStopFireEffects() const;
+
 	const APlayerController* GetPlayerController() const;
 	FORCEINLINE EVisualizationType GetVisualizationType() const { return CurrentVisualizationType; }
 

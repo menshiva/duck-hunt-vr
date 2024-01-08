@@ -40,6 +40,10 @@ void IHandVisualizationInterface::PlayFireEffects() {
 	check(IsPrimary());
 }
 
+void IHandVisualizationInterface::ForceStopFireEffects() {
+	check(IsPrimary());
+}
+
 void IHandVisualizationInterface::UpdateLaserType(const ELaserType NewType) {
 	check(IsPrimary());
 }

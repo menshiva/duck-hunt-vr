@@ -21,6 +21,8 @@ public:
 	virtual void SwapPrimary(IHandVisualizationInterface* SecondaryHandVisualization) override;
 
 	virtual void PlayFireEffects() override;
+	virtual void ForceStopFireEffects() override;
+
 	virtual void UpdateLaserType(ELaserType NewType) override;
 protected:
 	virtual void InitImpl(USceneComponent* AttachmentParent, bool Primary) override;

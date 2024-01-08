@@ -15,6 +15,7 @@ public:
 	virtual void EndPlay(EEndPlayReason::Type EndPlayReason) override;
 
 	void PlayFireEffects(EControllerHand HandType) const;
+	void ForceStopFireEffects() const;
 
 	FORCEINLINE ULaserBase* GetLaser() const { return LaserComponent; }
 protected:

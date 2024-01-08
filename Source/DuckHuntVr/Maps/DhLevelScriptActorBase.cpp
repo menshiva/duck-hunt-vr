@@ -1,6 +1,7 @@
 ﻿#include "DhLevelScriptActorBase.h"
 #include "LevelSequenceActor.h"
 #include "LevelSequencePlayer.h"
+#include "DuckHuntVr/Characters/Player/VrPawn.h"
 #include "DuckHuntVr/GameInstance/DhGameInstance.h"
 #include "Kismet/GameplayStatics.h"
 
@@ -15,6 +16,8 @@ void ADhLevelScriptActorBase::BeginPlay() {
 
 void ADhLevelScriptActorBase::OpenLevel(const TSoftObjectPtr<UWorld>& Level) {
 	LevelNameToOpen = FPackageName::ObjectPathToPackageName(Level.ToString());
+
+	Pawn->ForceStopFireEffects();
 
 	FLoadPackageAsyncDelegate LoadPackageAsyncDelegate;
 	LoadPackageAsyncDelegate.BindUObject(this, &ADhLevelScriptActorBase::OnAsyncMapLoadCompleted);

@@ -22,6 +22,8 @@ public:
 	virtual void SwapPrimary(IHandVisualizationInterface* SecondaryHandVisualization);
 
 	virtual void PlayFireEffects();
+	virtual void ForceStopFireEffects();
+
 	virtual void UpdateLaserType(ELaserType NewType);
 protected:
 	EControllerHand GetHandType() const;

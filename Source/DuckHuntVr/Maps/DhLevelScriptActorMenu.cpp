@@ -13,7 +13,8 @@ void ADhLevelScriptActorMenu::Tick(const float DeltaSeconds) {
 	IsHmdWorn = NewHmdWorn;
 }
 
-void ADhLevelScriptActorMenu::OpenDuckLevel() {
+void ADhLevelScriptActorMenu::OpenDuckLevel(const int32 NumDucks) {
+	GameInstance->SetDucksNum(NumDucks);
 	GameInstance->SetGameMapOpenedFromMenu(true);
 	GameInstance->SetGameVisualizationType(Pawn->GetVisualizationType());
 	OpenLevel(DuckLevel);
