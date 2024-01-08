@@ -1,5 +1,5 @@
 ﻿#include "ScorePanelWidget.h"
-#include "Components/TextBlock.h"
+#include "DuckHuntVr/UI/Widgets/TextWidget.h"
 #include "Kismet/KismetTextLibrary.h"
 
 void UScorePanelWidget::SynchronizeProperties() {

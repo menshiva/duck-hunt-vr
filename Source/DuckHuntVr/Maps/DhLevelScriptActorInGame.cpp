@@ -42,6 +42,8 @@ void ADhLevelScriptActorInGame::OpenMainMenuLevel() {
 		// we can just directly clear pause here instead of calling UDhGameStateBaseInGame::TogglePause(), since we are
 		// going to open another level anyway
 		GameMode->ClearPause();
+		if (const auto Player = IntroSequence->GetSequencePlayer())
+			Player->Pause();
 	}
 	OpenLevel(MainMenuLevel);
 }

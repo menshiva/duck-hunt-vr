@@ -3,7 +3,7 @@
 #include "Blueprint/UserWidget.h"
 #include "ScorePanelWidget.generated.h"
 
-class UTextBlock;
+class UTextWidget;
 
 UCLASS(Abstract, Blueprintable, NotBlueprintType, meta=(DisableNativeTick))
 class DUCKHUNTVR_API UScorePanelWidget : public UUserWidget {
@@ -17,5 +17,5 @@ protected:
 	int32 Score = 0;
 
 	UPROPERTY(meta=(BindWidget))
-	TObjectPtr<UTextBlock> ScoreText;
+	TObjectPtr<UTextWidget> ScoreText;
 };
