@@ -88,8 +88,7 @@ private:
 	GunPose CurrentPose = GunPose::None;
 	float CurrentFresnel = 0.0f;
 
-	int32 Index1BoneIdx = INDEX_NONE;
-	int32 WristBoneIdx = INDEX_NONE;
+	int32 Index2BoneIdx = INDEX_NONE;
 	FQuat CurrentLaserQuat;
 
 	bool IsSystemMenuShown = false;

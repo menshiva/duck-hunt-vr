@@ -126,8 +126,7 @@ void UTrackedVisualizationBase::InitImpl(USceneComponent* AttachmentParent, cons
 		// FireAudioComponent->RegisterComponent(); // causes auto play
 	}
 
-	Index1BoneIdx = GetBoneIndex(FName(UOculusXRInputFunctionLibrary::GetBoneName(EOculusXRBone::Index_1)));
-	WristBoneIdx = GetBoneIndex(FName(UOculusXRInputFunctionLibrary::GetBoneName(EOculusXRBone::Wrist_Root)));
+	Index2BoneIdx = GetBoneIndex(FName(UOculusXRInputFunctionLibrary::GetBoneName(EOculusXRBone::Index_2)));
 
 	UpdateMaterialPrimaryParameter();
 }
@@ -171,25 +170,20 @@ void UTrackedVisualizationBase::UpdateMaterialFresnelIfNeeded(const GunPose NewP
 
 void UTrackedVisualizationBase::UpdateLaserTransform(const GunPose NewPose, const float Dt) {
 	if (NewPose != GunPose::None) {
-		const auto WristTransform = GetBoneTransform(WristBoneIdx);
-		const auto Index0Transform = GetBoneTransform(Index1BoneIdx);
+		const auto Index2Transform = GetBoneTransform(Index2BoneIdx);
 
-		const auto Index0Pos = Index0Transform.GetLocation();
-		const auto WristQuat = GetBoneRotationMeshTypeBased(WristTransform);
-		const auto Index0Quat = GetBoneRotationMeshTypeBased(Index0Transform);
-
-		const auto WristQuatTowardsIndex = WristQuat * FQuat::FindBetween(WristQuat.GetUpVector(), Index0Quat.GetUpVector());
+		const auto Index2Pos = Index2Transform.GetLocation();
+		const auto Index2Quat = GetBoneRotationMeshTypeBased(Index2Transform);
 
 		if (CurrentPose != GunPose::None) {
 			// laser quat stabilization
-			auto DistQuat = CurrentLaserQuat.AngularDistance(WristQuatTowardsIndex);
-			DistQuat = FMath::Exp(DistQuat * 5.0) / 15.0; // so that it will be smoother on small values and faster on big ones
-			CurrentLaserQuat = FQuat::Slerp(CurrentLaserQuat, WristQuatTowardsIndex, FMath::Clamp(DistQuat * Dt * 7.5, 0.0, 1.0));
+			const auto DistQuat = CurrentLaserQuat.AngularDistance(Index2Quat);
+			CurrentLaserQuat = FQuat::Slerp(CurrentLaserQuat, Index2Quat, FMath::Clamp(DistQuat * Dt * 10, 0.0, 1.0));
 		}
 		else
-			CurrentLaserQuat = WristQuatTowardsIndex;
+			CurrentLaserQuat = Index2Quat;
 
-		LaserComponent->SetWorldLocationAndRotation(Index0Pos, CurrentLaserQuat);
+		LaserComponent->SetWorldLocationAndRotation(Index2Pos, CurrentLaserQuat);
 	}
 }
 
