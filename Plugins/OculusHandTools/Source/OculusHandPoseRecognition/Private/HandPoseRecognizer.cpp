@@ -8,38 +8,15 @@ UHandPoseRecognizer::UHandPoseRecognizer(const FObjectInitializer& ObjectInitial
 	: Super(ObjectInitializer)
 {
 	PrimaryComponentTick.bCanEverTick = true;
+	PrimaryComponentTick.bTickEvenWhenPaused = true;
 
-	// Recognition default parameters
-	Side = EOculusXRHandType::None;
-	RecognitionInterval = 0.0f;
-	DefaultConfidenceFloor = 0.5;
-	DampingFactor = 0.0f;
-
-	// Current hand pose being recognized
-	TimeSinceLastRecognition = 0.0f;
-	CurrentHandPose = -1;
-	CurrentHandPoseDuration = 0.0f;
-	CurrentHandPoseConfidence = 0.0f;
-	CurrentHandPoseError = std::numeric_limits<float>::max();
-
-	// Encoded hand pose logged index
-	LoggedIndex = 0;
+	Reset();
 }
 
 void UHandPoseRecognizer::BeginPlay()
 {
 	Super::BeginPlay();
-
-	// We decode the hand poses
-	for (int PatternIndex = 0; PatternIndex < Poses.Num(); ++PatternIndex)
-	{
-		if (!Poses[PatternIndex].Decode())
-		{
-			UE_LOG(LogHandPoseRecognition, Error, TEXT("UHandPoseRecognizer(%s) encoded pose at index %d is invalid."),
-				*GetName(),
-				PatternIndex);
-		}
-	}
+	Decode();
 }
 
 FRotator UHandPoseRecognizer::GetWristRotator(FQuat ComponentQuat)
@@ -169,4 +146,35 @@ void UHandPoseRecognizer::LogEncodedHandPose()
 {
 	Pose.Encode();
 	UE_LOG(LogHandPoseRecognition, Warning, TEXT("HAND POSE %d: %s"), LoggedIndex++, *Pose.CustomEncodedPose);
+}
+
+void UHandPoseRecognizer::Reset() {
+	// Recognition default parameters
+	Side = EOculusXRHandType::None;
+	RecognitionInterval = 0.0f;
+	DefaultConfidenceFloor = 0.5;
+	DampingFactor = 0.0f;
+
+	// Current hand pose being recognized
+	TimeSinceLastRecognition = 0.0f;
+	CurrentHandPose = -1;
+	CurrentHandPoseDuration = 0.0f;
+	CurrentHandPoseConfidence = 0.0f;
+	CurrentHandPoseError = std::numeric_limits<float>::max();
+
+	// Encoded hand pose logged index
+	LoggedIndex = 0;
+}
+
+void UHandPoseRecognizer::Decode() {
+	// We decode the hand poses
+	for (int PatternIndex = 0; PatternIndex < Poses.Num(); ++PatternIndex)
+	{
+		if (!Poses[PatternIndex].Decode())
+		{
+			UE_LOG(LogHandPoseRecognition, Error, TEXT("UHandPoseRecognizer(%s) encoded pose at index %d is invalid."),
+				*GetName(),
+				PatternIndex);
+		}
+	}
 }

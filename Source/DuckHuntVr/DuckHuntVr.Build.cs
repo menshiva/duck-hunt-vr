@@ -12,7 +12,7 @@ public class DuckHuntVr : ModuleRules
 
 		PrivateDependencyModuleNames.AddRange(new string[] {
 			"HeadMountedDisplay", "OculusXRHMD", "OculusXRInput", "UMG", "Niagara",
-			"Paper2D", "XRBase", "LevelSequence", "MovieScene"
+			"Paper2D", "XRBase", "LevelSequence", "MovieScene", "OculusHandPoseRecognition"
 		});
 
 		// Uncomment if you are using Slate UI

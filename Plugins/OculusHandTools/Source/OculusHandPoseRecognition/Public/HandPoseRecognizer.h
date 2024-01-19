@@ -70,6 +70,10 @@ public:
 		return Pose;
 	}
 
+	FORCEINLINE int32 GetCurrentHandPoseIndex() const { return CurrentHandPose; }
+	FORCEINLINE float GetCurrentHandPoseConfidence() const { return CurrentHandPoseConfidence; }
+	FORCEINLINE float GetCurrentHandPoseError() const { return CurrentHandPoseError; }
+
 	/**
 	 * Call to log the current hand pose.
 	 * This is used to create reference poses that can then be tweaked.
@@ -77,6 +81,8 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void LogEncodedHandPose();
 
+	void Reset();
+	void Decode();
 protected:
 	/** Structure storing the current bone rotators. */
 	FHandPose Pose;

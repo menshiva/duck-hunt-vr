@@ -1,13 +1,15 @@
 ﻿#pragma once
 
+#include "HandPose.h"
 #include "OculusXRHandComponent.h"
 #include "DuckHuntVr/Characters/Player/HandsController/Hand/HandVisualizationInterface.h"
 #include "TrackedVisualizationBase.generated.h"
 
+class ULaserBase;
 class UInputMappingContext;
 class UInputAction;
-class ULaserBase;
 struct FInputActionValue;
+class UHandPoseRecognizer;
 
 UCLASS(Abstract, Blueprintable, NotBlueprintType)
 class DUCKHUNTVR_API UTrackedVisualizationBase : public UOculusXRHandComponent, public IHandVisualizationInterface {
@@ -18,7 +20,7 @@ public:
 	virtual void EndPlay(EEndPlayReason::Type EndPlayReason) override;
 	virtual void TickComponent(float Dt, ELevelTick Tt, FActorComponentTickFunction* Tf) override;
 
-	virtual bool IsPrimary() const override { return static_cast<bool>(LaserComponent); }
+	virtual bool IsPrimary() const override { return GunPoseRecognizer && LaserComponent && FireAudioComponent; }
 	virtual void SwapPrimary(IHandVisualizationInterface* SecondaryHandVisualization) override;
 
 	virtual void PlayFireEffects() override;
@@ -41,23 +43,54 @@ protected:
 	TObjectPtr<UInputAction> IndexPinchAction;
 
 	UPROPERTY(EditDefaultsOnly, Category=Init)
+	TArray<FHandPose> GunPoses;
+
+	UPROPERTY(EditDefaultsOnly, Category=Init)
 	TObjectPtr<USoundBase> FireSound;
 
 	UPROPERTY(EditDefaultsOnly, Category=Subcomponents)
 	TSubclassOf<ULaserBase> LaserClass;
 private:
+	enum class GunPose : int32 {
+		None = INDEX_NONE,
+		Gun = 0,
+		GunShot = 1
+	};
+
+	FQuat GetBoneRotationMeshTypeBased(const FTransform& BoneTransform) const;
+
+	void UpdateMaterialFresnelIfNeeded(GunPose NewPose, float Dt);
+	void UpdateLaserTransform(GunPose NewPose, float Dt);
+	void ProcessGunPoseChangesIfNeeded(GunPose NewPose);
+
 	void OnMenuVisibilityChanged(const FInputActionValue& Value);
 	void OnIndexPinched();
 
-	FORCEINLINE void UpdateHandMaterialColor() const {
+	FORCEINLINE void UpdateMaterialPrimaryParameter() const {
 		DynamicHandMaterial->SetScalarParameterValue(TEXT("Primary"), IsPrimary());
+	}
+	FORCEINLINE void UpdateMaterialFresnelParameter() const {
+		DynamicHandMaterial->SetScalarParameterValue(TEXT("FresnelIn"), CurrentFresnel);
 	}
 
 	UPROPERTY()
 	TObjectPtr<UMaterialInstanceDynamic> DynamicHandMaterial;
 
 	UPROPERTY()
+	TObjectPtr<UHandPoseRecognizer> GunPoseRecognizer;
+
+	UPROPERTY()
 	TObjectPtr<ULaserBase> LaserComponent;
+
+	UPROPERTY()
+	TObjectPtr<UAudioComponent> FireAudioComponent;
+
+	GunPose CurrentPose = GunPose::None;
+	float CurrentFresnel = 0.0f;
+
+	int32 Index1BoneIdx = INDEX_NONE;
+	int32 WristBoneIdx = INDEX_NONE;
+	FQuat CurrentLaserQuat;
 
 	bool IsSystemMenuShown = false;
 };

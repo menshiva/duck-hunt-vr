@@ -19,10 +19,11 @@ void UControllerVisualizationBase::EndPlay(const EEndPlayReason::Type EndPlayRea
 
 void UControllerVisualizationBase::SwapPrimary(IHandVisualizationInterface* SecondaryHandVisualization) {
 	IHandVisualizationInterface::SwapPrimary(SecondaryHandVisualization);
-	const auto Secondary = CastChecked<UControllerVisualizationBase>(SecondaryHandVisualization);
+	const auto NewPrimary = CastChecked<UControllerVisualizationBase>(SecondaryHandVisualization);
+
 	GunComponent->DetachFromComponent(FDetachmentTransformRules::KeepRelativeTransform);
-	Swap(GunComponent, Secondary->GunComponent);
-	Secondary->GunComponent->AttachToComponent(Secondary, FAttachmentTransformRules::KeepRelativeTransform, TEXT("GunSocket"));
+	Swap(GunComponent, NewPrimary->GunComponent);
+	NewPrimary->GunComponent->AttachToComponent(NewPrimary, FAttachmentTransformRules::KeepRelativeTransform, TEXT("GunSocket"));
 }
 
 void UControllerVisualizationBase::PlayFireEffects() {

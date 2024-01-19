@@ -1,5 +1,15 @@
 ﻿# Duck Hunt VR
 
+## Dependencies
+
+### MetaXR plugin (60.0)
+
+* https://developer.oculus.com/downloads/package/unreal-engine-5-integration/60.0
+
+### OculusHandTools plugin (hand tracking pose recognition)
+
+* https://github.com/oculus-samples/Unreal-HandPoseShowcase/tree/main/Plugins/OculusHandTools
+
 ## Resources
 
 ### Original game

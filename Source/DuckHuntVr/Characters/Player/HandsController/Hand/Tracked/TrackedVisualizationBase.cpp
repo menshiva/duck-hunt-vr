@@ -1,6 +1,8 @@
 ﻿#include "TrackedVisualizationBase.h"
+#include "AudioComponent.h"
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
+#include "HandPoseRecognizer.h"
 #include "DuckHuntVr/Characters/Player/Laser/LaserBase.h"
 
 UTrackedVisualizationBase::UTrackedVisualizationBase() {
@@ -9,120 +11,79 @@ UTrackedVisualizationBase::UTrackedVisualizationBase() {
 }
 
 void UTrackedVisualizationBase::EndPlay(const EEndPlayReason::Type EndPlayReason) {
+	if (GunPoseRecognizer) {
+		GunPoseRecognizer->DestroyComponent();
+		GunPoseRecognizer = nullptr;
+	}
 	if (LaserComponent) {
 		LaserComponent->DestroyComponent();
 		LaserComponent = nullptr;
 	}
+	if (FireAudioComponent) {
+		FireAudioComponent->DestroyComponent();
+		FireAudioComponent = nullptr;
+	}
 	Super::EndPlay(EndPlayReason);
 }
 
-// TODO
 void UTrackedVisualizationBase::TickComponent(const float Dt, const ELevelTick Tt, FActorComponentTickFunction* Tf) {
 	Super::TickComponent(Dt, Tt, Tf);
 
-	// const auto T = UOculusXRInputFunctionLibrary::GetTrackingConfidence(MeshType);
-	// UKismetSystemLibrary::PrintString(
-	// 	this, UEnum::GetValueAsString(MeshType) + FString::Printf(TEXT(" Tracking confidence: %d"), T),
-	// 	true, false, FLinearColor::Red, 0.0f
-	// );
-
-	/*const auto K = UOculusXRInputFunctionLibrary::IsHandPositionValid(MeshType);
-	UKismetSystemLibrary::PrintString(
-		this, UEnum::GetValueAsString(MeshType) + FString::Printf(TEXT(" Hand position valid: %d"), K),
-		true, false, FLinearColor::Black, 0.0f
-	);
-
-	const auto L = UOculusXRInputFunctionLibrary::IsPointerPoseValid(MeshType);
-	UKismetSystemLibrary::PrintString(
-		this, UEnum::GetValueAsString(MeshType) + FString::Printf(TEXT(" Pointer pose valid: %d"), L),
-		true, false, FLinearColor::Black, 0.0f
-	);*/
-
-	/*if (T == EOculusXRTrackingConfidence::High) {
-		// const auto PointerTransform = UOculusXRInputFunctionLibrary::GetPointerPose(MeshType);
-
-		// const auto CompLoc = GetRelativeLocation();
-		// const auto TransformedLoc = PointerTransform.TransformPositionNoScale(CompLoc);
-
-		// auto Loc = PointerTransform.GetLocation();
-		// Loc.Z = GetComponentLocation().Z;
-
-		// const auto Fwd = PointerTransform.GetRotation().GetForwardVector();
-		// UKismetSystemLibrary::DrawDebugArrow(
-		// 	this, Loc, Loc + Fwd * 100.0f,
-		// 	10.0f, FLinearColor::Green
-		// );
-
-		// UKismetSystemLibrary::DrawDebugArrow(
-		// 	this, TransformedLoc, TransformedLoc + Fwd * 100.0f,
-		// 	10.0f, FLinearColor::Black
-		// );
-
-		const FName BoneName1(UOculusXRInputFunctionLibrary::GetBoneName(EOculusXRBone::Index_1));
-		const FName BoneName2(UOculusXRInputFunctionLibrary::GetBoneName(EOculusXRBone::Index_1));
-		const FName BoneName3(UOculusXRInputFunctionLibrary::GetBoneName(EOculusXRBone::Index_1));
-		const FName BoneName4(UOculusXRInputFunctionLibrary::GetBoneName(EOculusXRBone::Index_1));
-
-		const auto Loc1 = GetBoneLocation(BoneName1, EBoneSpaces::WorldSpace);
-		const auto Loc2 = GetBoneLocation(BoneName2, EBoneSpaces::WorldSpace);
-		const auto Loc3 = GetBoneLocation(BoneName3, EBoneSpaces::WorldSpace);
-		const auto Loc4 = GetBoneLocation(BoneName4, EBoneSpaces::WorldSpace);
-
-		const auto Rot1 = UOculusXRInputFunctionLibrary::GetBoneRotation(MeshType, EOculusXRBone::Index_1).GetForwardVector();
-		const auto Rot2 = UOculusXRInputFunctionLibrary::GetBoneRotation(MeshType, EOculusXRBone::Index_2).GetForwardVector();
-		const auto Rot3 = UOculusXRInputFunctionLibrary::GetBoneRotation(MeshType, EOculusXRBone::Index_3).GetForwardVector();
-		const auto Rot4 = UOculusXRInputFunctionLibrary::GetBoneRotation(MeshType, EOculusXRBone::Index_Tip).GetForwardVector();
-
-		UKismetSystemLibrary::DrawDebugArrow(
-			this, Loc1, Loc1 + Rot1 * 50.0f,
-			10.0f, FLinearColor::Red
-		);
-
-		UKismetSystemLibrary::DrawDebugArrow(
-			this, Loc2, Loc2 + Rot2 * 50.0f,
-			10.0f, FLinearColor::Green
-		);
-
-		UKismetSystemLibrary::DrawDebugArrow(
-			this, Loc3, Loc3 + Rot3 * 50.0f,
-			10.0f, FLinearColor::Blue
-		);
-
-		UKismetSystemLibrary::DrawDebugArrow(
-			this, Loc4, Loc4 + Rot4 * 50.0f,
-			10.0f, FLinearColor::Yellow
-		);
+	if (!IsPrimary()) {
+		CurrentPose = GunPose::None;
+		CurrentFresnel = 0.0f;
+		return;
 	}
 
-	const auto CompLoc = GetComponentLocation();
-	auto CompRot = GetComponentQuat();
+	if (UOculusXRInputFunctionLibrary::GetTrackingConfidence(MeshType) != EOculusXRTrackingConfidence::High) {
+		if (LaserComponent->IsActive())
+			LaserComponent->Deactivate();
+		CurrentPose = GunPose::None;
+		CurrentFresnel = 0.0f;
+		return;
+	}
 
-	UKismetSystemLibrary::DrawDebugArrow(
-		this, CompLoc, CompLoc + CompRot.GetRightVector() * 50.0f,
-		10.0f, FLinearColor::Black
-	);*/
+	const auto NewHandPose = static_cast<GunPose>(GunPoseRecognizer->GetCurrentHandPoseIndex());
+
+	UpdateMaterialFresnelIfNeeded(NewHandPose, Dt);
+	UpdateLaserTransform(NewHandPose, Dt);
+	ProcessGunPoseChangesIfNeeded(NewHandPose);
+
+	CurrentPose = NewHandPose;
 }
 
 void UTrackedVisualizationBase::SwapPrimary(IHandVisualizationInterface* SecondaryHandVisualization) {
 	IHandVisualizationInterface::SwapPrimary(SecondaryHandVisualization);
-	const auto Secondary = CastChecked<UTrackedVisualizationBase>(SecondaryHandVisualization);
+	const auto NewPrimary = CastChecked<UTrackedVisualizationBase>(SecondaryHandVisualization);
+
+	GunPoseRecognizer->DetachFromComponent(FDetachmentTransformRules::KeepRelativeTransform);
+	Swap(GunPoseRecognizer, NewPrimary->GunPoseRecognizer);
+	NewPrimary->GunPoseRecognizer->Reset();
+	NewPrimary->GunPoseRecognizer->Side = NewPrimary->MeshType;
+	NewPrimary->GunPoseRecognizer->Poses = NewPrimary->GunPoses;
+	NewPrimary->GunPoseRecognizer->AttachToComponent(NewPrimary, FAttachmentTransformRules::KeepRelativeTransform);
+	NewPrimary->GunPoseRecognizer->Decode();
 
 	LaserComponent->DetachFromComponent(FDetachmentTransformRules::KeepRelativeTransform);
-	Swap(LaserComponent, Secondary->LaserComponent);
-	Secondary->LaserComponent->AttachToComponent(Secondary, FAttachmentTransformRules::KeepRelativeTransform);
+	Swap(LaserComponent, NewPrimary->LaserComponent);
+	NewPrimary->LaserComponent->AttachToComponent(NewPrimary, FAttachmentTransformRules::KeepRelativeTransform);
 
-	UpdateHandMaterialColor();
-	Secondary->UpdateHandMaterialColor();
+	FireAudioComponent->DetachFromComponent(FDetachmentTransformRules::KeepRelativeTransform);
+	Swap(FireAudioComponent, NewPrimary->FireAudioComponent);
+	NewPrimary->FireAudioComponent->AttachToComponent(NewPrimary, FAttachmentTransformRules::KeepRelativeTransform);
+
+	UpdateMaterialPrimaryParameter();
+	NewPrimary->UpdateMaterialPrimaryParameter();
 }
 
 void UTrackedVisualizationBase::PlayFireEffects() {
 	IHandVisualizationInterface::PlayFireEffects();
-	// TODO
+	FireAudioComponent->Play();
 }
 
 void UTrackedVisualizationBase::ForceStopFireEffects() {
 	IHandVisualizationInterface::ForceStopFireEffects();
-	// TODO
+	FireAudioComponent->Stop();
 }
 
 void UTrackedVisualizationBase::UpdateLaserType(const ELaserType NewType) {
@@ -147,13 +108,28 @@ void UTrackedVisualizationBase::InitImpl(USceneComponent* AttachmentParent, cons
 	RegisterComponent();
 
 	if (Primary) {
+		GunPoseRecognizer = NewObject<UHandPoseRecognizer>(this);
+		GunPoseRecognizer->Side = MeshType;
+		GunPoseRecognizer->Poses = GunPoses;
+		GunPoseRecognizer->SetupAttachment(this);
+		GunPoseRecognizer->RegisterComponent();
+
 		LaserComponent = NewObject<ULaserBase>(this, LaserClass);
 		LaserComponent->SetupAttachment(this);
 		LaserComponent->RegisterComponent();
-		LaserComponent->Deactivate(); // TODO
+		LaserComponent->Deactivate();
+
+		FireAudioComponent = NewObject<UAudioComponent>(this);
+		FireAudioComponent->SetUISound(true); // allows to play sound even when game is paused
+		FireAudioComponent->SetSound(FireSound);
+		FireAudioComponent->AttachToComponent(this, FAttachmentTransformRules::KeepRelativeTransform); // fixes audio spatialization
+		// FireAudioComponent->RegisterComponent(); // causes auto play
 	}
 
-	UpdateHandMaterialColor();
+	Index1BoneIdx = GetBoneIndex(FName(UOculusXRInputFunctionLibrary::GetBoneName(EOculusXRBone::Index_1)));
+	WristBoneIdx = GetBoneIndex(FName(UOculusXRInputFunctionLibrary::GetBoneName(EOculusXRBone::Wrist_Root)));
+
+	UpdateMaterialPrimaryParameter();
 }
 
 void UTrackedVisualizationBase::AddMappingContexts(UEnhancedInputLocalPlayerSubsystem* Subsystem, UEnhancedInputComponent* Component) {
@@ -172,6 +148,65 @@ void UTrackedVisualizationBase::AddMappingContexts(UEnhancedInputLocalPlayerSubs
 void UTrackedVisualizationBase::ClearMappingContexts(UEnhancedInputLocalPlayerSubsystem* Subsystem) const {
 	if (ActionMappingContext)
 		Subsystem->RemoveMappingContext(ActionMappingContext);
+}
+
+FQuat UTrackedVisualizationBase::GetBoneRotationMeshTypeBased(const FTransform& BoneTransform) const {
+	// fixes Oculus hand mesh weird rotation
+	if (MeshType == EOculusXRHandType::HandRight)
+		return BoneTransform.GetRotation() * FQuat(FVector::UpVector, PI);
+	return BoneTransform.GetRotation() * FQuat(FVector::ForwardVector, PI);
+}
+
+void UTrackedVisualizationBase::UpdateMaterialFresnelIfNeeded(const GunPose NewPose, const float Dt) {
+	float FresnelDelta = Dt * 2;
+	if (NewPose == GunPose::None)
+		FresnelDelta = -FresnelDelta;
+
+	const float PrevValue = CurrentFresnel;
+    CurrentFresnel = FMath::Clamp(CurrentFresnel + FresnelDelta, 0.0f, 1.0f);
+
+    if (!FMath::IsNearlyEqual(PrevValue, CurrentFresnel))
+    	UpdateMaterialFresnelParameter();
+}
+
+void UTrackedVisualizationBase::UpdateLaserTransform(const GunPose NewPose, const float Dt) {
+	if (NewPose != GunPose::None) {
+		const auto WristTransform = GetBoneTransform(WristBoneIdx);
+		const auto Index0Transform = GetBoneTransform(Index1BoneIdx);
+
+		const auto Index0Pos = Index0Transform.GetLocation();
+		const auto WristQuat = GetBoneRotationMeshTypeBased(WristTransform);
+		const auto Index0Quat = GetBoneRotationMeshTypeBased(Index0Transform);
+
+		const auto WristQuatTowardsIndex = WristQuat * FQuat::FindBetween(WristQuat.GetUpVector(), Index0Quat.GetUpVector());
+
+		if (CurrentPose != GunPose::None) {
+			// laser quat stabilization
+			auto DistQuat = CurrentLaserQuat.AngularDistance(WristQuatTowardsIndex);
+			DistQuat = FMath::Exp(DistQuat * 5.0) / 15.0; // so that it will be smoother on small values and faster on big ones
+			CurrentLaserQuat = FQuat::Slerp(CurrentLaserQuat, WristQuatTowardsIndex, FMath::Clamp(DistQuat * Dt * 7.5, 0.0, 1.0));
+		}
+		else
+			CurrentLaserQuat = WristQuatTowardsIndex;
+
+		LaserComponent->SetWorldLocationAndRotation(Index0Pos, CurrentLaserQuat);
+	}
+}
+
+void UTrackedVisualizationBase::ProcessGunPoseChangesIfNeeded(const GunPose NewPose) {
+	if (CurrentPose != NewPose) {
+		if (CurrentPose == GunPose::None) {
+			if (!LaserComponent->IsActive())
+				LaserComponent->Activate(false);
+		}
+		else if (NewPose == GunPose::None) {
+			if (LaserComponent->IsActive())
+				LaserComponent->Deactivate();
+		}
+
+		if (CurrentPose == GunPose::Gun && NewPose == GunPose::GunShot)
+			Fire();
+	}
 }
 
 // ReSharper disable once CppMemberFunctionMayBeConst
