@@ -105,7 +105,10 @@ void ADhGameState::OnStartNewGame() {
 		AuthorityGameMode->ClearPause();
 
 	LevelScriptActor->SetDefaultSkyColor();
-	LevelScriptActor->GetInGameUI()->ClearStateInfo();
+
+	const auto InGameUI = LevelScriptActor->GetInGameUI();
+	InGameUI->ResetBullets();
+	InGameUI->ClearStateInfo();
 
 	// TODO: reset ducks (clays)
 
