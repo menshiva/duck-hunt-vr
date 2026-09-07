@@ -1,5 +1,19 @@
 ﻿# Duck Hunt VR
 
+## Showcase
+
+### Sprites
+
+![sprites](docs/showcase_sprites.webp)
+
+### Zapper
+
+![zapper](docs/showcase_zapper.jpg)
+
+### Hand tracking
+
+![hands](docs/showcase_hand_track.webp)
+
 ## Dependencies
 
 ### MetaXR plugin (60.0)
